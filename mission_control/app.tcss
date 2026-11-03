@@ -22,12 +22,12 @@ Header {
 }
 
 #projects {
-    width: 3fr;
+    width: 1fr;
     margin-right: 2;
 }
 
 #side-panels {
-    width: 2fr;
+    width: 1fr;
     min-width: 0;
 }
 

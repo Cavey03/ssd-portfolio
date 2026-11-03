@@ -11,6 +11,7 @@ from textual.app import ComposeResult
 from textual.containers import Vertical
 from textual.widgets import DataTable, Static
 
+from mission_control.containers import ContainerInfo, ContainerResult
 from mission_control.gitinfo import ProjectStatus
 
 # Status colours (kept in line with the accent in app.tcss)
@@ -63,7 +64,7 @@ class _TablePanel(Vertical):
         row_key, _ = table.coordinate_to_cell_key(table.cursor_coordinate)
         return row_key.value
 
-    def set_label(self, text: str) -> None:
+    def set_label(self, text: str | Text) -> None:
         """Set the small line of text above the table."""
         self.query_one(".panel-label", Static).update(text)
 
@@ -138,12 +139,86 @@ def _project_cells(status: ProjectStatus) -> tuple[Text, Text, Text, Text]:
     return name, branch, changes, sync
 
 
-class ContainersPanel(_PlaceholderPanel):
-    """Display a fake development container."""
+class ContainersPanel(_TablePanel):
+    """Distrobox containers with their live host status."""
 
     PANEL_TITLE = "Containers"
-    COLUMNS = ("Name", "Status", "Image")
-    ROWS = (("dev", "Running (demo)", "demo:latest"),)
+    COLUMNS = ("Name", "State", "Image")
+
+    def populate(self) -> None:
+        """Show a loading label until the first background scan finishes."""
+        self.containers: dict[str, ContainerInfo] = {}
+        self.set_label("Loading containers…")
+
+    @property
+    def selected_container(self) -> ContainerInfo | None:
+        """Return the selected container's latest status."""
+        return self.containers.get(self.selected_name or "")
+
+    def show(self, result: ContainerResult, current: str | None) -> None:
+        """Replace the rows, preserving selection and marking this container."""
+        selected = self.selected_name
+        self.table.clear()
+        self.containers = {container.name: container for container in result.containers}
+        for container in result.containers:
+            self.table.add_row(*_container_cells(container, current), key=container.name)
+        names = list(self.containers)
+        if selected in names:
+            self.table.move_cursor(row=names.index(selected))
+        if result.error:
+            self.set_label(Text(f"⚠ {result.error}", style=ALERT))
+        else:
+            count = len(names)
+            self.set_label(
+                f"{count} container{'s' if count != 1 else ''}"
+                if names
+                else "No Distrobox containers found"
+            )
+        self.border_subtitle = f"updated {datetime.now():%H:%M:%S}"
+
+
+_UNIT_SUFFIXES = {
+    "second": "s", "minute": "m", "hour": "h", "day": "d", "week": "w", "month": "mo", "year": "y",
+}
+
+
+def _short_uptime(status_text: str) -> str:
+    """Shorten podman's "Up About an hour" / "Up 5 minutes" to "1h" / "5m".
+
+    Returns "" for anything that isn't an "Up ..." status.
+    """
+    words = status_text.lower().split()
+    if len(words) < 3 or words[0] != "up":
+        return ""
+    amount, unit = words[1], words[2].rstrip("s")
+    if amount in ("about", "less"):
+        # "About an hour", "About a minute", "Less than a second"
+        amount, unit = ("<1", "second") if amount == "less" else ("1", words[-1].rstrip("s"))
+    suffix = _UNIT_SUFFIXES.get(unit)
+    return f"{amount}{suffix}" if suffix and (amount.isdigit() or amount == "<1") else ""
+
+
+def _container_cells(container: ContainerInfo, current: str | None) -> tuple[Text, Text, Text]:
+    """Turn a container summary into three styled table cells.
+
+    The uptime goes into the State cell (e.g. "● running · 1h") so the panel
+    fits in the narrow right-hand column without a horizontal scrollbar.
+    """
+    name = container.name + (" (this)" if container.name == current else "")
+    if container.state == "running":
+        state = Text(f"● {container.state}", style=OK)
+        uptime = _short_uptime(container.status_text)
+        if uptime:
+            state.append(f" · {uptime}", style=MUTED)
+    elif container.state in ("exited", "stopped"):
+        state = Text(f"○ {container.state}", style=MUTED)
+    else:
+        state = Text(f"● {container.state}", style=WARN)
+    image = container.image
+    registry, separator, remainder = image.partition("/")
+    if separator and ("." in registry or ":" in registry or registry == "localhost"):
+        image = remainder
+    return Text(name, style="bold"), state, Text(image)
 
 
 class AgentsPanel(_PlaceholderPanel):

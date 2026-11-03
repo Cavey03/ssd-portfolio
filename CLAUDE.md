@@ -23,7 +23,7 @@ A terminal "mission control" dashboard (TUI) for the dev setup, built with Pytho
 - [x] Project folder, git repo, private GitHub repo
 - [x] Python venv with Textual
 - [x] App skeleton (layout + keybindings)
-- [ ] Containers panel
+- [x] Containers panel (live podman status via host, start/stop with self-protection, tests)
 - [x] Projects panel (live git status, auto-refresh every 10s, unit tests)
 - [ ] Agents panel
 - [ ] Launch actions
