@@ -16,6 +16,7 @@ from mission_control.containers import (
 )
 from mission_control.agents import find_agents
 from mission_control.gitinfo import default_projects_root, scan_projects
+from mission_control.launcher import launch_agent
 from mission_control.panels import AgentsPanel, ContainersPanel, ProjectsPanel, UsagePanel
 from mission_control.usage import read_claude_usage, read_codex_usage
 
@@ -143,12 +144,17 @@ class MissionControlApp(App[None]):
         self.refresh_containers()
 
     def action_launch(self, agent: str) -> None:
-        """Describe launching an agent for the selected project (not implemented yet)."""
+        """Launch an agent for the selected project without blocking the UI."""
         project = self.query_one(ProjectsPanel).selected_name
         if project is None:
-            self.notify("Select a project first.", title="Demo")
+            self.notify("Select a project first.", severity="warning")
             return
-        self.notify(
-            f"Would launch {agent} for '{project}' in a new Konsole tab.",
-            title="Demo",
-        )
+        project_dir = self.projects_root / project
+
+        def launch() -> None:
+            ok, message = launch_agent(agent, project_dir)
+            self.call_from_thread(
+                self.notify, message, severity="information" if ok else "error"
+            )
+
+        self.run_worker(launch, thread=True, group="launch")
