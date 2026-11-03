@@ -43,6 +43,23 @@ cd ~/Projects/mission-control
   stop the container Mission Control is running in, detected from `$CONTAINER_ID` or `/run/.containerenv`.
 - All podman calls have timeouts and never crash the UI. Errors are shown in the panel instead.
 
+## How the Agents and Usage panels work
+- **Agents:** Distrobox shares the host's process list, so the app reads `/proc` to find `claude`, `codex`
+  and `agy` sessions, the folder each works in, and when each started. Two complications:
+  - The kernel hides host processes' working folders from a rootless container. For those, the app asks
+    the host in one `distrobox-host-exec` call.
+  - Codex runs helper processes (a sandbox runner and a background daemon). These are filtered out, so
+    each session appears once.
+- **Usage:** both providers show the **real 5-hour and weekly plan limits**:
+  - **Codex** writes them to its session logs (`~/.codex/sessions`) after every request.
+  - **Claude Code** caches the numbers behind its `/usage` command in `~/.claude.json`. The app only reads
+    it. Run `/usage` in Claude Code for the freshest numbers. This is an internal format, so the parser
+    treats every field as optional.
+
+## Launching agents
+Select a project and press `1` (Claude), `2` (Codex) or `3` (Antigravity). A new Konsole tab opens in that
+project, inside the `dev` container. The tab is started detached, so it stays open when Mission Control closes.
+
 ## Setup
 ```bash
 distrobox enter dev
@@ -61,6 +78,8 @@ pip install -r requirements.txt
 | Projects panel: live git status, background refresh, unit tests | Claude Code |
 | Containers panel: podman via host, start/stop, self-protection, 20 tests | Codex (**GPT-6 Astra**), reviewed by Claude Code |
 | Review fixes: panel fit (uptime merged into State), equal column widths, grammar | Claude Code |
+| Agents panel + Usage panel, 13 tests | Claude Code (in parallel with the launch actions) |
+| Launch actions: Konsole tab via host, safe quoting, 13 tests | Codex (**GPT-6.1 Sol**) in a git worktree, reviewed and merged by Claude Code |
 
 ### Agent review notes
 - **Codex skeleton:** clean, typed, well-structured code that worked on the first run. It ignored one
@@ -74,3 +93,9 @@ pip install -r requirements.txt
   kept the safety check in two places (UI and module). The one flaw was layout: 4 columns overflowed
   the narrow side panel. Unit tests can't catch that, only the screenshot check did. Compared with the
   skeleton task, Astra was slower but noticeably more careful than the default model.
+- **Parallel work (Sol + Claude):** Codex built the launch actions in a separate **git worktree** on its own
+  branch while Claude built two panels on `main`. Codex ran with `-a never -s workspace-write`, so it never
+  stopped to ask permission but could only write inside its worktree. Its code was small, correct and
+  stayed inside its allowed files. Merging gave one expected conflict (both sides edited the imports in
+  `app.py`), resolved by keeping both. Unit tests mock `Popen`, so a final real end-to-end launch with a
+  harmless command (`true`) checked the actual path from container to host to Konsole.

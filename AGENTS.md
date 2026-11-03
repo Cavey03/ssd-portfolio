@@ -27,6 +27,6 @@ A terminal "mission control" dashboard (TUI) for the dev setup, built with Pytho
 - [x] Projects panel (live git status, auto-refresh every 10s, unit tests)
 - [x] Agents panel (host processes, folder per session, helper filtering, tests)
 - [x] Usage panel (real 5h/weekly plan limits: Codex from session logs, Claude from ~/.claude.json cache, tests)
-- [ ] Launch actions
+- [x] Launch actions (1/2/3 open the agent in a new Konsole tab inside dev)
 
 Update this checklist as work is done.
