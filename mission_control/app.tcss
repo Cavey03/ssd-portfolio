@@ -118,3 +118,37 @@ FooterKey > .footer-key--key {
 FooterKey > .footer-key--description {
     color: $text;
 }
+
+/* Confirmation dialog */
+ConfirmScreen {
+    align: center middle;
+    background: $background 60%;
+}
+
+#confirm-box {
+    width: 64;
+    height: auto;
+    padding: 1 2;
+    background: $surface;
+    border: round $accent;
+}
+
+#confirm-question {
+    text-style: bold;
+    color: $text;
+}
+
+#confirm-detail {
+    margin-top: 1;
+    color: $muted;
+}
+
+#confirm-buttons {
+    height: auto;
+    margin-top: 1;
+    align-horizontal: right;
+}
+
+#confirm-buttons Button {
+    margin-left: 2;
+}

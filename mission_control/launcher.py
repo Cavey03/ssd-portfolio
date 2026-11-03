@@ -12,9 +12,13 @@ AGENTS = {"Claude": "claude", "Codex": "codex", "Agy": "agy"}
 
 
 def build_launch_command(agent_cmd: str, project_dir: Path, container: str | None) -> list[str]:
-    """Build a host Konsole command that enters the project in Distrobox."""
+    """Build a host Konsole command that enters the project in Distrobox.
+
+    It opens a new Konsole window. With --new-tab, Konsole adds the tab to the
+    most recently used window, which can be hard to find.
+    """
     command = [
-        "konsole", "--new-tab", "--workdir", str(project_dir), "-e",
+        "konsole", "--workdir", str(project_dir), "-e",
         "distrobox", "enter", container or "dev", "--", "bash", "-lc",
         f"cd {shlex.quote(str(project_dir))} && exec {shlex.quote(agent_cmd)}",
     ]

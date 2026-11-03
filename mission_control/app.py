@@ -14,7 +14,10 @@ from textual.worker import get_current_worker
 from mission_control.containers import (
     current_container_name, list_containers, start_container, stop_container,
 )
-from mission_control.agents import find_agents
+from mission_control.agents import (
+    AgentProcess, describe_folder, find_agents, format_age, stop_agent,
+)
+from mission_control.dialogs import ConfirmScreen
 from mission_control.gitinfo import default_projects_root, scan_projects
 from mission_control.launcher import launch_agent
 from mission_control.panels import AgentsPanel, ContainersPanel, ProjectsPanel, UsagePanel
@@ -36,6 +39,7 @@ class MissionControlApp(App[None]):
         Binding("1", "launch('Claude')", "Claude"),
         Binding("2", "launch('Codex')", "Codex"),
         Binding("3", "launch('Agy')", "Agy"),
+        Binding("k", "stop_agent", "Stop agent"),
         Binding("tab", "focus_next", "Next panel", priority=True),
     ]
 
@@ -142,6 +146,33 @@ class MissionControlApp(App[None]):
         self._container_action_pending = False
         self.notify(message, severity="information" if ok else "error")
         self.refresh_containers()
+
+    def action_stop_agent(self) -> None:
+        """Ask for confirmation, then stop the agent selected in the Agents panel."""
+        agent = self.query_one(AgentsPanel).selected_agent
+        if agent is None:
+            self.notify("Select an agent in the Agents panel first.", severity="warning")
+            return
+        where = describe_folder(agent.cwd, self.projects_root)
+        question = f"Stop {agent.agent} in {where}?"
+        detail = (
+            f"pid {agent.pid}, running for {format_age(agent.started)}.\n"
+            "Unsaved work in that session will be lost. If it's still open in a window, "
+            "quitting it there (/quit or /exit) is the cleaner way."
+        )
+
+        def answered(confirmed: bool | None) -> None:
+            if confirmed:
+                self.stop_agent_worker(agent)
+
+        self.push_screen(ConfirmScreen(question, detail), answered)
+
+    @work(thread=True, group="agent-actions")
+    def stop_agent_worker(self, agent: AgentProcess) -> None:
+        """Stop the agent in the background, then report and refresh."""
+        ok, message = stop_agent(agent)
+        self.call_from_thread(self.notify, message, severity="information" if ok else "error")
+        self.call_from_thread(self.refresh_agents)
 
     def action_launch(self, agent: str) -> None:
         """Launch an agent for the selected project without blocking the UI."""

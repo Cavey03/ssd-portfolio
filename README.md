@@ -57,8 +57,23 @@ cd ~/Projects/mission-control
     treats every field as optional.
 
 ## Launching agents
-Select a project and press `1` (Claude), `2` (Codex) or `3` (Antigravity). A new Konsole tab opens in that
-project, inside the `dev` container. The tab is started detached, so it stays open when Mission Control closes.
+Select a project and press `1` (Claude), `2` (Codex) or `3` (Antigravity). A **new Konsole window** opens in
+that project, inside the `dev` container. It is started detached, so it stays open when Mission Control closes.
+(A new tab isn't used, because Konsole adds tabs to whichever window was used last, which can be hard to find.)
+
+## Stopping agents (and the "orphan" problem)
+Select a session in the Agents panel and press `k`. A confirmation dialog asks first; "No" has focus, so Enter
+never confirms by accident. The agent gets `SIGTERM`, the polite "please exit" signal.
+
+**Why this exists:** if you close a terminal window while an agent runs **inside a container**, the agent does
+**not** quit. Normally closing a terminal sends the program a hang-up signal, but podman's `conmon` process
+keeps the container side of the terminal open. The agent keeps running invisibly ("orphaned") until reboot.
+Mission Control showed three of these, and the fix was to find them and stop them. The habit to learn: quit
+agents with `/quit` (Codex) or `/exit` (Claude) before closing the window.
+
+Safety checks in `stop_agent()`: it re-checks that the process ID still belongs to the same program with the
+same start time (process IDs get reused), never stops Mission Control itself, and falls back to sending the
+signal from the host if the container isn't allowed to.
 
 ## Setup
 ```bash
@@ -80,6 +95,7 @@ pip install -r requirements.txt
 | Review fixes: panel fit (uptime merged into State), equal column widths, grammar | Claude Code |
 | Agents panel + Usage panel, 13 tests | Claude Code (in parallel with the launch actions) |
 | Launch actions: Konsole tab via host, safe quoting, 13 tests | Codex (**GPT-6.1 Sol**) in a git worktree, reviewed and merged by Claude Code |
+| Orphan investigation, stop-agent key + confirm dialog, launches in new window, 7 tests | Claude Code |
 
 ### Agent review notes
 - **Codex skeleton:** clean, typed, well-structured code that worked on the first run. It ignored one

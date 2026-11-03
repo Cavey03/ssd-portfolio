@@ -215,17 +215,24 @@ class AgentsPanel(_TablePanel):
     """Running AI agent sessions and the folder each one works in."""
 
     PANEL_TITLE = "Agents"
-    COLUMNS = ("Agent", "Project", "Running for")
+    COLUMNS = ("Agent", "Project", "Age")
 
     def populate(self) -> None:
         """Show a loading label until the first scan finishes."""
+        self.agents: dict[str, AgentProcess] = {}
         self.set_label("Looking for agents…")
+
+    @property
+    def selected_agent(self) -> AgentProcess | None:
+        """The agent session in the selected row, if any."""
+        return self.agents.get(self.selected_name or "")
 
     def show(self, agents: list[AgentProcess], projects_root: Path) -> None:
         """Replace the rows (one per session, keyed by process id)."""
         table = self.table
         selected = self.selected_name
         table.clear()
+        self.agents = {str(a.pid): a for a in agents}
         for agent in agents:
             colour = AGENT_COLOURS.get(agent.agent, "")
             table.add_row(

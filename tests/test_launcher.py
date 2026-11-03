@@ -22,7 +22,7 @@ class LaunchCommandTests(unittest.TestCase):
         self.assertEqual(
             build_launch_command("codex", Path("/home/Kyle/Projects/mission-control"), "dev"),
             [
-                "distrobox-host-exec", "konsole", "--new-tab", "--workdir",
+                "distrobox-host-exec", "konsole", "--workdir",
                 "/home/Kyle/Projects/mission-control", "-e", "distrobox", "enter", "dev",
                 "--", "bash", "-lc", "cd /home/Kyle/Projects/mission-control && exec codex",
             ],
@@ -32,7 +32,7 @@ class LaunchCommandTests(unittest.TestCase):
         self.assertEqual(
             build_launch_command("claude", Path("/projects/example"), None),
             [
-                "konsole", "--new-tab", "--workdir", "/projects/example", "-e",
+                "konsole", "--workdir", "/projects/example", "-e",
                 "distrobox", "enter", "dev", "--", "bash", "-lc",
                 "cd /projects/example && exec claude",
             ],
@@ -42,7 +42,7 @@ class LaunchCommandTests(unittest.TestCase):
         self.assertEqual(
             build_launch_command("agy", Path("/projects/example"), "work"),
             [
-                "distrobox-host-exec", "konsole", "--new-tab", "--workdir",
+                "distrobox-host-exec", "konsole", "--workdir",
                 "/projects/example", "-e", "distrobox", "enter", "work", "--",
                 "bash", "-lc", "cd /projects/example && exec agy",
             ],
@@ -52,7 +52,7 @@ class LaunchCommandTests(unittest.TestCase):
         project_dir = Path("/projects/Kyle's \"test\" project; $(touch nope)")
         command = build_launch_command("codex", project_dir, "dev")
         self.assertEqual(command, [
-            "distrobox-host-exec", "konsole", "--new-tab", "--workdir", str(project_dir),
+            "distrobox-host-exec", "konsole", "--workdir", str(project_dir),
             "-e", "distrobox", "enter", "dev", "--", "bash", "-lc",
             "cd '/projects/Kyle'\"'\"'s \"test\" project; $(touch nope)' && exec codex",
         ])

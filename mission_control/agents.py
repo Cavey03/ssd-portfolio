@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import os
 import shutil
+import signal
 import subprocess
 import time
 from dataclasses import dataclass
@@ -195,3 +196,58 @@ def format_age(started: float | None, now: float | None = None) -> str:
     if seconds < 86400:
         return f"{seconds // 3600}h"
     return f"{seconds // 86400}d"
+
+
+def _same_process(agent: AgentProcess, proc: Path) -> bool:
+    """Check that agent.pid still belongs to the same agent session.
+
+    Process ids get reused, so a pid alone isn't enough: the program and its
+    start time must match what the panel showed.
+    """
+    entry = proc / str(agent.pid)
+    try:
+        argv = (entry / "cmdline").read_bytes().split(b"\0")
+        comm = (entry / "comm").read_text().strip()
+        stat_text = (entry / "stat").read_text()
+    except OSError:
+        return False
+    argv0 = argv[0].decode(errors="replace") if argv and argv[0] else ""
+    if identify_agent(argv0, comm) != agent.agent:
+        return False
+    if agent.started is None:
+        return True
+    started = _start_time(stat_text, _boot_time(proc))
+    return started is not None and abs(started - agent.started) < 1.0
+
+
+def stop_agent(agent: AgentProcess, proc: Path = PROC) -> tuple[bool, str]:
+    """Ask an agent session to quit (SIGTERM). Never raises.
+
+    Agents get SIGTERM, the polite "please exit" signal, so they can clean up.
+    If the container isn't allowed to signal the host process, the same
+    signal is sent from the host via distrobox-host-exec.
+    """
+    label = f"{agent.agent} (pid {agent.pid})"
+    if agent.pid == os.getpid():
+        return False, "Refusing to stop Mission Control itself."
+    if not _same_process(agent, proc):
+        return False, f"{label} has already exited."
+    try:
+        os.kill(agent.pid, signal.SIGTERM)
+        return True, f"Stopped {label}."
+    except ProcessLookupError:
+        return False, f"{label} has already exited."
+    except PermissionError:
+        pass
+    if not shutil.which("distrobox-host-exec"):
+        return False, f"Not allowed to stop {label}."
+    try:
+        result = subprocess.run(
+            ["distrobox-host-exec", "kill", "-TERM", str(agent.pid)],
+            capture_output=True, text=True, timeout=5, check=False,
+        )
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        return False, f"Could not stop {label}: {exc}"
+    if result.returncode != 0:
+        return False, f"Could not stop {label}: {result.stderr.strip() or 'kill failed'}"
+    return True, f"Stopped {label}."
