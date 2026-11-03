@@ -26,7 +26,7 @@ A terminal "mission control" dashboard (TUI) for the dev setup, built with Pytho
 - [x] Containers panel (live podman status via host, start/stop with self-protection, tests)
 - [x] Projects panel (live git status, auto-refresh every 10s, unit tests)
 - [x] Agents panel (host processes, folder per session, helper filtering, tests)
-- [x] Usage panel (Codex plan limits from logs, Claude token activity, tests)
+- [x] Usage panel (real 5h/weekly plan limits: Codex from session logs, Claude from ~/.claude.json cache, tests)
 - [ ] Launch actions
 
 Update this checklist as work is done.

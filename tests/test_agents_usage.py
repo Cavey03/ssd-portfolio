@@ -11,7 +11,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from mission_control.agents import describe_folder, find_agents, format_age, identify_agent
-from mission_control.usage import parse_codex_rate_limits, read_claude_usage, read_codex_usage
+from mission_control.usage import (
+    parse_claude_config,
+    parse_codex_rate_limits,
+    read_claude_usage,
+    read_codex_usage,
+)
 
 
 class IdentifyAgentTests(unittest.TestCase):
@@ -153,34 +158,55 @@ class CodexUsageTests(unittest.TestCase):
 
 
 class ClaudeUsageTests(unittest.TestCase):
-    def test_counts_unique_messages_per_window(self) -> None:
-        now = time.time()
+    NOW = datetime(2026, 11, 3, 21, 0, tzinfo=timezone.utc).timestamp()
 
-        def entry(msg_id: str, hours_ago: float, out: int) -> str:
-            ts = datetime.fromtimestamp(now - hours_ago * 3600, timezone.utc).isoformat().replace("+00:00", "Z")
-            return json.dumps({
-                "type": "assistant",
-                "timestamp": ts,
-                "message": {"id": msg_id, "usage": {"output_tokens": out}},
-            })
+    def config(self, five_hour_reset: str = "2026-11-03T22:40:00.1+00:00") -> str:
+        """A trimmed-down ~/.claude.json with the usage cache."""
+        return json.dumps({
+            "numStartups": 5,
+            "cachedUsageUtilization": {
+                "fetchedAtMs": 1793730755733,
+                "utilization": {
+                    "five_hour": {"utilization": 4, "resets_at": five_hour_reset},
+                    "seven_day": {"utilization": 29, "resets_at": "2026-11-07T13:00:00.1+00:00"},
+                    "seven_day_opus": None,
+                },
+            },
+        })
 
-        lines = [
-            entry("a", 1, 100),
-            entry("a", 1, 100),   # same message logged twice -> counted once
-            entry("b", 4, 50),
-            entry("c", 30, 1000),  # older than 5h, inside 7d
-            entry("d", 200, 9999),  # older than 7d
-            '{"type": "user", "message": {"content": "hi"}}',
-            "garbage",
-        ]
+    def test_parses_cached_limits(self) -> None:
+        usage = parse_claude_config(self.config(), self.NOW)
+        assert usage is not None
+        self.assertEqual(usage.five_hour.used_percent, 4)
+        self.assertEqual(usage.five_hour.window_minutes, 300)
+        self.assertEqual(usage.weekly.used_percent, 29)
+        self.assertAlmostEqual(usage.observed_at, 1793730755.733)
+
+    def test_window_that_already_reset_counts_as_zero(self) -> None:
+        usage = parse_claude_config(self.config("2026-11-03T20:00:00+00:00"), self.NOW)
+        assert usage is not None
+        self.assertEqual(usage.five_hour.used_percent, 0.0)
+
+    def test_missing_or_odd_data(self) -> None:
+        self.assertIsNone(parse_claude_config("not json", self.NOW))
+        self.assertIsNone(parse_claude_config('{"numStartups": 1}', self.NOW))
+        self.assertIsNone(parse_claude_config('{"cachedUsageUtilization": {"utilization": 3}}', self.NOW))
+        usage = parse_claude_config(
+            '{"cachedUsageUtilization": {"utilization": {"five_hour": {"utilization": "x"}}}}', self.NOW
+        )
+        assert usage is not None
+        self.assertIsNone(usage.five_hour)
+        self.assertIsNone(usage.weekly)
+        self.assertIsNone(usage.observed_at)
+
+    def test_reads_file(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
-            project = Path(tmp) / "-home-Kyle"
-            project.mkdir()
-            (project / "session.jsonl").write_text("\n".join(lines) + "\n")
-            usage = read_claude_usage(Path(tmp), now=now)
-
-        self.assertEqual((usage.requests_5h, usage.output_tokens_5h), (2, 150))
-        self.assertEqual((usage.requests_7d, usage.output_tokens_7d), (3, 1150))
+            path = Path(tmp) / ".claude.json"
+            self.assertIsNone(read_claude_usage(path))  # missing file
+            path.write_text(self.config())
+            usage = read_claude_usage(path)
+        assert usage is not None
+        self.assertEqual(usage.weekly.used_percent, 29)
 
 
 if __name__ == "__main__":

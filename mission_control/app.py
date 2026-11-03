@@ -93,7 +93,7 @@ class MissionControlApp(App[None]):
 
     @work(thread=True, exclusive=True, group="usage")
     def refresh_usage(self) -> None:
-        """Read subscription usage from the agents' logs in a background thread."""
+        """Read subscription usage from the agents' local files in a background thread."""
         codex, claude = read_codex_usage(), read_claude_usage()
         if not get_current_worker().is_cancelled:
             self.call_from_thread(self.query_one(UsagePanel).show, codex, claude)

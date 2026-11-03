@@ -3,9 +3,11 @@
 - Codex (ChatGPT): every session log contains `token_count` events with the
   real plan limits: the 5-hour and weekly windows as a used percentage, plus
   their reset times. We take the newest one.
-- Claude Code: the session logs contain token counts per message, but not the
-  plan limit percentage. We add up the tokens for the last 5 hours and 7 days.
-  This is an activity measure, not an official "% of limit".
+- Claude Code: keeps the same numbers that its /usage command shows in a
+  cache inside ~/.claude.json ("cachedUsageUtilization"): the 5-hour and
+  weekly utilization in percent, with reset times. Claude Code refreshes that
+  cache itself; we only read it. It is an internal format, so every field is
+  treated as optional.
 """
 
 from __future__ import annotations
@@ -17,10 +19,7 @@ from datetime import datetime
 from pathlib import Path
 
 CODEX_SESSIONS = Path.home() / ".codex" / "sessions"
-CLAUDE_PROJECTS = Path.home() / ".claude" / "projects"
-
-FIVE_HOURS = 5 * 3600
-SEVEN_DAYS = 7 * 86400
+CLAUDE_CONFIG = Path.home() / ".claude.json"
 
 
 @dataclass(frozen=True)
@@ -45,12 +44,12 @@ class CodexUsage:
 
 @dataclass(frozen=True)
 class ClaudeUsage:
-    """Claude Code activity totals from local logs."""
+    """Latest known Claude plan limits."""
 
-    requests_5h: int
-    output_tokens_5h: int
-    requests_7d: int
-    output_tokens_7d: int
+    five_hour: LimitWindow | None
+    weekly: LimitWindow | None
+    observed_at: float | None
+    """When Claude Code fetched these numbers."""
 
 
 def _window(data: object, now: float) -> LimitWindow | None:
@@ -108,53 +107,51 @@ def read_codex_usage(sessions_dir: Path = CODEX_SESSIONS) -> CodexUsage | None:
     return None
 
 
-def _parse_timestamp(text: str) -> float | None:
+def _parse_timestamp(text: object) -> float | None:
+    """Parse an ISO 8601 time such as "2026-11-03T22:40:00.16+00:00"."""
+    if not isinstance(text, str):
+        return None
     try:
         return datetime.fromisoformat(text.replace("Z", "+00:00")).timestamp()
-    except (AttributeError, ValueError):
+    except ValueError:
         return None
 
 
-def read_claude_usage(projects_dir: Path = CLAUDE_PROJECTS, now: float | None = None) -> ClaudeUsage:
-    """Add up Claude Code requests and output tokens for the last 5 hours and 7 days.
+def _claude_window(data: object, minutes: int, now: float) -> LimitWindow | None:
+    """Turn {"utilization": 4, "resets_at": "..."} into a LimitWindow."""
+    if not isinstance(data, dict):
+        return None
+    value = data.get("utilization")
+    if not isinstance(value, (int, float)):
+        return None
+    return _window(
+        {"used_percent": value, "window_minutes": minutes, "resets_at": _parse_timestamp(data.get("resets_at"))},
+        now,
+    )
 
-    One API response is logged once per content block, so messages are
-    counted once per unique message id.
-    """
-    now = now or time.time()
-    seen: set[str] = set()
-    req_5h = out_5h = req_7d = out_7d = 0
+
+def parse_claude_config(text: str, now: float) -> ClaudeUsage | None:
+    """Read the cached plan utilization out of ~/.claude.json's contents."""
     try:
-        logs = [p for p in projects_dir.rglob("*.jsonl") if p.stat().st_mtime >= now - SEVEN_DAYS]
+        config = json.loads(text)
+    except json.JSONDecodeError:
+        return None
+    cache = config.get("cachedUsageUtilization") if isinstance(config, dict) else None
+    if not isinstance(cache, dict) or not isinstance(cache.get("utilization"), dict):
+        return None
+    utilization = cache["utilization"]
+    fetched_ms = cache.get("fetchedAtMs")
+    return ClaudeUsage(
+        five_hour=_claude_window(utilization.get("five_hour"), 300, now),
+        weekly=_claude_window(utilization.get("seven_day"), 10080, now),
+        observed_at=fetched_ms / 1000 if isinstance(fetched_ms, (int, float)) else None,
+    )
+
+
+def read_claude_usage(config_path: Path = CLAUDE_CONFIG) -> ClaudeUsage | None:
+    """Return Claude's cached plan limits, or None if they aren't available."""
+    try:
+        text = config_path.read_text()
     except OSError:
-        logs = []
-    for log in logs:
-        try:
-            handle = log.open(errors="replace")
-        except OSError:
-            continue
-        with handle:
-            for line in handle:
-                if '"usage"' not in line:
-                    continue
-                try:
-                    record = json.loads(line)
-                except json.JSONDecodeError:
-                    continue
-                message = record.get("message")
-                if not isinstance(message, dict) or not isinstance(message.get("usage"), dict):
-                    continue
-                msg_id = message.get("id")
-                if not msg_id or msg_id in seen:
-                    continue
-                seen.add(msg_id)
-                ts = _parse_timestamp(record.get("timestamp", ""))
-                if ts is None or ts < now - SEVEN_DAYS:
-                    continue
-                output = int(message["usage"].get("output_tokens") or 0)
-                req_7d += 1
-                out_7d += output
-                if ts >= now - FIVE_HOURS:
-                    req_5h += 1
-                    out_5h += output
-    return ClaudeUsage(req_5h, out_5h, req_7d, out_7d)
+        return None
+    return parse_claude_config(text, time.time())

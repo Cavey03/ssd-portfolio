@@ -262,36 +262,44 @@ class UsagePanel(Vertical):
     def on_mount(self) -> None:
         self.border_title = "Usage"
 
-    def show(self, codex: CodexUsage | None, claude: ClaudeUsage) -> None:
-        """Render both providers."""
+    def show(self, codex: CodexUsage | None, claude: ClaudeUsage | None) -> None:
+        """Render both providers with the same bar layout."""
         text = Text()
-        text.append("ChatGPT · Codex", style="bold #c3e88d")
-        if codex is None:
-            text.append("\n  no Codex sessions found yet", style=MUTED)
-        else:
-            if codex.plan:
-                text.append(f"  ({codex.plan.title()} plan)", style=MUTED)
-            for label, window in (("5-hour ", codex.five_hour), ("weekly ", codex.weekly)):
-                text.append(f"\n  {label} ")
-                if window is None:
-                    text.append("unknown", style=MUTED)
-                    continue
-                text.append_text(_bar(window.used_percent, self.BAR_WIDTH))
-                text.append(f" {window.used_percent:>3.0f}%", style="bold")
-                if window.resets_at:
-                    text.append(f"  resets {_when(window.resets_at)}", style=MUTED)
-            text.append(f"\n  as of {_when(codex.observed_at)}", style=MUTED)
-
-        text.append("\n\nClaude Code", style="bold #d7875f")
-        text.append("  (activity, not % of plan limit)", style=MUTED)
-        text.append(
-            f"\n  last 5h  {claude.requests_5h:>5} requests  {_tokens(claude.output_tokens_5h):>6} tokens out"
-        )
-        text.append(
-            f"\n  last 7d  {claude.requests_7d:>5} requests  {_tokens(claude.output_tokens_7d):>6} tokens out"
-        )
+        plan = f"  ({codex.plan.title()} plan)" if codex and codex.plan else ""
+        self._provider(text, "ChatGPT · Codex", "#c3e88d", plan, codex,
+                       "no Codex sessions found yet")
+        text.append("\n\n")
+        self._provider(text, "Claude", "#d7875f", "", claude,
+                       "no cached usage yet (run /usage in Claude Code once)")
         self.query_one(".usage-body", Static).update(text)
         self.border_subtitle = f"updated {datetime.now():%H:%M:%S}"
+
+    def _provider(
+        self,
+        text: Text,
+        name: str,
+        colour: str,
+        extra: str,
+        usage: CodexUsage | ClaudeUsage | None,
+        missing: str,
+    ) -> None:
+        """Append one provider's heading, 5-hour and weekly bars to `text`."""
+        text.append(name, style=f"bold {colour}")
+        text.append(extra, style=MUTED)
+        if usage is None:
+            text.append(f"\n  {missing}", style=MUTED)
+            return
+        if usage.observed_at:
+            text.append(f"  as of {_when(usage.observed_at)}", style=MUTED)
+        for label, window in (("5-hour", usage.five_hour), ("weekly", usage.weekly)):
+            text.append(f"\n  {label:<7}")
+            if window is None:
+                text.append("unknown", style=MUTED)
+                continue
+            text.append_text(_bar(window.used_percent, self.BAR_WIDTH))
+            text.append(f" {window.used_percent:>3.0f}%", style="bold")
+            if window.resets_at:
+                text.append(f"  resets {_when(window.resets_at)}", style=MUTED)
 
 
 def _bar(percent: float, width: int) -> Text:
@@ -309,12 +317,3 @@ def _when(timestamp: float) -> str:
     if moment.date() == datetime.now().date():
         return f"{moment:%H:%M}"
     return f"{moment:%a %H:%M}"
-
-
-def _tokens(count: int) -> str:
-    """12345 -> "12.3k", 1234567 -> "1.2M"."""
-    if count >= 1_000_000:
-        return f"{count / 1_000_000:.1f}M"
-    if count >= 1_000:
-        return f"{count / 1_000:.1f}k"
-    return str(count)
