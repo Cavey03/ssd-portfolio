@@ -20,7 +20,11 @@ from mission_control.agents import (
 from mission_control.dialogs import ConfirmScreen
 from mission_control.gitinfo import default_projects_root, scan_projects
 from mission_control.launcher import launch_agent
-from mission_control.panels import AgentsPanel, ContainersPanel, ProjectsPanel, UsagePanel
+from mission_control.panels import AgentsPanel, ContainersPanel, ProjectsPanel, UsagePanel, _ThemedPanel
+from mission_control.settings import load_settings, save_setting
+from mission_control.themes import (
+    AGENT_VARIABLE_DEFAULTS, DEFAULT_THEME, THEME_NAMES, THEMES, next_theme,
+)
 from mission_control.usage import read_claude_usage, read_codex_usage
 
 AUTO_REFRESH_SECONDS = 10
@@ -40,12 +44,17 @@ class MissionControlApp(App[None]):
         Binding("2", "launch('Codex')", "Codex"),
         Binding("3", "launch('Agy')", "Agy"),
         Binding("k", "stop_agent", "Stop agent"),
+        Binding("t", "cycle_theme", "Theme"),
         Binding("tab", "focus_next", "Next panel", priority=True),
     ]
 
     def __init__(self, projects_root: Path | None = None) -> None:
         super().__init__()
         self.projects_root = projects_root or default_projects_root()
+        for theme in THEMES:
+            self.register_theme(theme)
+        saved = load_settings().get("theme")
+        self.theme = saved if isinstance(saved, str) and saved in self.available_themes else DEFAULT_THEME
         self._container_action_pending = False
 
     def compose(self) -> ComposeResult:
@@ -58,6 +67,26 @@ class MissionControlApp(App[None]):
                 yield ContainersPanel(id="containers", classes="panel")
                 yield AgentsPanel(id="agents", classes="panel")
         yield Footer()
+
+    def get_theme_variable_defaults(self) -> dict[str, str]:
+        """Defaults for our extra theme variables, so built-in themes work too."""
+        return dict(AGENT_VARIABLE_DEFAULTS)
+
+    def watch_theme(self, theme: str) -> None:
+        """Remember the new theme and recolour the panels straight away.
+
+        This also runs when the theme is changed from the command palette (Ctrl+P).
+        """
+        save_setting("theme", theme)
+        if not self.screen_stack:
+            return  # still starting up (theme set in __init__): nothing to redraw yet
+        for panel in self.query(_ThemedPanel):
+            panel.recolour()
+
+    def action_cycle_theme(self) -> None:
+        """Switch to the next of our own themes."""
+        self.theme = next_theme(self.theme)
+        self.notify(f"Theme: {THEME_NAMES.get(self.theme, self.theme)}", timeout=2)
 
     def on_mount(self) -> None:
         """Focus the projects table and start the refresh loop."""

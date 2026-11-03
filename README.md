@@ -75,6 +75,25 @@ Safety checks in `stop_agent()`: it re-checks that the process ID still belongs 
 same start time (process IDs get reused), never stops Mission Control itself, and falls back to sending the
 signal from the host if the container isn't allowed to.
 
+## Themes
+Press `t` to cycle through the built-in looks. Your choice is saved in `~/.config/mission-control/settings.json`.
+
+| Theme | Look |
+|---|---|
+| **Neon City** (default) | Cyberpunk: deep purple-black, glowing cyan and electric yellow, hot-pink alerts |
+| **CRT Green** | Retro mainframe: green phosphor on black |
+| **CRT Amber** | The same retro feel, in amber phosphor |
+| **Mission Teal** | The original look |
+
+Textual's own themes (Nord, Dracula, Gruvbox, Tokyo Night, Catppuccin, …) also work via the command
+palette (`Ctrl+P` → "Change theme").
+
+**How it works:** the stylesheet only uses theme variables (`$primary`, `$secondary`, `$background`,
+`$text-muted`, …), so the layout recolours itself. The coloured text inside the tables is drawn with Rich,
+which needs plain `#rrggbb` colours, so `themes.py` turns the active theme into a small `Palette` (muted
+text is the foreground blended into the background, because Textual's `auto 60%` isn't a real colour).
+Each panel remembers its last data and redraws instantly when the theme changes.
+
 ## Setup
 ```bash
 distrobox enter dev
@@ -96,6 +115,7 @@ pip install -r requirements.txt
 | Agents panel + Usage panel, 13 tests | Claude Code (in parallel with the launch actions) |
 | Launch actions: Konsole tab via host, safe quoting, 13 tests | Codex (**GPT-6.1 Sol**) in a git worktree, reviewed and merged by Claude Code |
 | Orphan investigation, stop-agent key + confirm dialog, launches in new window, 7 tests | Claude Code |
+| Theme system: Neon City / CRT Green / CRT Amber / Mission Teal, `t` to cycle, saved choice, 10 tests | Claude Code |
 
 ### Agent review notes
 - **Codex skeleton:** clean, typed, well-structured code that worked on the first run. It ignored one

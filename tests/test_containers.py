@@ -213,7 +213,7 @@ class ContainersAppTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(panel.selected_name, "work")
             with patch.object(panel, "set_label") as label:
                 panel.show(ContainerResult([], "Host unavailable"), "dev")
-                self.assertEqual(label.call_args.args[0].style, ALERT)
+                self.assertEqual(label.call_args.args[0].style, panel.palette.alert)
                 self.assertIn("Host unavailable", label.call_args.args[0].plain)
             self.assertIsNone(panel.selected_container)
 

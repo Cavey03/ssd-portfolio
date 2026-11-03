@@ -1,10 +1,15 @@
-"""Dashboard panels."""
+"""Dashboard panels.
+
+Colours come from the active theme (see themes.py). Each panel remembers the
+last data it showed, so recolour() can redraw it instantly when the theme
+changes instead of waiting for the next refresh.
+"""
 
 from __future__ import annotations
 
 from datetime import datetime
 from pathlib import Path
-from typing import ClassVar
+from typing import Any, ClassVar
 
 from rich.text import Text
 from textual.app import ComposeResult
@@ -14,17 +19,42 @@ from textual.widgets import DataTable, Static
 from mission_control.agents import AgentProcess, describe_folder, format_age
 from mission_control.containers import ContainerInfo, ContainerResult
 from mission_control.gitinfo import ProjectStatus
+from mission_control.themes import DEFAULT_PALETTE, Palette, palette_from_variables
 from mission_control.usage import ClaudeUsage, CodexUsage
 
-# Status colours (kept in line with the accent in app.tcss)
-OK = "#50d6c5"
-WARN = "#e5c07b"
-INFO = "#61afef"
-ALERT = "#e06c75"
-MUTED = "#8795a8"
+# Mission Teal colours as constants, used as defaults for the cell helpers.
+OK = DEFAULT_PALETTE.ok
+WARN = DEFAULT_PALETTE.warn
+INFO = DEFAULT_PALETTE.info
+ALERT = DEFAULT_PALETTE.alert
+MUTED = DEFAULT_PALETTE.muted
+
+AGENT_NAMES = ("claude", "codex", "agy")
 
 
-class _TablePanel(Vertical):
+class _ThemedPanel(Vertical):
+    """A panel that draws with the active theme and can redraw on theme change."""
+
+    _last: tuple[Any, ...] | None = None
+
+    @property
+    def palette(self) -> Palette:
+        """Plain colours for the active theme."""
+        try:
+            return palette_from_variables(self.app.get_css_variables())
+        except Exception:  # not attached to an app (shouldn't happen when mounted)
+            return DEFAULT_PALETTE
+
+    def show(self, *args: Any) -> None:  # overridden by each panel
+        raise NotImplementedError
+
+    def recolour(self) -> None:
+        """Redraw the last data with the current theme's colours."""
+        if self._last is not None:
+            self.show(*self._last)
+
+
+class _TablePanel(_ThemedPanel):
     """A titled panel holding one selectable table.
 
     Each row's key is the item's name, so the selection survives refreshes even
@@ -70,6 +100,10 @@ class _TablePanel(Vertical):
         """Set the small line of text above the table."""
         self.query_one(".panel-label", Static).update(text)
 
+    def _restore_selection(self, selected: str | None, keys: list[str]) -> None:
+        if selected in keys:
+            self.table.move_cursor(row=keys.index(selected))
+
 
 class ProjectsPanel(_TablePanel):
     """Folders in the projects root with their live git status."""
@@ -79,52 +113,53 @@ class ProjectsPanel(_TablePanel):
 
     def show(self, root: Path, statuses: list[ProjectStatus]) -> None:
         """Replace the rows with fresh statuses, keeping the selected project."""
-        table = self.table
+        self._last = (root, statuses)
+        pal = self.palette
         selected = self.selected_name
-        table.clear()
+        self.table.clear()
         for status in statuses:
-            table.add_row(*_project_cells(status), key=status.name)
-
-        names = [s.name for s in statuses]
-        if selected in names:
-            table.move_cursor(row=names.index(selected))
+            self.table.add_row(*_project_cells(status, pal), key=status.name)
+        self._restore_selection(selected, [s.name for s in statuses])
 
         repos = sum(s.is_repo for s in statuses)
-        self.set_label(f"{root}  ·  {repos} repos")
-        self.border_subtitle = f"updated {datetime.now():%H:%M:%S}"
-        if not statuses:
+        if statuses:
+            self.set_label(f"{root}  ·  {repos} repos")
+        else:
             self.set_label(f"{root}  ·  no project folders found")
+        self.border_subtitle = f"updated {datetime.now():%H:%M:%S}"
 
 
-def _project_cells(status: ProjectStatus) -> tuple[Text, Text, Text, Text]:
+def _project_cells(
+    status: ProjectStatus, pal: Palette = DEFAULT_PALETTE
+) -> tuple[Text, Text, Text, Text]:
     """Turn a ProjectStatus into the four styled table cells."""
     name = Text(status.name, style="bold")
 
     if not status.is_repo:
-        return name, Text("—", style=MUTED), Text("not a git repo", style=MUTED), Text("")
+        return name, Text("—", style=pal.muted), Text("not a git repo", style=pal.muted), Text("")
     if status.error:
-        return name, Text("—", style=MUTED), Text(f"⚠ {status.error}", style=ALERT), Text("")
+        return name, Text("—", style=pal.muted), Text(f"⚠ {status.error}", style=pal.alert), Text("")
 
-    branch_style = WARN if status.branch == "(detached)" else ""
+    branch_style = pal.warn if status.branch == "(detached)" else ""
     branch = Text(status.branch or "?", style=branch_style)
 
     if status.changes:
-        changes = Text(f"● {status.changes} changed", style=WARN)
+        changes = Text(f"● {status.changes} changed", style=pal.warn)
     else:
-        changes = Text("✓ clean", style=OK)
+        changes = Text("✓ clean", style=pal.ok)
 
     if status.ahead is None:
-        sync = Text("no remote", style=MUTED)
+        sync = Text("no remote", style=pal.muted)
     elif status.ahead == 0 and status.behind == 0:
-        sync = Text("✓ synced", style=OK)
+        sync = Text("✓ synced", style=pal.ok)
     else:
         sync = Text()
         if status.ahead:
-            sync.append(f"↑{status.ahead} to push", style=INFO)
+            sync.append(f"↑{status.ahead} to push", style=pal.info)
         if status.behind:
             if sync:
                 sync.append("  ")
-            sync.append(f"↓{status.behind} to pull", style=ALERT)
+            sync.append(f"↓{status.behind} to pull", style=pal.alert)
 
     return name, branch, changes, sync
 
@@ -147,16 +182,17 @@ class ContainersPanel(_TablePanel):
 
     def show(self, result: ContainerResult, current: str | None) -> None:
         """Replace the rows, preserving selection and marking this container."""
+        self._last = (result, current)
+        pal = self.palette
         selected = self.selected_name
         self.table.clear()
         self.containers = {container.name: container for container in result.containers}
         for container in result.containers:
-            self.table.add_row(*_container_cells(container, current), key=container.name)
+            self.table.add_row(*_container_cells(container, current, pal), key=container.name)
         names = list(self.containers)
-        if selected in names:
-            self.table.move_cursor(row=names.index(selected))
+        self._restore_selection(selected, names)
         if result.error:
-            self.set_label(Text(f"⚠ {result.error}", style=ALERT))
+            self.set_label(Text(f"⚠ {result.error}", style=pal.alert))
         else:
             count = len(names)
             self.set_label(
@@ -188,7 +224,9 @@ def _short_uptime(status_text: str) -> str:
     return f"{amount}{suffix}" if suffix and (amount.isdigit() or amount == "<1") else ""
 
 
-def _container_cells(container: ContainerInfo, current: str | None) -> tuple[Text, Text, Text]:
+def _container_cells(
+    container: ContainerInfo, current: str | None, pal: Palette = DEFAULT_PALETTE
+) -> tuple[Text, Text, Text]:
     """Turn a container summary into three styled table cells.
 
     The uptime goes into the State cell (e.g. "● running · 1h") so the panel
@@ -196,14 +234,14 @@ def _container_cells(container: ContainerInfo, current: str | None) -> tuple[Tex
     """
     name = container.name + (" (this)" if container.name == current else "")
     if container.state == "running":
-        state = Text(f"● {container.state}", style=OK)
+        state = Text(f"● {container.state}", style=pal.ok)
         uptime = _short_uptime(container.status_text)
         if uptime:
-            state.append(f" · {uptime}", style=MUTED)
+            state.append(f" · {uptime}", style=pal.muted)
     elif container.state in ("exited", "stopped"):
-        state = Text(f"○ {container.state}", style=MUTED)
+        state = Text(f"○ {container.state}", style=pal.muted)
     else:
-        state = Text(f"● {container.state}", style=WARN)
+        state = Text(f"● {container.state}", style=pal.warn)
     image = container.image
     registry, separator, remainder = image.partition("/")
     if separator and ("." in registry or ":" in registry or registry == "localhost"):
@@ -229,92 +267,91 @@ class AgentsPanel(_TablePanel):
 
     def show(self, agents: list[AgentProcess], projects_root: Path) -> None:
         """Replace the rows (one per session, keyed by process id)."""
-        table = self.table
+        self._last = (agents, projects_root)
+        pal = self.palette
         selected = self.selected_name
-        table.clear()
+        self.table.clear()
         self.agents = {str(a.pid): a for a in agents}
         for agent in agents:
-            colour = AGENT_COLOURS.get(agent.agent, "")
-            table.add_row(
-                Text(f"● {agent.agent}", style=f"bold {colour}"),
+            self.table.add_row(
+                Text(f"● {agent.agent}", style=f"bold {pal.agent(agent.agent)}"),
                 Text(describe_folder(agent.cwd, projects_root)),
-                Text(format_age(agent.started), style=MUTED),
+                Text(format_age(agent.started), style=pal.muted),
                 key=str(agent.pid),
             )
-        keys = [str(a.pid) for a in agents]
-        if selected in keys:
-            table.move_cursor(row=keys.index(selected))
+        self._restore_selection(selected, list(self.agents))
 
-        counts = {name: sum(a.agent == name for a in agents) for name in AGENT_COLOURS}
         label = Text()
-        for name, count in counts.items():
+        for name in AGENT_NAMES:
+            count = sum(a.agent == name for a in agents)
             if label:
-                label.append("  ·  ", style=MUTED)
-            label.append(f"{name} {count}", style=AGENT_COLOURS[name] if count else MUTED)
-        self.set_label(label if agents else Text("No agents running", style=MUTED))
+                label.append("  ·  ", style=pal.muted)
+            label.append(f"{name} {count}", style=pal.agent(name) if count else pal.muted)
+        self.set_label(label if agents else Text("No agents running", style=pal.muted))
         self.border_subtitle = f"updated {datetime.now():%H:%M:%S}"
 
 
-AGENT_COLOURS = {"claude": "#d7875f", "codex": "#c3e88d", "agy": INFO}
-
-
-class UsagePanel(Vertical):
-    """Subscription usage: real Codex plan limits and Claude Code activity."""
+class UsagePanel(_ThemedPanel):
+    """Subscription usage: the real plan limits of Codex and Claude."""
 
     BAR_WIDTH = 20
 
     def compose(self) -> ComposeResult:
-        yield Static("Reading usage logs…", classes="usage-body")
+        yield Static("Reading usage…", classes="usage-body")
 
     def on_mount(self) -> None:
         self.border_title = "Usage"
 
     def show(self, codex: CodexUsage | None, claude: ClaudeUsage | None) -> None:
         """Render both providers with the same bar layout."""
+        self._last = (codex, claude)
+        pal = self.palette
         text = Text()
         plan = f"  ({codex.plan.title()} plan)" if codex and codex.plan else ""
-        self._provider(text, "ChatGPT · Codex", "#c3e88d", plan, codex,
-                       "no Codex sessions found yet")
+        _provider(text, pal, "ChatGPT · Codex", pal.agent("codex"), plan, codex,
+                  "no Codex sessions found yet", self.BAR_WIDTH)
         text.append("\n\n")
-        self._provider(text, "Claude", "#d7875f", "", claude,
-                       "no cached usage yet (run /usage in Claude Code once)")
+        _provider(text, pal, "Claude", pal.agent("claude"), "", claude,
+                  "no cached usage yet (run /usage in Claude Code once)", self.BAR_WIDTH)
         self.query_one(".usage-body", Static).update(text)
         self.border_subtitle = f"updated {datetime.now():%H:%M:%S}"
 
-    def _provider(
-        self,
-        text: Text,
-        name: str,
-        colour: str,
-        extra: str,
-        usage: CodexUsage | ClaudeUsage | None,
-        missing: str,
-    ) -> None:
-        """Append one provider's heading, 5-hour and weekly bars to `text`."""
-        text.append(name, style=f"bold {colour}")
-        text.append(extra, style=MUTED)
-        if usage is None:
-            text.append(f"\n  {missing}", style=MUTED)
-            return
-        if usage.observed_at:
-            text.append(f"  as of {_when(usage.observed_at)}", style=MUTED)
-        for label, window in (("5-hour", usage.five_hour), ("weekly", usage.weekly)):
-            text.append(f"\n  {label:<7}")
-            if window is None:
-                text.append("unknown", style=MUTED)
-                continue
-            text.append_text(_bar(window.used_percent, self.BAR_WIDTH))
-            text.append(f" {window.used_percent:>3.0f}%", style="bold")
-            if window.resets_at:
-                text.append(f"  resets {_when(window.resets_at)}", style=MUTED)
+
+def _provider(
+    text: Text,
+    pal: Palette,
+    name: str,
+    colour: str,
+    extra: str,
+    usage: CodexUsage | ClaudeUsage | None,
+    missing: str,
+    bar_width: int,
+) -> None:
+    """Append one provider's heading, 5-hour and weekly bars to `text`."""
+    text.append(name, style=f"bold {colour}")
+    text.append(extra, style=pal.muted)
+    if usage is None:
+        text.append(f"\n  {missing}", style=pal.muted)
+        return
+    if usage.observed_at:
+        text.append(f"  as of {_when(usage.observed_at)}", style=pal.muted)
+    for label, window in (("5-hour", usage.five_hour), ("weekly", usage.weekly)):
+        text.append(f"\n  {label:<7}")
+        if window is None:
+            text.append("unknown", style=pal.muted)
+            continue
+        text.append_text(_bar(window.used_percent, bar_width, pal))
+        text.append(f" {window.used_percent:>3.0f}%", style="bold")
+        if window.resets_at:
+            text.append(f"  resets {_when(window.resets_at)}", style=pal.muted)
 
 
-def _bar(percent: float, width: int) -> Text:
-    """A coloured bar: green below 60 %, yellow below 85 %, red above."""
+def _bar(percent: float, width: int, pal: Palette = DEFAULT_PALETTE) -> Text:
+    """A coloured bar: "ok" colour below 60 %, "warn" below 85 %, "alert" above."""
     filled = round(max(0.0, min(percent, 100.0)) / 100 * width)
-    colour = OK if percent < 60 else WARN if percent < 85 else ALERT
+    colour = pal.ok if percent < 60 else pal.warn if percent < 85 else pal.alert
     bar = Text("█" * filled, style=colour)
-    bar.append("░" * (width - filled), style=MUTED)
+    bar.append("░" * (width - filled), style=pal.muted)
     return bar
 
 

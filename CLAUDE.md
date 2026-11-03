@@ -29,5 +29,6 @@ A terminal "mission control" dashboard (TUI) for the dev setup, built with Pytho
 - [x] Usage panel (real 5h/weekly plan limits: Codex from session logs, Claude from ~/.claude.json cache, tests)
 - [x] Launch actions (1/2/3 open the agent in a new Konsole window inside dev)
 - [x] Stop agent (k, with confirmation; for orphaned sessions)
+- [x] Themes (t cycles; colours only from theme variables, never hard-code colours)
 
 Update this checklist as work is done.
