@@ -15,6 +15,7 @@ A terminal "mission control" dashboard (TUI) for the dev setup, built with Pytho
 
 ## Dev setup
 - Run everything inside `dev`: `distrobox enter dev`, then `cd ~/Projects/mission-control && source .venv/bin/activate`.
+- Run tests with `.venv/bin/python -m unittest -v`.
 - Dependencies are in `requirements.txt`. After adding a package, run `pip freeze > requirements.txt`.
 - The app runs inside the container but must see host things (distrobox/podman, Konsole). Use `distrobox-host-exec <cmd>` to run host commands.
 
@@ -23,7 +24,7 @@ A terminal "mission control" dashboard (TUI) for the dev setup, built with Pytho
 - [x] Python venv with Textual
 - [x] App skeleton (layout + keybindings)
 - [ ] Containers panel
-- [ ] Projects panel
+- [x] Projects panel (live git status, auto-refresh every 10s, unit tests)
 - [ ] Agents panel
 - [ ] Launch actions
 
