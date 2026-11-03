@@ -1,0 +1,111 @@
+$accent: #50d6c5;
+$background: #10151e;
+$surface: #171f2b;
+$text: #dce5ef;
+$muted: #8795a8;
+$border: #344155;
+
+Screen {
+    background: $background;
+    color: $text;
+}
+
+Header {
+    background: $surface;
+    color: $accent;
+    text-style: bold;
+}
+
+#dashboard {
+    height: 1fr;
+    padding: 1 2;
+}
+
+#projects {
+    width: 3fr;
+    margin-right: 2;
+}
+
+#side-panels {
+    width: 2fr;
+    min-width: 0;
+}
+
+.panel {
+    height: 1fr;
+    min-width: 0;
+    background: $background;
+    border: round $border;
+    border-title-color: $muted;
+    border-title-style: bold;
+    padding: 0 1;
+}
+
+.panel:focus-within {
+    border: round $accent;
+    border-title-color: $accent;
+}
+
+#containers {
+    margin-bottom: 1;
+}
+
+.demo-label {
+    height: 1;
+    margin: 0 0 1 0;
+    color: $muted;
+    text-style: italic;
+}
+
+DataTable {
+    height: 1fr;
+    background: $background;
+    color: $text;
+    scrollbar-color: $border;
+    scrollbar-color-hover: $accent;
+    scrollbar-color-active: $accent;
+}
+
+DataTable > .datatable--header {
+    background: $background;
+    color: $muted;
+    text-style: bold;
+}
+
+DataTable > .datatable--even-row {
+    background: $background;
+}
+
+DataTable > .datatable--odd-row {
+    background: $surface;
+}
+
+DataTable > .datatable--cursor {
+    background: $border;
+    color: $text;
+}
+
+DataTable:focus > .datatable--cursor {
+    background: $accent 20%;
+    color: $accent;
+    text-style: bold;
+}
+
+Footer {
+    background: $surface;
+    color: $muted;
+}
+
+FooterKey {
+    background: $surface;
+}
+
+FooterKey > .footer-key--key {
+    background: $surface;
+    color: $accent;
+    text-style: bold;
+}
+
+FooterKey > .footer-key--description {
+    color: $text;
+}

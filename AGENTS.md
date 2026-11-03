@@ -21,7 +21,7 @@ A terminal "mission control" dashboard (TUI) for the dev setup, built with Pytho
 ## Progress
 - [x] Project folder, git repo, private GitHub repo
 - [x] Python venv with Textual
-- [ ] App skeleton (layout + keybindings)
+- [x] App skeleton (layout + keybindings)
 - [ ] Containers panel
 - [ ] Projects panel
 - [ ] Agents panel
