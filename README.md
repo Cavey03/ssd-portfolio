@@ -14,11 +14,20 @@ Part of my SSD portfolio: [ssd-portfolio](https://github.com/Cavey03/ssd-portfol
 🚧 In development. See the progress checklist in `CLAUDE.md`.
 
 ## Run
-```bash
-distrobox enter dev
-cd ~/Projects/mission-control
-.venv/bin/python -m mission_control
-```
+Type `mc` in any terminal, or open **Mission Control** from the KDE app menu (Development).
+
+Install the command and menu entry once with `./scripts/install.sh` (`--uninstall` removes both).
+It links `~/.local/bin/mc` to `scripts/mc` and writes `~/.local/share/applications/mission-control.desktop`.
+
+**Where it runs:** started from the host, `mc` runs the app **on the host** using the same `.venv`
+(host and container have the same Python version). If that ever stops working, for example after a host
+update changes Python, it falls back to running inside `dev`.
+
+**Why the host:** a program started through `distrobox enter` keeps running invisibly when you close its
+window, because podman's `conmon` keeps the container side of the terminal open. A test with a
+pseudo-terminal proved it: closing the window left Mission Control running inside `dev`, but on the host it
+stopped normally. On the host the app also gets Podman directly and can see every process's folder, with
+no `distrobox-host-exec` workarounds needed.
 
 ## Tests
 ```bash
@@ -116,6 +125,8 @@ pip install -r requirements.txt
 | Launch actions: Konsole tab via host, safe quoting, 13 tests | Codex (**GPT-6.1 Sol**) in a git worktree, reviewed and merged by Claude Code |
 | Orphan investigation, stop-agent key + confirm dialog, launches in new window, 7 tests | Claude Code |
 | Theme system: Neon City / CRT Green / CRT Amber / Mission Teal, `t` to cycle, saved choice, 10 tests | Claude Code |
+| `mc` launcher, KDE menu entry, install script, script tests | Codex (**GPT-6.1 Sol**), reviewed by Claude Code |
+| Review: found that closing the window orphaned the app inside `dev` (pty test); `mc` now runs on the host with a fallback; menu category fix | Claude Code |
 
 ### Agent review notes
 - **Codex skeleton:** clean, typed, well-structured code that worked on the first run. It ignored one

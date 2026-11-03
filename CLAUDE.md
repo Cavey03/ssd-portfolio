@@ -17,7 +17,8 @@ A terminal "mission control" dashboard (TUI) for the dev setup, built with Pytho
 - Run everything inside `dev`: `distrobox enter dev`, then `cd ~/Projects/mission-control && source .venv/bin/activate`.
 - Run tests with `.venv/bin/python -m unittest -v`.
 - Dependencies are in `requirements.txt`. After adding a package, run `pip freeze > requirements.txt`.
-- The app runs inside the container but must see host things (distrobox/podman, Konsole). Use `distrobox-host-exec <cmd>` to run host commands.
+- The app runs on the host or inside `dev`, and must work in both. `mc` prefers the host (avoids orphaned processes when a window closes). Inside `dev`, use `distrobox-host-exec <cmd>` for host things (podman, Konsole).
+- Start the app with `mc` (scripts/mc). Install the command and menu entry with `scripts/install.sh`.
 
 ## Progress
 - [x] Project folder, git repo, private GitHub repo
@@ -30,5 +31,6 @@ A terminal "mission control" dashboard (TUI) for the dev setup, built with Pytho
 - [x] Launch actions (1/2/3 open the agent in a new Konsole window inside dev)
 - [x] Stop agent (k, with confirmation; for orphaned sessions)
 - [x] Themes (t cycles; colours only from theme variables, never hard-code colours)
+- [x] `mc` launcher + KDE menu entry (runs on host with fallback to dev)
 
 Update this checklist as work is done.
