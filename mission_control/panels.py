@@ -11,8 +11,10 @@ from textual.app import ComposeResult
 from textual.containers import Vertical
 from textual.widgets import DataTable, Static
 
+from mission_control.agents import AgentProcess, describe_folder, format_age
 from mission_control.containers import ContainerInfo, ContainerResult
 from mission_control.gitinfo import ProjectStatus
+from mission_control.usage import ClaudeUsage, CodexUsage
 
 # Status colours (kept in line with the accent in app.tcss)
 OK = "#50d6c5"
@@ -67,18 +69,6 @@ class _TablePanel(Vertical):
     def set_label(self, text: str | Text) -> None:
         """Set the small line of text above the table."""
         self.query_one(".panel-label", Static).update(text)
-
-
-class _PlaceholderPanel(_TablePanel):
-    """A panel that still shows fake rows (not implemented yet)."""
-
-    ROWS: ClassVar[tuple[tuple[str, ...], ...]]
-
-    def populate(self) -> None:
-        """Load the fake rows."""
-        self.set_label("PLACEHOLDER DATA")
-        for row in self.ROWS:
-            self.table.add_row(*row, key=row[0])
 
 
 class ProjectsPanel(_TablePanel):
@@ -221,13 +211,110 @@ def _container_cells(container: ContainerInfo, current: str | None) -> tuple[Tex
     return Text(name, style="bold"), state, Text(image)
 
 
-class AgentsPanel(_PlaceholderPanel):
-    """Display fake agent activity."""
+class AgentsPanel(_TablePanel):
+    """Running AI agent sessions and the folder each one works in."""
 
     PANEL_TITLE = "Agents"
-    COLUMNS = ("Agent", "Status", "Project")
-    ROWS = (
-        ("claude", "Idle (demo)", "ssd-portfolio"),
-        ("codex", "Idle (demo)", "mission-control"),
-        ("agy", "Idle (demo)", "—"),
-    )
+    COLUMNS = ("Agent", "Project", "Running for")
+
+    def populate(self) -> None:
+        """Show a loading label until the first scan finishes."""
+        self.set_label("Looking for agents…")
+
+    def show(self, agents: list[AgentProcess], projects_root: Path) -> None:
+        """Replace the rows (one per session, keyed by process id)."""
+        table = self.table
+        selected = self.selected_name
+        table.clear()
+        for agent in agents:
+            colour = AGENT_COLOURS.get(agent.agent, "")
+            table.add_row(
+                Text(f"● {agent.agent}", style=f"bold {colour}"),
+                Text(describe_folder(agent.cwd, projects_root)),
+                Text(format_age(agent.started), style=MUTED),
+                key=str(agent.pid),
+            )
+        keys = [str(a.pid) for a in agents]
+        if selected in keys:
+            table.move_cursor(row=keys.index(selected))
+
+        counts = {name: sum(a.agent == name for a in agents) for name in AGENT_COLOURS}
+        label = Text()
+        for name, count in counts.items():
+            if label:
+                label.append("  ·  ", style=MUTED)
+            label.append(f"{name} {count}", style=AGENT_COLOURS[name] if count else MUTED)
+        self.set_label(label if agents else Text("No agents running", style=MUTED))
+        self.border_subtitle = f"updated {datetime.now():%H:%M:%S}"
+
+
+AGENT_COLOURS = {"claude": "#d7875f", "codex": "#c3e88d", "agy": INFO}
+
+
+class UsagePanel(Vertical):
+    """Subscription usage: real Codex plan limits and Claude Code activity."""
+
+    BAR_WIDTH = 20
+
+    def compose(self) -> ComposeResult:
+        yield Static("Reading usage logs…", classes="usage-body")
+
+    def on_mount(self) -> None:
+        self.border_title = "Usage"
+
+    def show(self, codex: CodexUsage | None, claude: ClaudeUsage) -> None:
+        """Render both providers."""
+        text = Text()
+        text.append("ChatGPT · Codex", style="bold #c3e88d")
+        if codex is None:
+            text.append("\n  no Codex sessions found yet", style=MUTED)
+        else:
+            if codex.plan:
+                text.append(f"  ({codex.plan.title()} plan)", style=MUTED)
+            for label, window in (("5-hour ", codex.five_hour), ("weekly ", codex.weekly)):
+                text.append(f"\n  {label} ")
+                if window is None:
+                    text.append("unknown", style=MUTED)
+                    continue
+                text.append_text(_bar(window.used_percent, self.BAR_WIDTH))
+                text.append(f" {window.used_percent:>3.0f}%", style="bold")
+                if window.resets_at:
+                    text.append(f"  resets {_when(window.resets_at)}", style=MUTED)
+            text.append(f"\n  as of {_when(codex.observed_at)}", style=MUTED)
+
+        text.append("\n\nClaude Code", style="bold #d7875f")
+        text.append("  (activity, not % of plan limit)", style=MUTED)
+        text.append(
+            f"\n  last 5h  {claude.requests_5h:>5} requests  {_tokens(claude.output_tokens_5h):>6} tokens out"
+        )
+        text.append(
+            f"\n  last 7d  {claude.requests_7d:>5} requests  {_tokens(claude.output_tokens_7d):>6} tokens out"
+        )
+        self.query_one(".usage-body", Static).update(text)
+        self.border_subtitle = f"updated {datetime.now():%H:%M:%S}"
+
+
+def _bar(percent: float, width: int) -> Text:
+    """A coloured bar: green below 60 %, yellow below 85 %, red above."""
+    filled = round(max(0.0, min(percent, 100.0)) / 100 * width)
+    colour = OK if percent < 60 else WARN if percent < 85 else ALERT
+    bar = Text("█" * filled, style=colour)
+    bar.append("░" * (width - filled), style=MUTED)
+    return bar
+
+
+def _when(timestamp: float) -> str:
+    """"21:37" for today, otherwise "Mon 09:17"."""
+    moment = datetime.fromtimestamp(timestamp)
+    if moment.date() == datetime.now().date():
+        return f"{moment:%H:%M}"
+    return f"{moment:%a %H:%M}"
+
+
+def _tokens(count: int) -> str:
+    """12345 -> "12.3k", 1234567 -> "1.2M"."""
+    if count >= 1_000_000:
+        return f"{count / 1_000_000:.1f}M"
+    if count >= 1_000:
+        return f"{count / 1_000:.1f}k"
+    return str(count)

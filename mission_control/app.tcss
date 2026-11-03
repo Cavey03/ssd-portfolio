@@ -21,9 +21,18 @@ Header {
     padding: 1 2;
 }
 
-#projects {
+#main-panels {
     width: 1fr;
     margin-right: 2;
+}
+
+#usage {
+    height: auto;
+    margin-top: 1;
+}
+
+.usage-body {
+    padding: 1 0 0 0;
 }
 
 #side-panels {

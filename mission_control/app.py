@@ -14,10 +14,13 @@ from textual.worker import get_current_worker
 from mission_control.containers import (
     current_container_name, list_containers, start_container, stop_container,
 )
+from mission_control.agents import find_agents
 from mission_control.gitinfo import default_projects_root, scan_projects
-from mission_control.panels import AgentsPanel, ContainersPanel, ProjectsPanel
+from mission_control.panels import AgentsPanel, ContainersPanel, ProjectsPanel, UsagePanel
+from mission_control.usage import read_claude_usage, read_codex_usage
 
 AUTO_REFRESH_SECONDS = 10
+USAGE_REFRESH_SECONDS = 60
 
 
 class MissionControlApp(App[None]):
@@ -43,7 +46,9 @@ class MissionControlApp(App[None]):
     def compose(self) -> ComposeResult:
         yield Header(show_clock=True)
         with Horizontal(id="dashboard"):
-            yield ProjectsPanel(id="projects", classes="panel")
+            with Vertical(id="main-panels"):
+                yield ProjectsPanel(id="projects", classes="panel")
+                yield UsagePanel(id="usage", classes="panel")
             with Vertical(id="side-panels"):
                 yield ContainersPanel(id="containers", classes="panel")
                 yield AgentsPanel(id="agents", classes="panel")
@@ -54,8 +59,12 @@ class MissionControlApp(App[None]):
         self.query_one(ProjectsPanel).table.focus()
         self.refresh_projects()
         self.refresh_containers()
+        self.refresh_agents()
+        self.refresh_usage()
         self.set_interval(AUTO_REFRESH_SECONDS, self.refresh_projects)
         self.set_interval(AUTO_REFRESH_SECONDS, self.refresh_containers)
+        self.set_interval(AUTO_REFRESH_SECONDS, self.refresh_agents)
+        self.set_interval(USAGE_REFRESH_SECONDS, self.refresh_usage)
 
     @work(thread=True, exclusive=True, group="projects")
     def refresh_projects(self) -> None:
@@ -73,11 +82,29 @@ class MissionControlApp(App[None]):
         if not get_current_worker().is_cancelled:
             self.call_from_thread(self.query_one(ContainersPanel).show, result, current)
 
+    @work(thread=True, exclusive=True, group="agents")
+    def refresh_agents(self) -> None:
+        """Find running agent sessions in a background thread."""
+        agents = find_agents()
+        if not get_current_worker().is_cancelled:
+            self.call_from_thread(
+                self.query_one(AgentsPanel).show, agents, self.projects_root
+            )
+
+    @work(thread=True, exclusive=True, group="usage")
+    def refresh_usage(self) -> None:
+        """Read subscription usage from the agents' logs in a background thread."""
+        codex, claude = read_codex_usage(), read_claude_usage()
+        if not get_current_worker().is_cancelled:
+            self.call_from_thread(self.query_one(UsagePanel).show, codex, claude)
+
     def action_refresh(self) -> None:
         """Refresh all live panels now."""
         self.refresh_projects()
         self.refresh_containers()
-        self.notify("Refreshing projects and containers…", timeout=2)
+        self.refresh_agents()
+        self.refresh_usage()
+        self.notify("Refreshing…", timeout=2)
 
     def action_toggle_container(self) -> None:
         """Start or stop the selected container, protecting our own runtime."""
