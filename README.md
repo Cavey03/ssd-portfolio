@@ -4,7 +4,7 @@ A local large language model (LLM) running on my RTX 5070, used as a coding agen
 Codex (GPT). Part of my SSD portfolio: [ssd-portfolio](https://github.com/Cavey03/ssd-portfolio).
 
 ## Status
-🔧 **Ollama v0.40.14 installed and running on the GPU; no models pulled yet.** This README records every
+🔧 **Ollama v0.40.14 running on the GPU with two models (`gemma4:12b`, `ornith-1.5:9b`).** This README records every
 decision and step as the setup happens.
 
 ## Why a local model?
@@ -123,10 +123,39 @@ unpack the new release the same way, start again.
 `rm -rf ~/.local/bin/ollama ~/.local/lib/ollama ~/.config/systemd/user/ollama.service` and
 `systemctl --user daemon-reload`. Models are in `~/.ollama` (delete separately if wanted).
 
+## Models pulled (2026-11-05)
+Tags checked against the official Ollama library first. Started with two, as decided with the owner.
+
+| Tag | Download | Why this tag |
+|---|---|---|
+| `gemma4:12b` | 8.0 GB | Plain `12b` tag; its ID `6114515d63c1` is the same as `gemma4:12b-it-q4_K_M`, so it is **Q4_K_M**. (`gemma4:latest` is the smaller E4B model, not the 12B.) |
+| `ornith-1.5:9b` | 6.6 GB | Ornith has two official lines: `ornith:9b` (1.0, 4 months old) and `ornith-1.5` (updated 2 weeks ago, adds image input). Chose the newer 1.5. |
+
+```bash
+ollama pull gemma4:12b
+ollama pull ornith-1.5:9b
+ollama list
+```
+
+**First check (one short prompt each, thinking off, via `/api/generate`):**
+
+| Model | `ollama ps` | VRAM in use (`nvidia-smi`, incl. ~1 GB desktop) | Load time | Output speed |
+|---|---|---|---|---|
+| `gemma4:12b` | 100% GPU | 9.7 GB / 12 GB | 3.9 s | 172 tokens/s |
+| `ornith-1.5:9b` | 100% GPU | 7.4 GB / 12 GB | 2.9 s | 103 tokens/s |
+
+One run each, only a sanity check; the real comparison is the benchmark step.
+
+**Found:** Ollama loads models with a **4096-token context** by default (the `CONTEXT` column of
+`ollama ps`). That is far too small for an agent like Codex, which sends long prompts. It has to be raised
+(for example `OLLAMA_CONTEXT_LENGTH` in the service, or per model) when connecting Codex, while watching that
+the model still fits 100% on the GPU. Gemma 4 12B has only ~2.5 GB of VRAM headroom left for that.
+
 ## Plan
 - [x] Choose the install option and install Ollama (option 1, v0.40.14)
-- [ ] Verify Ollama uses the GPU (`ollama ps`, `nvidia-smi`): CUDA detected at startup; confirm with a loaded model
-- [ ] Pull 2–3 candidate models
+- [x] Verify Ollama uses the GPU (`ollama ps`, `nvidia-smi`): both models 100% GPU
+- [x] Pull 2–3 candidate models (`gemma4:12b`, `ornith-1.5:9b`; a third later if needed)
+- [ ] Raise the context length and check the models still fit fully on the GPU
 - [ ] Connect Codex: `codex --oss -m <model>` (and set `oss_provider` in `~/.codex/config.toml`)
 - [ ] Benchmark: the same small coding tasks on each local model vs Sol/Claude (speed, success, quality)
 - [ ] Pick a default local model
@@ -147,3 +176,4 @@ unpack the new release the same way, start again.
 |---|---|
 | Research, decisions, this plan | Claude Code (with the owner choosing role, tool and dashboard) |
 | Ollama install (option 1), user service, install log | Claude Code (owner approved download and manual start) |
+| Model tag check, pulls, first GPU/speed check | Claude Code (owner approved pulling two models) |
