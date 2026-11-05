@@ -87,6 +87,7 @@ After=network-online.target
 [Service]
 ExecStart=%h/.local/bin/ollama serve
 Environment="OLLAMA_HOST=127.0.0.1:11434"
+Environment="OLLAMA_CONTEXT_LENGTH=65536"   # added later, see "Connecting Codex"
 Restart=on-failure
 RestartSec=3
 
