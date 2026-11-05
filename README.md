@@ -4,7 +4,7 @@ A local large language model (LLM) running on my RTX 5070, used as a coding agen
 Codex (GPT). Part of my SSD portfolio: [ssd-portfolio](https://github.com/Cavey03/ssd-portfolio).
 
 ## Status
-🔧 **Ollama v0.40.14 running on the GPU with two models (`gemma4:12b`, `ornith-1.5:9b`).** This README records every
+🔧 **Ollama v0.40.14 on the GPU with two models; Codex connected (`codex -p local`, default `ornith-1.5:9b`).** This README records every
 decision and step as the setup happens.
 
 ## Why a local model?
@@ -202,15 +202,62 @@ NUM_CTX=32768 python3 -I bench/coding_test.py            # both models, thinking
 - Only 5 tasks, one run each, with non-zero temperature, so results vary between runs. This is a first
   sanity check, not the benchmark; that comes after connecting Codex.
 
+## Default model (provisional, 2026-11-05)
+**`ornith-1.5:9b`**, to be confirmed by the benchmark. Both models scored 5/5 with thinking on, so the tie
+was broken by:
+- **Built for agentic coding** (multi-step tool use, which is Codex's job); Gemma 4 is general-purpose.
+- **No looping seen**, while gemma looped at temperature 0: a risk in long agent sessions.
+- **More VRAM headroom**: 9.3 GB vs 10.7 GB at 64K context.
+
+`gemma4:12b` stays installed as the fast option (172 vs 103 tokens/s, better with thinking off). If Ornith
+struggles with Codex's tool calls in the benchmark, switch.
+
+## Connecting Codex (2026-11-05)
+Codex CLI 0.166.0 in `dev`. Settings checked against the
+[Ollama Codex docs](https://docs.ollama.com/integrations/codex) and the Codex config reference.
+
+**1. 64K context on the server.** Ollama's docs say Codex needs *at least 64K*. Codex talks to Ollama
+through the OpenAI-style API, which does not carry Ollama's `num_ctx`, so the default is set in the service
+(`~/.config/systemd/user/ollama.service`):
+```ini
+Environment="OLLAMA_CONTEXT_LENGTH=65536"
+```
+64K is also the largest size that kept both models 100% on the GPU in the test above.
+```bash
+systemctl --user daemon-reload && systemctl --user restart ollama
+```
+
+**2. A Codex profile** `~/.codex/local.config.toml`. Profiles are extra files layered on top of
+`~/.codex/config.toml`, so the normal GPT setup is unchanged and the local model is used only when asked for:
+```toml
+model_provider = "ollama"      # Codex's built-in Ollama provider
+oss_provider = "ollama"        # used by --oss
+model = "ornith-1.5:9b"
+model_context_window = 65536   # tell Codex how big the window is
+```
+
+**Use it** (inside `dev`; the model server must be running on the host):
+```bash
+codex -p local                                   # interactive
+codex exec -p local "<task>"                     # one-shot
+codex exec -p local -m gemma4:12b "<task>"       # other local model
+```
+
+**First run:** in a throwaway git repo, `codex exec -p local -s workspace-write "Create fizzbuzz.py ... then run
+it with python3 to check it works."` Codex wrote the file with a shell command, ran it, checked the output and
+summarised. **Correct, 21 s, 100% GPU at 65536 context (`ollama ps`).**
+It used **27,308 tokens** for this tiny task: Codex sends a long system prompt and tool list on every step.
+This is why the 4K default would never work and why 64K is the minimum.
+
 ## Plan
 - [x] Choose the install option and install Ollama (option 1, v0.40.14)
 - [x] Verify Ollama uses the GPU (`ollama ps`, `nvidia-smi`): both models 100% GPU
 - [x] Pull 2–3 candidate models (`gemma4:12b`, `ornith-1.5:9b`; a third later if needed)
 - [x] Raise the context length and check the models still fit fully on the GPU: both fit up to 64K
 - [x] First coding sanity test (`bench/coding_test.py`): both 5/5 with thinking on
-- [ ] Connect Codex: `codex --oss -m <model>` (and set `oss_provider` in `~/.codex/config.toml`)
+- [x] Connect Codex: profile `~/.codex/local.config.toml`, `codex -p local`; 64K context on the server
 - [ ] Benchmark: the same small coding tasks on each local model vs Sol/Claude (speed, success, quality)
-- [ ] Pick a default local model
+- [ ] Pick a default local model (provisional: `ornith-1.5:9b`, confirm after benchmark)
 - [ ] Add rules for delegating to the local model in `~/Projects/CLAUDE.md`
 - [ ] Mission Control: show Ollama status, loaded model and GPU memory
 
@@ -230,3 +277,4 @@ NUM_CTX=32768 python3 -I bench/coding_test.py            # both models, thinking
 | Ollama install (option 1), user service, install log | Claude Code (owner approved download and manual start) |
 | Model tag check, pulls, first GPU/speed check | Claude Code (owner approved pulling two models) |
 | Context/GPU-fit test, `bench/coding_test.py` and first coding test | Claude Code (owner asked to test the models) |
+| Model recommendation, Codex profile and 64K server setting | Claude Code (owner chose Ornith as provisional default) |
