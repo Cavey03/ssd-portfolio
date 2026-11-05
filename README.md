@@ -151,11 +151,63 @@ One run each, only a sanity check; the real comparison is the benchmark step.
 (for example `OLLAMA_CONTEXT_LENGTH` in the service, or per model) when connecting Codex, while watching that
 the model still fits 100% on the GPU. Gemma 4 12B has only ~2.5 GB of VRAM headroom left for that.
 
+## First test (2026-11-05)
+
+### Context length vs GPU fit
+Each model was loaded with growing `num_ctx` and the server log was checked for how many layers landed on
+the GPU (`load_tensors: offloaded X/Y layers to GPU`). VRAM numbers from `nvidia-smi` include ~1 GB used by
+the desktop.
+
+| Context (tokens) | `gemma4:12b` layers on GPU | VRAM | `ornith-1.5:9b` layers on GPU | VRAM |
+|---|---|---|---|---|
+| 8K | 49/49 | 10.1 GB | 33/33 | 7.6 GB |
+| 16K | 49/49 | 10.3 GB | 33/33 | 7.9 GB |
+| 32K | 49/49 | 10.2 GB | 33/33 | 8.3 GB |
+| 64K | 49/49 | 10.7 GB | 33/33 | 9.3 GB |
+| 128K | **47/49** (spills to RAM) | 11.6 GB | **30/33** (spills to RAM) | 11.0 GB |
+
+**Both models stay fully on the GPU up to 64K context.** That is the ceiling to use for Codex.
+
+What the log showed along the way:
+- `gemma4:12b` is really **two models**: the 12B main model (49 layers, 7.0 GB) plus a small "Assistant"
+  draft model (5 layers, 0.4 GB) for speculative decoding: the draft guesses tokens ahead and the big model
+  checks them. That is why the 12B model is *faster* than the 9B one (172 vs 103 tokens/s).
+- `ollama ps` (and `/api/ps`) shows gemma as only ~1.2–1.5 GB: it appears to report the draft model only.
+  **Trust `nvidia-smi` and the server log for gemma, not `ollama ps`.** (Matters for Mission Control.)
+- Gemma uses sliding-window attention: only 8 of its layers keep the full context, so its memory grows very
+  little with context. Ornith's grows faster (+1 GB from 32K to 64K).
+
+### Coding test
+`bench/coding_test.py`: 5 small Python tasks (Roman numerals, merge intervals, parse a duration string with
+error handling, fix a buggy binary search, top-k word count). The model's code is run against hidden
+asserts in a separate process. Thinking off and on, 32K context, each model's default temperature.
+
+```bash
+NUM_CTX=32768 python3 -I bench/coding_test.py            # both models, thinking off and on
+```
+
+| Model | Thinking off | Thinking on |
+|---|---|---|
+| `gemma4:12b` | 4/5 passed, 12 s total | **5/5 passed**, 91 s total |
+| `ornith-1.5:9b` | 3/5 passed, 11 s total | **5/5 passed**, 83 s total |
+
+- Without thinking, both are near-instant (~1–6 s per task) but make careless mistakes (gemma: Roman
+  numerals; ornith: duration parsing and the word counter).
+- With thinking, both solve everything, at the cost of 2–50 s per task (up to ~6,600 thinking tokens).
+- **Problem found: temperature 0 makes gemma loop.** My first run used `temperature 0` (always pick the most
+  likely word, for repeatable results). Gemma then failed 2 tasks with thinking on: it filled the *entire*
+  context (8K, and again 32K) with thinking and never wrote code. Its thinking ended in
+  `Wait, I'm repeating myself again.`, repeated. With the model's default temperature it finished normally.
+  **Lesson: don't force temperature 0 on thinking models.**
+- Only 5 tasks, one run each, with non-zero temperature, so results vary between runs. This is a first
+  sanity check, not the benchmark; that comes after connecting Codex.
+
 ## Plan
 - [x] Choose the install option and install Ollama (option 1, v0.40.14)
 - [x] Verify Ollama uses the GPU (`ollama ps`, `nvidia-smi`): both models 100% GPU
 - [x] Pull 2–3 candidate models (`gemma4:12b`, `ornith-1.5:9b`; a third later if needed)
-- [ ] Raise the context length and check the models still fit fully on the GPU
+- [x] Raise the context length and check the models still fit fully on the GPU: both fit up to 64K
+- [x] First coding sanity test (`bench/coding_test.py`): both 5/5 with thinking on
 - [ ] Connect Codex: `codex --oss -m <model>` (and set `oss_provider` in `~/.codex/config.toml`)
 - [ ] Benchmark: the same small coding tasks on each local model vs Sol/Claude (speed, success, quality)
 - [ ] Pick a default local model
@@ -177,3 +229,4 @@ the model still fits 100% on the GPU. Gemma 4 12B has only ~2.5 GB of VRAM headr
 | Research, decisions, this plan | Claude Code (with the owner choosing role, tool and dashboard) |
 | Ollama install (option 1), user service, install log | Claude Code (owner approved download and manual start) |
 | Model tag check, pulls, first GPU/speed check | Claude Code (owner approved pulling two models) |
+| Context/GPU-fit test, `bench/coding_test.py` and first coding test | Claude Code (owner asked to test the models) |
