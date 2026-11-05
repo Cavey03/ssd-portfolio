@@ -4,7 +4,8 @@ A local large language model (LLM) running on my RTX 5070, used as a coding agen
 Codex (GPT). Part of my SSD portfolio: [ssd-portfolio](https://github.com/Cavey03/ssd-portfolio).
 
 ## Status
-🧪 **Planning, nothing installed yet.** This README records every decision and step as the setup happens.
+🔧 **Ollama v0.40.14 installed and running on the GPU; no models pulled yet.** This README records every
+decision and step as the setup happens.
 
 ## Why a local model?
 - **Fallback:** works offline and when cloud usage limits run out.
@@ -52,9 +53,79 @@ system service, does not fit. Bazzite's `ujust` has no Ollama helper.
 Codex in `dev` can reach either option at `http://localhost:11434`, because distrobox shares the host's
 network.
 
+**Chosen: option 1** (2026-11-05). Simplest, no GPU passthrough, nothing touches the system.
+
+## Install log (2026-11-05)
+Ollama **v0.40.14** (released 2026-11-03), file `ollama-linux-amd64.tar.zst` (1.45 GB download, 2.3 GB
+unpacked; it bundles its own CUDA 12 and 13 libraries, so nothing NVIDIA-related needs installing).
+
+```bash
+# 1. Download from the official GitHub release, plus the checksum list
+B=https://github.com/ollama/ollama/releases/download/v0.40.14
+curl -fL -o ollama-linux-amd64.tar.zst $B/ollama-linux-amd64.tar.zst
+curl -fsSL -o sha256sum.txt $B/sha256sum.txt
+
+# 2. Verify the download is intact (prints "OK"). Entries are written as "./name".
+grep ' ./ollama-linux-amd64.tar.zst$' sha256sum.txt | sha256sum -c -
+
+# 3. Unpack into ~/.local instead of /usr (no sudo): gives ~/.local/bin/ollama + ~/.local/lib/ollama
+tar --zstd -xf ollama-linux-amd64.tar.zst -C ~/.local
+```
+
+The official docs unpack into `/usr` with `sudo`, which is read-only on Bazzite. Ollama finds its
+libraries relative to its own binary (`../lib/ollama`), so the same layout under `~/.local` just works,
+and `~/.local/bin` is already on `PATH`.
+
+**User service** `~/.config/systemd/user/ollama.service` (instead of the docs' system service and
+dedicated `ollama` user):
+
+```ini
+[Unit]
+Description=Ollama model server (user)
+After=network-online.target
+
+[Service]
+ExecStart=%h/.local/bin/ollama serve
+Environment="OLLAMA_HOST=127.0.0.1:11434"
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=default.target
+```
+
+- `OLLAMA_HOST=127.0.0.1` keeps the server private to this machine (the `dev` container shares the host
+  network, so it still reaches it).
+- Models are stored in `~/.ollama/models` (the default when Ollama runs as my user).
+- **Not started automatically** (decision): it is started by hand, so the GPU stays free for other work.
+
+```bash
+systemctl --user daemon-reload       # make systemd read the new unit file
+systemctl --user start ollama        # start the server (stop: systemctl --user stop ollama)
+systemctl --user status ollama       # is it running?
+journalctl --user -u ollama -f       # follow the server log
+# Autostart at login, if wanted later: systemctl --user enable ollama
+```
+
+**Verified:**
+| Check | Result |
+|---|---|
+| `curl http://127.0.0.1:11434/api/version` (host) | `{"version":"0.40.14"}` |
+| Same from inside `dev` (`localhost:11434`) | `{"version":"0.40.14"}` |
+| Server log, GPU discovery | `inference compute ... library=CUDA compute=12.0 description="NVIDIA GeForce RTX 5070" libdirs=ollama,cuda_v13 driver=13.4` |
+
+**Problem hit:** my first checksum check failed with `no properly formatted checksum lines found`. The
+download was fine; `sha256sum.txt` lists files as `./name`, and my `grep` pattern missed the `./`.
+
+**Update:** stop the service, `rm -rf ~/.local/lib/ollama` (old libraries must not mix with new ones),
+unpack the new release the same way, start again.
+**Uninstall:** `systemctl --user stop ollama`, then
+`rm -rf ~/.local/bin/ollama ~/.local/lib/ollama ~/.config/systemd/user/ollama.service` and
+`systemctl --user daemon-reload`. Models are in `~/.ollama` (delete separately if wanted).
+
 ## Plan
-- [ ] Choose the install option and install Ollama
-- [ ] Verify Ollama uses the GPU (`ollama ps`, `nvidia-smi`)
+- [x] Choose the install option and install Ollama (option 1, v0.40.14)
+- [ ] Verify Ollama uses the GPU (`ollama ps`, `nvidia-smi`): CUDA detected at startup; confirm with a loaded model
 - [ ] Pull 2–3 candidate models
 - [ ] Connect Codex: `codex --oss -m <model>` (and set `oss_provider` in `~/.codex/config.toml`)
 - [ ] Benchmark: the same small coding tasks on each local model vs Sol/Claude (speed, success, quality)
@@ -75,3 +146,4 @@ network.
 | Part | Built by |
 |---|---|
 | Research, decisions, this plan | Claude Code (with the owner choosing role, tool and dashboard) |
+| Ollama install (option 1), user service, install log | Claude Code (owner approved download and manual start) |
