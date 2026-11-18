@@ -14,14 +14,16 @@ from typing import Any, ClassVar, Sequence
 from rich.text import Text
 from textual.app import ComposeResult
 from textual.containers import Vertical
+from textual.binding import Binding
 from textual.widgets import DataTable, Static
 
 from mission_control.agents import AgentProcess, describe_folder, format_age
 from mission_control.containers import ContainerInfo, ContainerResult
 from mission_control.gitinfo import ProjectStatus
 from mission_control.localllm import GpuInfo, LoadedModel, OllamaStatus
+from mission_control.tasks import Task
 from mission_control.themes import DEFAULT_PALETTE, Palette, palette_from_variables
-from mission_control.usage import ClaudeUsage, CodexUsage
+from mission_control.usage import ClaudeUsage, CodexUsage, LocalUsage
 
 # Mission Teal colours as constants, used as defaults for the cell helpers.
 OK = DEFAULT_PALETTE.ok
@@ -410,6 +412,129 @@ def _gpu_line(gpu: GpuInfo | None, bar_width: int, pal: Palette = DEFAULT_PALETT
     return line
 
 
+class TasksPanel(_TablePanel):
+    """Dispatched tasks, newest first: worker, progress, changes and Opus's review.
+
+    Its keys (view, merge, discard) only apply here, so they appear in the
+    footer only while this panel has focus.
+    """
+
+    PANEL_TITLE = "Tasks"
+    COLUMNS = ("Task", "Worker", "Status", "Age")
+    BINDINGS = [
+        Binding("v", "app.view_task", "View task"),
+        Binding("m", "app.merge_task", "Merge"),
+        Binding("x", "app.discard_task", "Discard"),
+    ]
+
+    def populate(self) -> None:
+        self.tasks: dict[str, Task] = {}
+        self.alive: set[str] = set()
+        self.set_label("No tasks yet: select a project and press d to dispatch one")
+
+    @property
+    def selected_task(self) -> Task | None:
+        return self.tasks.get(self.selected_name or "")
+
+    def show(self, tasks: list[Task], alive: set[str]) -> None:
+        """Replace the rows. `alive` holds the ids whose supervisor is still working."""
+        self._last = (tasks, alive)
+        pal = self.palette
+        selected = self.selected_name
+        self.table.clear()
+        self.tasks = {t.id: t for t in tasks}
+        self.alive = alive
+        for task in tasks:
+            title = task.title if len(task.title) <= 34 else task.title[:33] + "…"
+            self.table.add_row(
+                Text(title, style="" if task.status not in ("merged", "discarded") else pal.muted),
+                _worker_cell(task, pal),
+                _task_status_cell(task, task.id in alive, pal),
+                Text(format_age(task.created), style=pal.muted),
+                key=task.id,
+            )
+        self._restore_selection(selected, list(self.tasks))
+        if tasks:
+            running = sum(t.status == "running" for t in tasks)
+            waiting = sum(t.status in ("done", "failed", "timeout") for t in tasks)
+            self.set_label(f"{running} running  ·  {waiting} waiting for your decision  ·  d new task")
+        self.border_subtitle = f"updated {datetime.now():%H:%M:%S}"
+
+
+def _worker_cell(task: Task, pal: Palette = DEFAULT_PALETTE) -> Text:
+    if task.agent == "local":
+        return Text(f"local · {task.model}", style=pal.info)
+    return Text(task.agent, style=pal.agent(task.agent))
+
+
+VERDICT_STYLE = {"approve": ("✓ approve", "ok"), "changes": ("△ changes", "warn"), "reject": ("✗ reject", "alert")}
+
+
+def _task_status_cell(task: Task, alive: bool, pal: Palette = DEFAULT_PALETTE) -> Text:
+    """E.g. "● running 2m/10m", "✓ done · 2 files · ✓ approve", "⏱ timeout · reviewing…"."""
+    colours = {"ok": pal.ok, "warn": pal.warn, "alert": pal.alert}
+    if task.status == "planned":
+        return Text("○ starting…", style=pal.muted)
+    if task.status == "running":
+        elapsed = format_age(task.started) if task.started else "0s"
+        return Text(f"● running {elapsed} / {task.time_limit // 60}m", style=pal.info)
+    if task.status in ("merged", "discarded"):
+        return Text(f"{'⇢' if task.status == 'merged' else '–'} {task.status}", style=pal.muted)
+    symbol, style = {"done": ("✓ done", pal.ok), "timeout": ("⏱ timeout", pal.warn),
+                     "failed": ("✗ failed", pal.alert)}[task.status]
+    cell = Text(symbol, style=style)
+    cell.append(f" · {len(task.files)} file{'s' if len(task.files) != 1 else ''}", style=pal.muted)
+    if task.review:
+        label, colour = VERDICT_STYLE.get(str(task.review.get("verdict")), ("? review", "warn"))
+        cell.append(" · ")
+        cell.append(label, style=colours[colour])
+    elif alive:
+        cell.append(" · reviewing…", style=pal.info)
+    return cell
+
+
+def task_details(task: Task, worker_output: str, diff: str, pal: Palette = DEFAULT_PALETTE) -> Text:
+    """The full text for the task view (v)."""
+    text = Text()
+    text.append(f"{task.title}\n", style="bold")
+    text.append(f"task {task.id}  ·  {task.project}\n\n", style=pal.muted)
+    text.append("Worker  ", style="bold")
+    text.append_text(_worker_cell(task, pal))
+    text.append(f"   time limit {task.time_limit // 60} min\n")
+    text.append("Why     ", style="bold")
+    text.append(f"{task.reason}\n")
+    text.append("Status  ", style="bold")
+    text.append_text(_task_status_cell(task, False, pal))
+    if task.exit_code is not None:
+        text.append(f"  (exit code {task.exit_code})", style=pal.muted)
+    text.append("\n")
+    if task.error:
+        text.append(f"Problem {task.error}\n", style=pal.alert)
+    if task.review:
+        review = task.review_obj
+        assert review is not None
+        label, _ = VERDICT_STYLE.get(review.verdict, (review.verdict, ""))
+        text.append("\nReview by Opus: ", style="bold")
+        text.append(f"{label}\n")
+        text.append(f"{review.summary}\n")
+        for concern in review.concerns:
+            text.append(f"  • {concern}\n", style=pal.warn)
+    if task.files:
+        text.append(f"\nChanged files (+{task.insertions} −{task.deletions})\n", style="bold")
+        for name in task.files:
+            text.append(f"  {name}\n")
+    if worker_output:
+        text.append("\nWorker's summary\n", style="bold")
+        text.append(worker_output[-2500:].strip() + "\n")
+    if diff:
+        text.append("\nDiff\n", style="bold")
+        for line in diff.splitlines()[:400]:
+            style = pal.ok if line.startswith("+") else pal.alert if line.startswith("-") else ""
+            text.append(line + "\n", style=style)
+    text.append("\nEsc to close.  On the Tasks panel: m merge, x discard.", style=pal.muted)
+    return text
+
+
 class UsagePanel(_ThemedPanel):
     """Subscription usage: the real plan limits of Codex and Claude."""
 
@@ -421,9 +546,11 @@ class UsagePanel(_ThemedPanel):
     def on_mount(self) -> None:
         self.border_title = "Usage"
 
-    def show(self, codex: CodexUsage | None, claude: ClaudeUsage | None) -> None:
-        """Render both providers with the same bar layout."""
-        self._last = (codex, claude)
+    def show(
+        self, codex: CodexUsage | None, claude: ClaudeUsage | None, local: LocalUsage | None = None
+    ) -> None:
+        """Render the two cloud plans with the same bar layout, then the local model's tokens."""
+        self._last = (codex, claude, local)
         pal = self.palette
         text = Text()
         plan = f"  ({codex.plan.title()} plan)" if codex and codex.plan else ""
@@ -432,6 +559,9 @@ class UsagePanel(_ThemedPanel):
         text.append("\n\n")
         _provider(text, pal, "Claude", pal.agent("claude"), "", claude,
                   "no cached usage yet (run /usage in Claude Code once)", self.BAR_WIDTH)
+        if local is not None:
+            text.append("\n\n")
+            _local(text, pal, local)
         self.query_one(".usage-body", Static).update(text)
         self.border_subtitle = f"updated {datetime.now():%H:%M:%S}"
 
@@ -463,6 +593,31 @@ def _provider(
         text.append(f" {window.used_percent:>3.0f}%", style="bold")
         if window.resets_at:
             text.append(f"  resets {_when(window.resets_at)}", style=pal.muted)
+
+
+def _local(text: Text, pal: Palette, local: LocalUsage) -> None:
+    """Append the local model's row: no limits, so tokens processed instead of a bar."""
+    text.append("Local · Ollama", style=f"bold {pal.info}")
+    text.append("  (no limits: runs on my GPU)", style=pal.muted)
+    for label, tokens, sessions in (
+        ("today", local.today_tokens, local.today_sessions),
+        ("7 days", local.week_tokens, local.week_sessions),
+    ):
+        text.append(f"\n  {label:<7}")
+        if not sessions:
+            text.append("no local sessions", style=pal.muted)
+            continue
+        text.append(f"{format_tokens(tokens)} tokens", style="bold")
+        text.append(f"  ·  {sessions} session{'s' if sessions != 1 else ''}", style=pal.muted)
+
+
+def format_tokens(count: int) -> str:
+    """1234 -> "1.2K", 2207237 -> "2.2M"."""
+    if count >= 1_000_000:
+        return f"{count / 1_000_000:.1f}M"
+    if count >= 1_000:
+        return f"{count / 1_000:.1f}K"
+    return str(count)
 
 
 def _bar(percent: float, width: int, pal: Palette = DEFAULT_PALETTE) -> Text:

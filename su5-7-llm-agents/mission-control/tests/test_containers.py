@@ -197,6 +197,7 @@ class ContainersAppTests(unittest.IsolatedAsyncioTestCase):
         # Never contact the real Ollama server or GPU from tests.
         patch("mission_control.app.read_ollama", return_value=OllamaStatus(running=False)).start()
         patch("mission_control.app.read_gpu", return_value=None).start()
+        patch("mission_control.app.read_local_usage", return_value=None).start()
         patch("mission_control.app.current_container_name", return_value="dev").start()
         self.start = patch("mission_control.app.start_container", return_value=(True, "Started work.")).start()
         self.stop = patch("mission_control.app.stop_container", return_value=(True, "Stopped work.")).start()

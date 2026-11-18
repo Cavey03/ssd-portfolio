@@ -7,6 +7,10 @@ if [[ "${1-}" == --help ]]; then
     exit 0
 fi
 
+# Remember where mc was started: `mc task ...` uses it as the project folder,
+# because the commands below change into the app's own folder.
+export MISSION_CONTROL_CWD="${MISSION_CONTROL_CWD:-$PWD}"
+
 # Resolve the installed symlink so we always find the original checkout.
 script_path=$(readlink -f "$0")
 repo_dir=$(dirname "$(dirname "$script_path")")

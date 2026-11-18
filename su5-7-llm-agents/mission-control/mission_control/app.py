@@ -17,20 +17,23 @@ from mission_control.containers import (
 from mission_control.agents import (
     AgentProcess, describe_folder, find_agents, format_age, profile_model, stop_agent,
 )
-from mission_control.dialogs import ConfirmScreen
+from mission_control import tasks as task_store
+from mission_control.dialogs import ConfirmScreen, DispatchScreen, TaskScreen
 from mission_control.gitinfo import ProjectStatus, default_projects_root, scan_projects
 from mission_control.launcher import launch_agent
 from mission_control.localllm import read_gpu, read_ollama, set_service
 from mission_control.panels import (
-    AgentsPanel, ContainersPanel, LocalLLMPanel, ProjectsPanel, UsagePanel, _ThemedPanel,
+    AgentsPanel, ContainersPanel, LocalLLMPanel, ProjectsPanel, TasksPanel, UsagePanel, _ThemedPanel,
+    task_details,
 )
 from mission_control.settings import load_settings, save_setting
 from mission_control.themes import (
     AGENT_VARIABLE_DEFAULTS, DEFAULT_THEME, THEME_NAMES, THEMES, next_theme,
 )
-from mission_control.usage import read_claude_usage, read_codex_usage
+from mission_control.usage import read_claude_usage, read_codex_usage, read_local_usage
 
 AUTO_REFRESH_SECONDS = 10
+TASKS_REFRESH_SECONDS = 3
 USAGE_REFRESH_SECONDS = 60
 
 
@@ -48,6 +51,7 @@ class MissionControlApp(App[None]):
         Binding("3", "launch('Agy')", "Agy"),
         Binding("4", "launch_local", "Local"),
         Binding("o", "toggle_ollama", "Ollama"),
+        Binding("d", "dispatch", "Dispatch"),
         Binding("k", "stop_agent", "Stop agent"),
         Binding("t", "cycle_theme", "Theme"),
         Binding("tab", "focus_next", "Next panel", priority=True),
@@ -61,6 +65,8 @@ class MissionControlApp(App[None]):
         saved = load_settings().get("theme")
         self.theme = saved if isinstance(saved, str) and saved in self.available_themes else DEFAULT_THEME
         self._container_action_pending = False
+        self._task_states: dict[str, tuple[str, bool]] | None = None
+        """Last seen (status, has review) per task, to notify when a task finishes."""
         self._project_keys: tuple[str, ...] = ()
         """Project folders from the last scan; the Agents panel names agents by them."""
 
@@ -69,6 +75,7 @@ class MissionControlApp(App[None]):
         with Horizontal(id="dashboard"):
             with Vertical(id="main-panels"):
                 yield ProjectsPanel(id="projects", classes="panel")
+                yield TasksPanel(id="tasks", classes="panel")
                 yield UsagePanel(id="usage", classes="panel")
             with Vertical(id="side-panels"):
                 yield ContainersPanel(id="containers", classes="panel")
@@ -104,6 +111,8 @@ class MissionControlApp(App[None]):
         self.refresh_agents()
         self.refresh_usage()
         self.refresh_local_llm()
+        self.refresh_tasks()
+        self.set_interval(TASKS_REFRESH_SECONDS, self.refresh_tasks)
         self.set_interval(AUTO_REFRESH_SECONDS, self.refresh_projects)
         self.set_interval(AUTO_REFRESH_SECONDS, self.refresh_local_llm)
         self.set_interval(AUTO_REFRESH_SECONDS, self.refresh_containers)
@@ -141,9 +150,9 @@ class MissionControlApp(App[None]):
     @work(thread=True, exclusive=True, group="usage")
     def refresh_usage(self) -> None:
         """Read subscription usage from the agents' local files in a background thread."""
-        codex, claude = read_codex_usage(), read_claude_usage()
+        codex, claude, local = read_codex_usage(), read_claude_usage(), read_local_usage()
         if not get_current_worker().is_cancelled:
-            self.call_from_thread(self.query_one(UsagePanel).show, codex, claude)
+            self.call_from_thread(self.query_one(UsagePanel).show, codex, claude, local)
 
     @work(thread=True, exclusive=True, group="local-llm")
     def refresh_local_llm(self) -> None:
@@ -151,6 +160,119 @@ class MissionControlApp(App[None]):
         status, gpu, default = read_ollama(), read_gpu(), profile_model()
         if not get_current_worker().is_cancelled:
             self.call_from_thread(self.query_one(LocalLLMPanel).show, status, gpu, default)
+
+    @work(thread=True, exclusive=True, group="tasks")
+    def refresh_tasks(self) -> None:
+        """Read the task records (written by the supervisor processes) in a background thread."""
+        tasks = [task_store.mark_lost(t) for t in task_store.list_tasks()]
+        alive = {t.id for t in tasks if task_store.is_alive(t)}
+        if not get_current_worker().is_cancelled:
+            self.call_from_thread(self._show_tasks, tasks, alive)
+
+    def _show_tasks(self, tasks: list[task_store.Task], alive: set[str]) -> None:
+        """Show the tasks and tell the owner when one finishes or gets its review."""
+        states = {t.id: (t.status, t.review is not None) for t in tasks}
+        if self._task_states is not None:  # not on the first scan: those aren't news
+            for task in tasks:
+                before = self._task_states.get(task.id)
+                if before is None or before == states[task.id]:
+                    continue
+                if before[0] == "running" and task.status in task_store.FINISHED:
+                    self.notify(f"Task {task.status}: {task.title[:50]}", timeout=6)
+                elif not before[1] and task.review:
+                    verdict = str(task.review.get("verdict", "?"))
+                    self.notify(f"Opus review: {verdict}. {task.title[:40]} (v to view, m to merge)",
+                                severity="information" if verdict == "approve" else "warning", timeout=8)
+        self._task_states = states
+        self.query_one(TasksPanel).show(tasks, alive)
+
+    def action_dispatch(self) -> None:
+        """Open the Dispatch dialog for the selected project."""
+        project = self.query_one(ProjectsPanel).selected_name
+        if project is None:
+            self.notify("Select a project first.", severity="warning")
+            return
+        project_dir = self.projects_root / project
+        local = self.query_one(LocalLLMPanel)
+        models = [m.name for m in local.status.installed] if local.status else []
+
+        def answered(result: tuple | None) -> None:
+            if result is not None:
+                text, plan, suggested = result
+                self.start_task_worker(text, project_dir, plan, suggested)
+
+        self.push_screen(DispatchScreen(project_dir, models, local.running, local.default_model), answered)
+
+    @work(thread=True, group="task-actions")
+    def start_task_worker(self, text: str, project_dir: Path, plan, suggested) -> None:
+        """Create and start the task off the UI thread."""
+        try:
+            task = task_store.start_task(task_store.make_task(text, project_dir, plan, suggested))
+        except OSError as exc:
+            self.call_from_thread(self.notify, f"Could not start the task: {exc}", severity="error")
+            return
+        worker = f"{task.agent} ({task.model})" if task.model else task.agent
+        self.call_from_thread(self.notify, f"Started task {task.id} with {worker}")
+        self.call_from_thread(self.refresh_tasks)
+
+    def _selected_task(self) -> task_store.Task | None:
+        task = self.query_one(TasksPanel).selected_task
+        if task is None:
+            self.notify("Select a task in the Tasks panel first.", severity="warning")
+        return task
+
+    def action_view_task(self) -> None:
+        """Show everything about the selected task."""
+        task = self._selected_task()
+        if task is None:
+            return
+        try:
+            diff = (task.folder / "diff.patch").read_text(errors="replace")
+        except OSError:
+            diff = ""
+        details = task_details(task, task_store.worker_output(task), diff, self.query_one(TasksPanel).palette)
+        self.push_screen(TaskScreen(details))
+
+    def action_merge_task(self) -> None:
+        """Ask, then merge the selected task's changes into the main checkout."""
+        task = self._selected_task()
+        if task is None:
+            return
+        if task.status not in task_store.FINISHED:
+            self.notify(f"Only finished tasks can be merged (this one is {task.status}).", severity="warning")
+            return
+        verdict = str(task.review.get("verdict")) if task.review else "no review"
+        detail = (f"{len(task.files)} files, +{task.insertions} −{task.deletions}. Opus: {verdict}.\n"
+                  "This commits the worker's changes on its branch and merges them into the main checkout.")
+
+        def answered(confirmed: bool | None) -> None:
+            if confirmed:
+                self.task_action_worker(task, merge=True)
+
+        self.push_screen(ConfirmScreen(f"Merge task {task.id}?", detail), answered)
+
+    def action_discard_task(self) -> None:
+        """Ask, then delete the selected task's worktree and branch."""
+        task = self._selected_task()
+        if task is None:
+            return
+        if task.status in task_store.CLOSED:
+            self.notify(f"This task is already {task.status}.", severity="warning")
+            return
+
+        def answered(confirmed: bool | None) -> None:
+            if confirmed:
+                self.task_action_worker(task, merge=False)
+
+        self.push_screen(ConfirmScreen(f"Discard task {task.id}?",
+                                       "Deletes its worktree, branch and all its changes."), answered)
+
+    @work(thread=True, group="task-actions")
+    def task_action_worker(self, task: task_store.Task, merge: bool) -> None:
+        ok, message = task_store.merge_task(task) if merge else task_store.discard_task(task)
+        self.call_from_thread(self.notify, message, severity="information" if ok else "error")
+        self.call_from_thread(self.refresh_tasks)
+        self.call_from_thread(self.refresh_projects)
 
     def action_refresh(self) -> None:
         """Refresh all live panels now."""

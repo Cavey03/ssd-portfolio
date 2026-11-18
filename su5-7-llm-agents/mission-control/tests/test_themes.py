@@ -92,6 +92,7 @@ class AppThemeTests(IsolatedSettings, unittest.IsolatedAsyncioTestCase):
         # Never contact the real Ollama server or GPU from tests.
         patch("mission_control.app.read_ollama", return_value=OllamaStatus(running=False)).start()
         patch("mission_control.app.read_gpu", return_value=None).start()
+        patch("mission_control.app.read_local_usage", return_value=None).start()
         patch("mission_control.app.list_containers", return_value=ContainerResult([])).start()
         patch("mission_control.app.read_codex_usage", return_value=None).start()
         patch("mission_control.app.read_claude_usage", return_value=None).start()

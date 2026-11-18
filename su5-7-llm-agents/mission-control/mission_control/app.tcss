@@ -28,6 +28,11 @@ Header {
     margin-top: 1;
 }
 
+#tasks {
+    height: 12;
+    margin-top: 1;
+}
+
 .usage-body {
     padding: 1 0 0 0;
 }
@@ -164,4 +169,54 @@ ConfirmScreen {
 
 #confirm-buttons Button {
     margin-left: 2;
+}
+
+/* Dispatch dialog and task view */
+DispatchScreen, TaskScreen {
+    align: center middle;
+    background: $background 60%;
+}
+
+#dispatch-box {
+    width: 100;
+    max-width: 95%;
+    height: auto;
+    max-height: 90%;
+    padding: 1 2;
+    background: $surface;
+    border: round $primary;
+}
+
+#dispatch-title {
+    text-style: bold;
+    color: $primary;
+    margin-bottom: 1;
+}
+
+#dispatch-plan {
+    margin: 1 0;
+    height: auto;
+    max-height: 24;
+    color: $foreground;
+}
+
+#dispatch-controls {
+    height: auto;
+}
+
+#dispatch-worker {
+    width: 1fr;
+}
+
+#dispatch-controls Button {
+    margin-left: 1;
+}
+
+#task-box {
+    width: 110;
+    max-width: 95%;
+    height: 90%;
+    padding: 1 2;
+    background: $surface;
+    border: round $primary;
 }

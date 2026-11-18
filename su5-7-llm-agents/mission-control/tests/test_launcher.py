@@ -141,6 +141,7 @@ class LaunchAppTests(unittest.IsolatedAsyncioTestCase):
             # Never contact the real Ollama server or GPU from tests.
             ("mission_control.app.read_ollama", OllamaStatus(running=False)),
             ("mission_control.app.read_gpu", None),
+            ("mission_control.app.read_local_usage", None),
         ):
             mock_patch = patch(target, return_value=value)
             mock_patch.start()

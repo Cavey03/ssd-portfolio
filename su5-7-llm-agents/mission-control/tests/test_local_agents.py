@@ -94,6 +94,7 @@ class LocalAppTests(unittest.IsolatedAsyncioTestCase):
             ("mission_control.app.read_codex_usage", None),
             ("mission_control.app.read_claude_usage", None),
             ("mission_control.app.read_gpu", None),
+            ("mission_control.app.read_local_usage", None),
             ("mission_control.app.profile_model", "ornith-1.5:9b"),
         ):
             patch(target, return_value=value).start()

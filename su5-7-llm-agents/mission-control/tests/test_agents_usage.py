@@ -7,15 +7,20 @@ import os
 import tempfile
 import time
 import unittest
+from unittest.mock import patch
 from datetime import datetime, timezone
 from pathlib import Path
 
 from mission_control.agents import describe_folder, find_agents, format_age, identify_agent
+from mission_control.panels import format_tokens
 from mission_control.usage import (
+    LocalUsage,
     parse_claude_config,
     parse_codex_rate_limits,
     read_claude_usage,
     read_codex_usage,
+    read_local_usage,
+    session_local_tokens,
 )
 
 
@@ -191,6 +196,63 @@ class CodexUsageTests(unittest.TestCase):
     def test_no_logs(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             self.assertIsNone(read_codex_usage(Path(tmp)))
+
+
+class LocalUsageTests(unittest.TestCase):
+    """Tokens of Codex sessions on the local model (Ollama)."""
+
+    @staticmethod
+    def session(provider: str, totals: list[int]) -> str:
+        lines = [json.dumps({"type": "session_meta", "payload": {"model_provider": provider}})]
+        for total in totals:
+            lines.append(json.dumps({"type": "event_msg", "payload": {"type": "token_count", "info": {
+                "total_token_usage": {"input_tokens": total - 10, "output_tokens": 10, "total_tokens": total}}}}))
+        lines.append(json.dumps({"type": "event_msg", "payload": {"type": "token_count", "info": None}}))
+        return "\n".join(lines) + "\n"
+
+    def write(self, root: Path, name: str, text: str, mtime: float) -> Path:
+        path = root / name
+        path.write_text(text)
+        os.utime(path, (mtime, mtime))
+        return path
+
+    def test_session_tokens(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            local = self.write(root, "a.jsonl", self.session("ollama", [100, 2500]), 1.0)
+            cloud = self.write(root, "b.jsonl", self.session("openai", [999]), 1.0)
+            broken = self.write(root, "c.jsonl", "not json\n", 1.0)
+            self.assertEqual(session_local_tokens(local), 2500)  # the last running total counts
+            self.assertIsNone(session_local_tokens(cloud))
+            self.assertIsNone(session_local_tokens(broken))
+
+    def test_today_and_week(self) -> None:
+        now = datetime(2026, 11, 18, 15, 0).timestamp()
+        day = 24 * 3600
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self.write(root, "today.jsonl", self.session("ollama", [2_000_000]), now - 3600)
+            self.write(root, "yesterday.jsonl", self.session("ollama", [300_000]), now - day)
+            self.write(root, "old.jsonl", self.session("ollama", [5_000_000]), now - 8 * day)
+            self.write(root, "gpt.jsonl", self.session("openai", [7_000]), now - 60)
+            usage = read_local_usage(root, now)
+        self.assertEqual(usage, LocalUsage(2_000_000, 1, 2_300_000, 2))
+
+    def test_log_is_reread_only_when_it_changes(self) -> None:
+        now = time.time()
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self.write(root, "s.jsonl", self.session("ollama", [10]), now - 60)
+            self.assertEqual(read_local_usage(root, now).today_tokens, 10)
+            with patch("mission_control.usage.session_local_tokens") as reader:
+                read_local_usage(root, now)
+                reader.assert_not_called()  # unchanged: served from the cache
+            self.write(root, "s.jsonl", self.session("ollama", [10, 50]), now - 30)
+            self.assertEqual(read_local_usage(root, now).today_tokens, 50)
+
+    def test_format_tokens(self) -> None:
+        for count, text in ((999, "999"), (1_234, "1.2K"), (2_207_237, "2.2M")):
+            self.assertEqual(format_tokens(count), text)
 
 
 class ClaudeUsageTests(unittest.TestCase):

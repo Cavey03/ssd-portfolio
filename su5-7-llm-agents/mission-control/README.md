@@ -7,6 +7,9 @@ A terminal dashboard (TUI) for my Linux agentic coding setup. From one screen I 
 - see which AI coding agents (Claude Code, Codex, Antigravity) are running, and which run on my **local model**
 - see the **local LLM** (Ollama on my RTX 5070): server, models, what's loaded, GPU memory; start/stop it
 - launch any agent, including Codex on a local model, in any project with one keypress
+- **dispatch** a task: Opus picks the right worker (local model, Codex or Claude) and writes its brief, the
+  worker runs unattended in its own git worktree, Opus reviews the result, and I merge or discard it
+- see my plan limits (ChatGPT, Claude) and how many tokens my local model processed
 
 Built with **Python 3.14** and **[Textual](https://textual.textualize.io/)**.
 Part of my SSD portfolio: [ssd-portfolio](https://github.com/Cavey03/ssd-portfolio).
@@ -102,6 +105,74 @@ The local model server is **Ollama**, running on the host as a user service (see
 - **Key `4`** opens Codex on the model selected in the Local LLM panel (`codex -p local -m <model>`) in the
   project selected in the Projects panel. If Ollama isn't running, it says so instead.
 
+## Usage panel: the Local row
+The local model has no plan limits, so the panel shows how much work it did instead: tokens processed today
+and in the last 7 days, and in how many sessions. It reads the Codex session logs whose first line says
+`model_provider: "ollama"` and takes the last running total (`total_token_usage`) of each. A log is only read
+again when it changes, so the 60-second refresh stays instant. These are tokens that didn't use cloud limits.
+
+Local sessions also write an *empty* plan-limit entry to their logs. The ChatGPT row skips those, otherwise a
+local run would hide the real ChatGPT limits ("unknown").
+
+## Dispatch: orchestrator and workers
+```
+ you ──d──▶ Dispatch dialog ── task text ──▶ Opus (claude -p, no tools, JSON schema)
+                 ▲                              │ plan: worker, model, why, brief, time limit
+                 └──── confirm or change ◀──────┘                           │
+                                                                            ▼ logged in decisions.jsonl
+ Tasks panel ◀── task.json ◀── supervisor (detached process) ──────────────────┐
+   v view                         1. git worktree + branch task/<id>          │
+   m merge (asks first)           2. worker in dev, with a time limit:        │
+   x discard (asks first)            local: codex exec -p local -m <model>    │
+                                     codex: codex exec                        │
+                                     claude: claude -p --permission-mode acceptEdits
+                                  3. changes (files, diff) from the worktree  │
+                                  4. review by Opus: approve / changes / reject
+```
+**Life of a task:** `planned → running → done | timeout | failed → merged | discarded`. Each task is a folder
+in `~/.local/state/mission-control/tasks/<id>/` with `task.json`, `worker.log`, `diff.patch` and the worker's
+last message. The supervisor is a separate process, so tasks keep running when Mission Control is closed,
+and the Tasks panel picks them up again on the next start.
+
+**How Opus chooses** (`orchestrator.py`, `ROUTING_RULES`): the cheapest worker that will very likely succeed.
+- **local**: only small, single-step, well-specified tasks (1–2 files), only when Ollama is running,
+  10-minute limit, and a short concrete brief ending in "write the change first, then test, then fix".
+  These rules come from measurements: the local 9B model looped on a large task but did small ones in about
+  a minute ([agentic runs](../local-llm/agentic-runs/)).
+- **codex** (GPT): well-specified multi-file work. **claude**: ambiguous or design-heavy work.
+- The plan is checked before use: the local model can't be chosen while Ollama is off, and an unknown model
+  falls back to the default.
+
+**You stay in control:** nothing starts until you press Start (you can change the worker; Opus's brief is
+kept), and nothing is merged until you confirm `m`. If Opus can't be reached, choose a worker yourself and
+the task text becomes the brief.
+
+**Safety:**
+- Every worker works in its own git worktree under `~/Projects/.worktrees/`, never in the main checkout.
+  Codex workers run with `-s workspace-write` (they can only write inside it); Claude workers may edit files
+  and run only the unit tests and `git status`/`git diff`.
+- Every worker has a time limit (`timeout`), and the supervisor kills it 60 s after that if needed.
+- Workers run with `PYTHONDONTWRITEBYTECODE=1`, so running tests leaves no `.pyc` files in the diff.
+- A worktree starts from the last **commit**: uncommitted changes in the main checkout aren't in it.
+- Merging commits the worktree as `Task <id>: <title>` (no AI names in commit messages, see the portfolio
+  rules) and merges with `--no-ff`. On a conflict the merge is aborted and the main checkout is left as it was.
+- `decisions.jsonl` records every plan and whether I changed it. It's for transparency, **not training data**:
+  Anthropic's and OpenAI's terms forbid training models on their output.
+
+**Limits:** Opus reviews the diff and the worker's log; it doesn't run the tests itself. A worktree has no
+`.venv` (it's gitignored), so the brief tells the worker to use the main checkout's `.venv`.
+
+### From the command line
+`mc task` does the same without the dashboard (for scripts, or for another agent acting as orchestrator):
+```bash
+mc task start "add a --version option to mc"          # Opus plans, you confirm, it runs
+mc task start "fix the typo in README" --agent local  # skip planning, choose the worker yourself
+mc task list                                          # recent tasks with status and review
+mc task show <id>       mc task diff <id>
+mc task merge <id>      mc task discard <id>
+```
+The project is the folder you run `mc task` in (or `--project`).
+
 ## Launching agents
 Select a project and press `1` (Claude), `2` (Codex), `3` (Antigravity) or `4` (Codex on the local model). A **new Konsole window** opens in
 that project, inside the `dev` container. It is started detached, so it stays open when Mission Control closes.
@@ -182,6 +253,9 @@ Rebuild `.venv-host` (delete it and repeat step 2) when a Bazzite update changes
 | Found that a host update (Python 3.15) broke `mc` on the host; `.venv-host` and launcher order, 3 tests | Claude Code |
 | `localllm.py` parse functions + 15 tests | **Local model `ornith-1.5:9b`** via `codex exec -p local` in a worktree (2nd attempt; 1st looped), reviewed by Claude Code: fixed one bug (`self.` missing) and two broken test samples. [Write-up](../local-llm/agentic-runs/2026-11-18-localllm/README.md) |
 | Local LLM panel, `localllm.py` server/GPU/service functions, local-agent detection, keys `4` and `o`, Usage fix for local sessions, 24 tests | Claude Code |
+| `worktrees.py` (git layer of Dispatch) + 27 tests | **Codex (`gpt-6.1-sol`)** in a worktree, 3 min, accepted unchanged after review. [Comparison with the local model](../local-llm/agentic-runs/2026-11-18-worktrees-gpt/README.md) |
+| Dispatch: orchestrator (Opus planning + review), task store and supervisor, `mc task` CLI, Dispatch dialog, Tasks panel, task view, 25 tests; Usage panel Local row, 4 tests | Claude Code (owner allowed GPT for Phases 3–4) |
+| End-to-end test of Dispatch with the local model; fixes it found (`.pyc` files, commit messages) | Claude Code. [Evidence](../local-llm/agentic-runs/2026-11-18-dispatch-e2e/README.md) |
 | Projects panel for the one-repo portfolio (projects = marked folders + separate repos, changes per folder), agents named by project, fixed a date-dependent usage test, 6 tests | Claude Code (owner chose "real projects only") |
 
 ### Agent review notes

@@ -8,6 +8,10 @@
   weekly utilization in percent, with reset times. Claude Code refreshes that
   cache itself; we only read it. It is an internal format, so every field is
   treated as optional.
+- Local model (Ollama): has no plan limits, so instead we count the tokens it
+  processed: Codex sessions whose log says `model_provider: "ollama"`, using the
+  last `total_token_usage` in each. That is roughly what those sessions would
+  otherwise have cost in cloud usage.
 """
 
 from __future__ import annotations
@@ -40,6 +44,17 @@ class CodexUsage:
     weekly: LimitWindow | None
     observed_at: float
     """When this snapshot was written (mtime of the log file)."""
+
+
+@dataclass(frozen=True)
+class LocalUsage:
+    """Tokens processed by the local model (Codex sessions on Ollama)."""
+
+    today_tokens: int
+    today_sessions: int
+    week_tokens: int
+    week_sessions: int
+    """The last 7 days, including today."""
 
 
 @dataclass(frozen=True)
@@ -165,3 +180,74 @@ def read_claude_usage(
     except OSError:
         return None
     return parse_claude_config(text, time.time() if now is None else now)
+
+
+LOCAL_PROVIDERS = frozenset({"ollama"})
+"""Codex `model_provider` values that mean the model ran on this machine."""
+_local_cache: dict[Path, tuple[float, int | None]] = {}
+"""log file -> (mtime, tokens or None for a cloud session); a log is only re-read when it changes."""
+
+
+def session_local_tokens(log: Path) -> int | None:
+    """Return the total tokens of a local-model session log, or None for a cloud session.
+
+    The first line (`session_meta`) names the provider, so cloud logs are rejected
+    after one line. `total_token_usage` is a running total; the last one counts.
+    """
+    with log.open(errors="replace") as f:
+        try:
+            meta = json.loads(f.readline())
+        except json.JSONDecodeError:
+            return None
+        payload = meta.get("payload") if isinstance(meta, dict) else None
+        if meta.get("type") != "session_meta" or not isinstance(payload, dict):
+            return None
+        if payload.get("model_provider") not in LOCAL_PROVIDERS:
+            return None
+        total = 0
+        for line in f:
+            if '"total_token_usage"' not in line:
+                continue  # cheap check before parsing JSON
+            try:
+                info = json.loads(line)["payload"]["info"]["total_token_usage"]
+                total = int(info["total_tokens"])
+            except (json.JSONDecodeError, KeyError, TypeError, ValueError):
+                continue
+        return total
+
+
+def read_local_usage(sessions_dir: Path = CODEX_SESSIONS, now: float | None = None) -> LocalUsage:
+    """Add up the local model's tokens for today and the last 7 days.
+
+    A session counts on the day it was last active (the log's modification time).
+    """
+    now = time.time() if now is None else now
+    week_start = now - 7 * 24 * 3600
+    today_start = datetime.fromtimestamp(now).replace(hour=0, minute=0, second=0, microsecond=0).timestamp()
+    today = [0, 0]
+    week = [0, 0]
+    try:
+        logs = list(sessions_dir.rglob("*.jsonl"))
+    except OSError:
+        logs = []
+    for log in logs:
+        try:
+            mtime = log.stat().st_mtime
+            if mtime < week_start:
+                continue
+            cached = _local_cache.get(log)
+            if cached is not None and cached[0] == mtime:
+                tokens = cached[1]
+            else:
+                tokens = session_local_tokens(log)
+                _local_cache[log] = (mtime, tokens)
+        except OSError:
+            continue
+        if tokens is None:
+            continue
+        week[0] += tokens
+        week[1] += 1
+        if mtime >= today_start:
+            today[0] += tokens
+            today[1] += 1
+    return LocalUsage(today[0], today[1], week[0], week[1])
