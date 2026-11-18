@@ -17,9 +17,9 @@ downloaded on 2026-11-18.
 | Chapter 3 – Forward Propagation – Intro to Neural Prediction (with my comments) | ✅ | [commented/](commented/Chapter%203%20-%20Forward%20Propagation%20-%20Intro%20to%20Neural%20Prediction.ipynb): League of Legends version |
 | Chapter 4 – Gradient Descent – Intro to Neural Learning (original) | ✅ | [original/](original/Chapter%204%20-%20Gradient%20Descent%20-%20Intro%20to%20Neural%20Learning.ipynb) |
 | Chapter 4 – Gradient Descent – Intro to Neural Learning (with my comments) | ✅ | [commented/](commented/Chapter%204%20-%20Gradient%20Descent%20-%20Intro%20to%20Neural%20Learning.ipynb): League of Legends version, plus my learning-rate experiment |
-| Optional: Chapter 5 – Generalizing Gradient Descent | ❌ | |
-| Optional: Chapter 6 – Intro to Backpropagation | ❌ | |
-| Optional: Chapter 8 – Intro to Regularization | ❌ | |
+| Optional: Chapter 5 – Generalizing Gradient Descent | 🟡 original added, comments to do | [original](original/Chapter%205%20-%20Generalizing%20Gradient%20Descent%20-%20Learning%20Multiple%20Weights%20at%20a%20Time.ipynb) · copy to comment in `commented/` |
+| Optional: Chapter 6 – Intro to Backpropagation | 🟡 original added, comments to do | [original](original/Chapter%206%20-%20Intro%20to%20Backpropagation%20-%20Building%20Your%20First%20DEEP%20Neural%20Network.ipynb) · copy to comment in `commented/` |
+| Optional: Chapter 8 – Intro to Regularization | 🟡 original added, comments to do | [original](original/Chapter%208%20-%20Intro%20to%20Regularization%20-%20Learning%20Signal%20and%20Ignoring%20Noise.ipynb) · copy to comment in `commented/` (loads MNIST through `keras`; runs as-is in Colab) |
 | Optional: Chapter 9 – Intro to Activation Functions | ❌ | |
 | Optional: other notebooks experimented with | ❌ | |
 

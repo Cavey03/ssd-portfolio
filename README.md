@@ -54,7 +54,7 @@ No deliverable. The outcomes are covered in the [SU1 study summary](su1-machine-
 |---|---|---|
 | Chapter 3 – Forward Propagation (original + with my comments) | ✅ | [`su3-learning-models/`](su3-learning-models/README.md) |
 | Chapter 4 – Gradient Descent (original + with my comments) | ✅ | [`su3-learning-models/`](su3-learning-models/README.md) |
-| ➖ Chapters 5, 6, 8, 9 and other notebooks | ❌ | |
+| ➖ Chapters 5, 6, 8, 9 and other notebooks | 🟡 Ch 5, 6, 8 originals added, comments to do | [`su3-learning-models/`](su3-learning-models/README.md) |
 
 ### SU4 – Convolutional neural networks → [`su4-cnn/`](su4-cnn/)
 | Item | Status | Where |
@@ -62,7 +62,7 @@ No deliverable. The outcomes are covered in the [SU1 study summary](su1-machine-
 | Group project report | ❌ | |
 | Group project presentation slides | ❌ | |
 | All experiments in the report (scripts, notebooks, results, comments) | 🟡 | [`su4-cnn/group-repo/`](su4-cnn/README.md) (submodule of [Gravity-Spy-Glitch-Spectrogram-Classification](https://github.com/Cavey03/Gravity-Spy-Glitch-Spectrogram-Classification)) |
-| Dataset(s) in different stages of cleanup | ❌ | |
+| Dataset(s) in different stages of cleanup | ✅ | [`su4-cnn/group-repo/`](su4-cnn/README.md): `splits/` (train, validation, test, blank-image list) and the `data/` loading and inspection code |
 | ➖ More experiments, Trask Chapters 10 and 11 | ❌ | |
 
 ### SU5–7 – Transfer learning, LLMs, agents → [`su5-7-llm-agents/`](su5-7-llm-agents/)

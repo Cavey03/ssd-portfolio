@@ -20,7 +20,7 @@ models, notebooks, outputs, data splits and a `RUNBOOK.md`.
 | Group project report | ❌ | add here |
 | Group project presentation slides | ❌ | add here |
 | All experiments referred to in the report (scripts, programs, notebooks, results, comments) | 🟡 | [`group-repo/`](group-repo/) (submodule); still to map each report experiment to its file |
-| Dataset(s) in different stages of cleanup | ❌ | add samples or describe where they are (large datasets stay out of git) |
+| Dataset(s) in different stages of cleanup | ✅ | `group-repo/splits/` (train, validation, test, and the blank images removed in cleanup) and `group-repo/data/` (loading, inspection and transforms). The full 3.1 GB Gravity Spy download stays out of git |
 | Optional: more experiments not in the report | ❌ | |
 | Optional: Trask Chapter 10 – Intro to CNNs | ❌ | |
 | Optional: Trask Chapter 11 – Intro to Word Embeddings | ❌ | |
