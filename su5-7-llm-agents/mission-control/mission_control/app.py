@@ -18,7 +18,7 @@ from mission_control.agents import (
     AgentProcess, describe_folder, find_agents, format_age, stop_agent,
 )
 from mission_control.dialogs import ConfirmScreen
-from mission_control.gitinfo import default_projects_root, scan_projects
+from mission_control.gitinfo import ProjectStatus, default_projects_root, scan_projects
 from mission_control.launcher import launch_agent
 from mission_control.panels import AgentsPanel, ContainersPanel, ProjectsPanel, UsagePanel, _ThemedPanel
 from mission_control.settings import load_settings, save_setting
@@ -56,6 +56,8 @@ class MissionControlApp(App[None]):
         saved = load_settings().get("theme")
         self.theme = saved if isinstance(saved, str) and saved in self.available_themes else DEFAULT_THEME
         self._container_action_pending = False
+        self._project_keys: tuple[str, ...] = ()
+        """Project folders from the last scan; the Agents panel names agents by them."""
 
     def compose(self) -> ComposeResult:
         yield Header(show_clock=True)
@@ -104,9 +106,12 @@ class MissionControlApp(App[None]):
     def refresh_projects(self) -> None:
         """Scan the projects in a background thread so the UI never freezes."""
         statuses = scan_projects(self.projects_root)
-        self.call_from_thread(
-            self.query_one(ProjectsPanel).show, self.projects_root, statuses
-        )
+        self.call_from_thread(self._show_projects, statuses)
+
+    def _show_projects(self, statuses: list[ProjectStatus]) -> None:
+        """Show the scan (UI thread) and remember the project folders for the Agents panel."""
+        self._project_keys = tuple(s.key or s.name for s in statuses)
+        self.query_one(ProjectsPanel).show(self.projects_root, statuses)
 
     @work(thread=True, exclusive=True, group="containers")
     def refresh_containers(self) -> None:
@@ -122,7 +127,7 @@ class MissionControlApp(App[None]):
         agents = find_agents()
         if not get_current_worker().is_cancelled:
             self.call_from_thread(
-                self.query_one(AgentsPanel).show, agents, self.projects_root
+                self.query_one(AgentsPanel).show, agents, self.projects_root, self._project_keys
             )
 
     @work(thread=True, exclusive=True, group="usage")
@@ -182,7 +187,7 @@ class MissionControlApp(App[None]):
         if agent is None:
             self.notify("Select an agent in the Agents panel first.", severity="warning")
             return
-        where = describe_folder(agent.cwd, self.projects_root)
+        where = describe_folder(agent.cwd, self.projects_root, self._project_keys)
         question = f"Stop {agent.agent} in {where}?"
         detail = (
             f"pid {agent.pid}, running for {format_age(agent.started)}.\n"

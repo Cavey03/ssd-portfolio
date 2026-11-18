@@ -19,9 +19,11 @@ Type `mc` in any terminal, or open **Mission Control** from the KDE app menu (De
 Install the command and menu entry once with `./scripts/install.sh` (`--uninstall` removes both).
 It links `~/.local/bin/mc` to `scripts/mc` and writes `~/.local/share/applications/mission-control.desktop`.
 
-**Where it runs:** started from the host, `mc` runs the app **on the host** using the same `.venv`
-(host and container have the same Python version). If that ever stops working, for example after a host
-update changes Python, it falls back to running inside `dev`.
+**Where it runs:** started from the host, `mc` runs the app **on the host**. A Python venv only works with
+the Python version it was built with, and the host and `dev` can differ (since November 2026 the host has
+Python 3.15 and `dev` 3.14). So there are two venvs: `.venv` (built in `dev`) and `.venv-host` (built on the
+host). `mc` tries `.venv-host`, then `.venv`, and if neither works it falls back to running inside `dev`
+with a warning.
 
 **Why the host:** a program started through `distrobox enter` keeps running invisibly when you close its
 window, because podman's `conmon` keeps the container side of the terminal open. A test with a
@@ -31,10 +33,21 @@ no `distrobox-host-exec` workarounds needed.
 
 ## Tests
 ```bash
-.venv/bin/python -m unittest -v
+.venv/bin/python -m unittest -v        # inside dev
+.venv-host/bin/python -m unittest -v   # on the host: the app must work in both
 ```
 
 ## How the Projects panel works
+- **What counts as a project.** `~/Projects` is one git repo (the portfolio), so the panel lists:
+  1. the portfolio repo itself (`Projects`), with its branch, changes and sync state;
+  2. indented under it, each folder inside it that has its own `CLAUDE.md` or `AGENTS.md`, such as
+     `su5-7-llm-agents/mission-control`. Each shows only the changes inside that folder
+     (`git status -- <folder>`), and shares the repo's branch;
+  3. every separate git repo below `~/Projects`, such as `particle-sim` or the `su4-cnn/group-repo` submodule.
+  The search goes 4 folder levels deep, skips hidden folders, `.venv` and `node_modules`, and doesn't look
+  inside separate repos. Plain folders such as `su3-learning-models/` aren't projects, so they aren't listed.
+- The launch keys open the agent in exactly the selected folder, and the Agents panel names each agent by
+  the project it works in (`mission-control`, not `su5-7-llm-agents`).
 - `gitinfo.py` runs `git status --porcelain=v2 --branch` in each folder in `~/Projects`. The
   "porcelain" format is git's stable, machine-readable output. One command gives the branch,
   the changed files and how many commits are ahead of or behind the remote.
@@ -103,14 +116,29 @@ which needs plain `#rrggbb` colours, so `themes.py` turns the active theme into 
 text is the foreground blended into the background, because Textual's `auto 60%` isn't a real colour).
 Each panel remembers its last data and redraws instantly when the theme changes.
 
+## Known issues
+- **Containers panel at startup:** about one start in three, the Containers table first draws its columns
+  at header width (`dev   ● run  fedor`). The data is right; the next refresh (within 10 s) draws it
+  correctly. Present before the version 2 work; not yet investigated.
+
 ## Setup
 ```bash
+# 1. The dev venv (for tests and for running inside dev)
 distrobox enter dev
 cd ~/Projects/su5-7-llm-agents/mission-control
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+exit
+
+# 2. The host venv (so mc runs on the host). Run on the host, not in dev.
+#    Only this project folder changes; nothing is installed into the system.
+cd ~/Projects/su5-7-llm-agents/mission-control
+python3 -m venv .venv-host
+.venv-host/bin/pip install -r requirements.txt
 ```
+Rebuild `.venv-host` (delete it and repeat step 2) when a Bazzite update changes the host's Python;
+`mc` warns when it has to fall back to `dev`.
 
 ## Who built what
 | Part | Built by |
@@ -127,6 +155,8 @@ pip install -r requirements.txt
 | Theme system: Neon City / CRT Green / CRT Amber / Mission Teal, `t` to cycle, saved choice, 10 tests | Claude Code |
 | `mc` launcher, KDE menu entry, install script, script tests | Codex (**GPT-6.1 Sol**), reviewed by Claude Code |
 | Review: found that closing the window orphaned the app inside `dev` (pty test); `mc` now runs on the host with a fallback; menu category fix | Claude Code |
+| Found that a host update (Python 3.15) broke `mc` on the host; `.venv-host` and launcher order, 3 tests | Claude Code |
+| Projects panel for the one-repo portfolio (projects = marked folders + separate repos, changes per folder), agents named by project, fixed a date-dependent usage test, 6 tests | Claude Code (owner chose "real projects only") |
 
 ### Agent review notes
 - **Codex skeleton:** clean, typed, well-structured code that worked on the first run. It ignored one

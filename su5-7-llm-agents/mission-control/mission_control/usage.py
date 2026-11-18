@@ -148,10 +148,15 @@ def parse_claude_config(text: str, now: float) -> ClaudeUsage | None:
     )
 
 
-def read_claude_usage(config_path: Path = CLAUDE_CONFIG) -> ClaudeUsage | None:
-    """Return Claude's cached plan limits, or None if they aren't available."""
+def read_claude_usage(
+    config_path: Path = CLAUDE_CONFIG, now: float | None = None
+) -> ClaudeUsage | None:
+    """Return Claude's cached plan limits, or None if they aren't available.
+
+    `now` defaults to the current time; tests pass a fixed time.
+    """
     try:
         text = config_path.read_text()
     except OSError:
         return None
-    return parse_claude_config(text, time.time())
+    return parse_claude_config(text, time.time() if now is None else now)

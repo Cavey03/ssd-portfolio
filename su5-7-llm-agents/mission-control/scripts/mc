@@ -20,22 +20,28 @@ if [[ -z "$container" && -f "$containerenv" ]]; then
     container=${container:-unknown}
 fi
 
-venv_python="$repo_dir/.venv/bin/python"
+venv_python="$repo_dir/.venv/bin/python"            # built inside dev
+host_venv_python="$repo_dir/.venv-host/bin/python"  # built with the host's Python
 
 case "$container" in
     '')
-        # On the host: prefer running the app right here, using the same .venv.
+        # On the host: prefer running the app right here.
         # Why: a program started through `distrobox enter` keeps running invisibly
         # if you close its window (podman's conmon keeps the container side of the
         # terminal open). On the host, closing the window stops the app normally.
-        # The .venv only works on the host while host and container have the same
-        # Python version, so check that it can import the app's library first.
-        if [[ -x "$venv_python" ]] && "$venv_python" -c 'import textual' >/dev/null 2>&1; then
-            cd "$repo_dir"
-            exec "$venv_python" -m mission_control "$@"
-        fi
-        printf 'Note: the .venv does not work on the host, so Mission Control runs inside dev.\n' >&2
+        # A venv only works with the Python version it was built with, and the host
+        # and dev can differ (host 3.15, dev 3.14 since Nov 2026). So try the host's
+        # own .venv-host first, then dev's .venv, and use the first one that can
+        # import the app's library.
+        for python in "$host_venv_python" "$venv_python"; do
+            if [[ -x "$python" ]] && "$python" -c 'import textual' >/dev/null 2>&1; then
+                cd "$repo_dir"
+                exec "$python" -m mission_control "$@"
+            fi
+        done
+        printf 'Note: no venv works on the host, so Mission Control runs inside dev.\n' >&2
         printf 'Quit it with q: closing the window would leave it running in the background.\n' >&2
+        printf 'Fix: build .venv-host on the host (see README, "Setup").\n' >&2
         exec distrobox enter dev -- "$script_path" "$@" ;;
     dev) ;; # Already in the right container; continue below.
     *) printf 'Error: run mc on the host or inside dev (current container: %s).\n' "$container" >&2

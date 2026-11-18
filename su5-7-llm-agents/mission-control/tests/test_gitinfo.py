@@ -7,7 +7,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from mission_control.gitinfo import parse_porcelain_v2, read_status, scan_projects
+from mission_control.gitinfo import find_projects, parse_porcelain_v2, read_status, scan_projects
 
 
 def git(cwd: Path, *args: str) -> None:
@@ -88,13 +88,73 @@ class ReadStatusTests(unittest.TestCase):
         folder.mkdir()
         self.assertFalse(read_status(folder).is_repo)
 
-    def test_scan_sorts_and_skips_hidden_folders(self) -> None:
-        make_repo(self.root / "b-project")
+    def test_plain_folders_without_markers_are_not_projects(self) -> None:
         (self.root / "A-folder").mkdir()
-        (self.root / ".hidden").mkdir()
         (self.root / "file.txt").write_text("not a folder\n")
-        names = [s.name for s in scan_projects(self.root)]
-        self.assertEqual(names, ["A-folder", "b-project"])
+        self.assertEqual(scan_projects(self.root), [])
+
+    def test_missing_root_returns_empty_list(self) -> None:
+        self.assertEqual(scan_projects(self.root / "does-not-exist"), [])
+
+
+class FindProjectsTests(unittest.TestCase):
+    """The portfolio layout: ~/Projects is one repo with projects inside it."""
+
+    def setUp(self) -> None:
+        self._tmp = tempfile.TemporaryDirectory()
+        self.root = make_repo(Path(self._tmp.name) / "Projects")
+        for folder in ("su5/mission-control", "su5/local-llm", "tools/summaries"):
+            (self.root / folder).mkdir(parents=True)
+        (self.root / "su5/mission-control/CLAUDE.md").write_text("rules\n")
+        (self.root / "su5/local-llm/AGENTS.md").write_text("rules\n")
+        (self.root / "tools/summaries/build.py").write_text("print()\n")  # no marker
+        make_repo(self.root / "particle-sim")
+        (self.root / "particle-sim/CLAUDE.md").write_text("rules\n")
+        for skipped in (".worktrees/task/CLAUDE.md", ".venv/x/CLAUDE.md", "particle-sim/sub/AGENTS.md"):
+            (self.root / skipped).parent.mkdir(parents=True, exist_ok=True)
+            (self.root / skipped).write_text("rules\n")
+        git(self.root, "add", "su5", "tools")
+        git(self.root, "commit", "-q", "-m", "projects")
+
+    def tearDown(self) -> None:
+        self._tmp.cleanup()
+
+    def test_finds_marked_folders_and_separate_repos_only(self) -> None:
+        keys = [p.relative_to(self.root).as_posix() for p in find_projects(self.root)]
+        # Not found: hidden folders, .venv, a folder without a marker, folders inside another repo.
+        self.assertEqual(keys, ["particle-sim", "su5/local-llm", "su5/mission-control"])
+
+    def test_scan_order_root_then_inside_then_separate_repos(self) -> None:
+        statuses = scan_projects(self.root)
+        self.assertEqual(
+            [(s.key, s.name, s.in_root_repo) for s in statuses],
+            [
+                (".", "Projects", False),
+                ("su5/local-llm", "su5/local-llm", True),
+                ("su5/mission-control", "su5/mission-control", True),
+                ("particle-sim", "particle-sim", False),
+            ],
+        )
+        self.assertEqual(statuses[2].path, self.root / "su5/mission-control")
+
+    def test_changes_are_counted_per_folder(self) -> None:
+        (self.root / "su5/mission-control/app.py").write_text("new\n")
+        (self.root / "su5/mission-control/CLAUDE.md").write_text("edited\n")
+        changes = {s.key: s.changes for s in scan_projects(self.root)}
+        # The root also sees particle-sim/ and .venv/ etc. as untracked (no .gitignore in the test repo).
+        self.assertEqual(changes["su5/mission-control"], 2)
+        self.assertEqual(changes["su5/local-llm"], 0)
+        self.assertGreaterEqual(changes["."], 2)
+        self.assertEqual(changes["particle-sim"], 2)  # its own repo: the untracked CLAUDE.md and sub/
+
+    def test_root_that_is_not_a_repo_lists_projects_without_git(self) -> None:
+        plain = Path(self._tmp.name) / "plain"
+        (plain / "tool").mkdir(parents=True)
+        (plain / "tool/AGENTS.md").write_text("rules\n")
+        make_repo(plain / "repo")
+        statuses = scan_projects(plain)
+        self.assertEqual([(s.key, s.is_repo) for s in statuses], [("tool", False), ("repo", True)])
+
 
     def test_missing_root_returns_empty_list(self) -> None:
         self.assertEqual(scan_projects(self.root / "does-not-exist"), [])

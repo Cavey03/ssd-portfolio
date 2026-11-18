@@ -17,6 +17,7 @@ import subprocess
 import time
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Sequence
 
 PROC = Path("/proc")
 
@@ -157,9 +158,14 @@ def find_agents(proc: Path = PROC, ask_host: bool = True) -> list[AgentProcess]:
     return sorted(found, key=lambda a: (a.started or 0, a.pid))
 
 
-def describe_folder(cwd: Path | None, projects_root: Path) -> str:
+def describe_folder(
+    cwd: Path | None, projects_root: Path, projects: Sequence[str] = ()
+) -> str:
     """Describe an agent's folder relative to the projects root.
 
+    `projects` are the known project folders relative to the root (from the
+    Projects panel, e.g. "su5-7-llm-agents/mission-control"). If the agent works
+    inside one of them, the project's own folder name is shown ("mission-control").
     /var/home is the real path of /home on Fedora Atomic, so both are normalised.
     """
     if cwd is None:
@@ -173,9 +179,13 @@ def describe_folder(cwd: Path | None, projects_root: Path) -> str:
     if path == root:
         return "~/Projects"
     if path.startswith(root + "/"):
-        parts = path[len(root) + 1 :].split("/")
+        relative = path[len(root) + 1 :]
+        parts = relative.split("/")
         if parts[0] == ".worktrees" and len(parts) > 1:
             return f"{parts[1]} (worktree)"
+        inside = [p for p in projects if p != "." and (relative + "/").startswith(p + "/")]
+        if inside:
+            return max(inside, key=len).rsplit("/", 1)[-1]  # the deepest matching project
         return parts[0]
     if path == home:
         return "~"

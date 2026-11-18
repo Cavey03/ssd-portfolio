@@ -1,4 +1,5 @@
 .venv/
+.venv-host/
 __pycache__/
 *.pyc
 .codex-task.txt

@@ -55,6 +55,21 @@ class DescribeFolderTests(unittest.TestCase):
             with self.subTest(cwd=cwd):
                 self.assertEqual(describe_folder(cwd, root), expected)
 
+    def test_agent_is_named_by_its_project(self) -> None:
+        root = Path.home() / "Projects"
+        projects = (".", "su5-7-llm-agents/mission-control", "su5-7-llm-agents/local-llm", "particle-sim")
+        cases = [
+            (root / "su5-7-llm-agents/mission-control/tests", "mission-control"),
+            (root / "su5-7-llm-agents/local-llm", "local-llm"),
+            (root / "su5-7-llm-agents/environment", "su5-7-llm-agents"),  # not a project: first folder
+            (root / "particle-sim/src", "particle-sim"),
+            (root / "su5-7-llm-agents/mission-control-old", "su5-7-llm-agents"),  # prefix, not inside
+            (root, "~/Projects"),
+        ]
+        for cwd, expected in cases:
+            with self.subTest(cwd=cwd):
+                self.assertEqual(describe_folder(cwd, root, projects), expected)
+
     def test_format_age(self) -> None:
         now = 1_000_000.0
         self.assertEqual(format_age(now - 5, now), "5s")
@@ -204,7 +219,7 @@ class ClaudeUsageTests(unittest.TestCase):
             path = Path(tmp) / ".claude.json"
             self.assertIsNone(read_claude_usage(path))  # missing file
             path.write_text(self.config())
-            usage = read_claude_usage(path)
+            usage = read_claude_usage(path, now=self.NOW)  # fixed time: the sample's windows mustn't expire
         assert usage is not None
         self.assertEqual(usage.weekly.used_percent, 29)
 

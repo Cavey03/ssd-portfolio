@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from pathlib import Path
-from typing import Any, ClassVar
+from typing import Any, ClassVar, Sequence
 
 from rich.text import Text
 from textual.app import ComposeResult
@@ -106,7 +106,11 @@ class _TablePanel(_ThemedPanel):
 
 
 class ProjectsPanel(_TablePanel):
-    """Folders in the projects root with their live git status."""
+    """The projects below the projects root with their live git status.
+
+    Row keys are paths relative to the root ("." is the root), so the launch
+    keys can open an agent in exactly that folder.
+    """
 
     PANEL_TITLE = "Projects"
     COLUMNS = ("Name", "Branch", "Changes", "Sync")
@@ -117,23 +121,31 @@ class ProjectsPanel(_TablePanel):
         pal = self.palette
         selected = self.selected_name
         self.table.clear()
-        for status in statuses:
-            self.table.add_row(*_project_cells(status, pal), key=status.name)
-        self._restore_selection(selected, [s.name for s in statuses])
+        keys = [s.key or s.name for s in statuses]
+        for status, key in zip(statuses, keys):
+            self.table.add_row(*_project_cells(status, pal), key=key)
+        self._restore_selection(selected, keys)
 
-        repos = sum(s.is_repo for s in statuses)
         if statuses:
-            self.set_label(f"{root}  ·  {repos} repos")
+            repos = sum(s.is_repo and not s.in_root_repo for s in statuses)
+            self.set_label(f"{root}  ·  {len(statuses)} projects  ·  {repos} repos")
         else:
-            self.set_label(f"{root}  ·  no project folders found")
+            self.set_label(f"{root}  ·  no projects found")
         self.border_subtitle = f"updated {datetime.now():%H:%M:%S}"
 
 
 def _project_cells(
     status: ProjectStatus, pal: Palette = DEFAULT_PALETTE
 ) -> tuple[Text, Text, Text, Text]:
-    """Turn a ProjectStatus into the four styled table cells."""
-    name = Text(status.name, style="bold")
+    """Turn a ProjectStatus into the four styled table cells.
+
+    Folders inside the root repo are indented under it and leave Branch and Sync
+    to the root's row, because they share them.
+    """
+    if status.in_root_repo:
+        name = Text().append("  └ ", style=pal.muted).append(status.name)  # only the glyph is dim
+    else:
+        name = Text(status.name, style="bold")
 
     if not status.is_repo:
         return name, Text("—", style=pal.muted), Text("not a git repo", style=pal.muted), Text("")
@@ -147,6 +159,8 @@ def _project_cells(
         changes = Text(f"● {status.changes} changed", style=pal.warn)
     else:
         changes = Text("✓ clean", style=pal.ok)
+    if status.in_root_repo:
+        return name, Text("·", style=pal.muted), changes, Text("")
 
     if status.ahead is None:
         sync = Text("no remote", style=pal.muted)
@@ -265,9 +279,11 @@ class AgentsPanel(_TablePanel):
         """The agent session in the selected row, if any."""
         return self.agents.get(self.selected_name or "")
 
-    def show(self, agents: list[AgentProcess], projects_root: Path) -> None:
+    def show(
+        self, agents: list[AgentProcess], projects_root: Path, projects: Sequence[str] = ()
+    ) -> None:
         """Replace the rows (one per session, keyed by process id)."""
-        self._last = (agents, projects_root)
+        self._last = (agents, projects_root, projects)
         pal = self.palette
         selected = self.selected_name
         self.table.clear()
@@ -275,7 +291,7 @@ class AgentsPanel(_TablePanel):
         for agent in agents:
             self.table.add_row(
                 Text(f"● {agent.agent}", style=f"bold {pal.agent(agent.agent)}"),
-                Text(describe_folder(agent.cwd, projects_root)),
+                Text(describe_folder(agent.cwd, projects_root, projects)),
                 Text(format_age(agent.started), style=pal.muted),
                 key=str(agent.pid),
             )

@@ -1,9 +1,17 @@
-"""Read the git status of project folders.
+"""Find the projects in ~/Projects and read their git status.
 
 This module has no UI code, so it can be tested on its own. It runs one
 `git status --porcelain=v2 --branch` per project. That machine-readable output
 contains the branch, the ahead/behind counts against the upstream and one line
 per changed file.
+
+~/Projects is itself one git repo (the portfolio), so a "project" is either:
+  * the root repo itself,
+  * a folder inside it with its own CLAUDE.md or AGENTS.md (for example
+    su5-7-llm-agents/mission-control). Its status is the root repo's status
+    limited to that folder (`git status -- <folder>`), or
+  * a separate git repo somewhere below the root (for example particle-sim, or
+    a submodule). We don't look inside it.
 """
 
 from __future__ import annotations
@@ -14,6 +22,12 @@ from dataclasses import dataclass
 from pathlib import Path
 
 GIT_TIMEOUT_SECONDS = 5
+PROJECT_MARKERS = ("CLAUDE.md", "AGENTS.md")
+"""A folder holding one of these files is a project."""
+SKIP_DIRS = frozenset({".venv", "venv", "node_modules", "__pycache__"})
+"""Never searched (big, and never projects). Hidden folders are skipped too."""
+MAX_DEPTH = 4
+"""How many folder levels below the root are searched for projects."""
 
 
 @dataclass(frozen=True)
@@ -31,6 +45,10 @@ class ProjectStatus:
     behind: int | None = None
     """Commits on the remote not yet pulled. None means no upstream."""
     error: str | None = None
+    key: str = ""
+    """Path relative to the projects root ("." for the root itself); unique per row."""
+    in_root_repo: bool = False
+    """A folder inside the root repo: it shares the root's branch and sync."""
 
 
 def default_projects_root() -> Path:
@@ -63,10 +81,21 @@ def parse_porcelain_v2(output: str) -> tuple[str | None, int, int | None, int | 
     return branch, changes, ahead, behind
 
 
-def read_status(path: Path) -> ProjectStatus:
-    """Return the git status of a single folder."""
-    if not (path / ".git").exists():
-        return ProjectStatus(name=path.name, path=path, is_repo=False)
+def is_git_repo(path: Path) -> bool:
+    """True if `path` is the top of a git repo (.git is a folder, or a file for submodules/worktrees)."""
+    return (path / ".git").exists()
+
+
+def read_status(path: Path, folder: str | None = None, key: str | None = None) -> ProjectStatus:
+    """Return the git status of the repo at `path`.
+
+    With `folder` (relative to `path`), only changes inside that folder are counted.
+    """
+    name = path.name if key in (None, ".") else key  # the root shows its folder name
+    target = path / folder if folder else path
+    extra = {"key": key or name, "in_root_repo": folder is not None}
+    if not is_git_repo(path):
+        return ProjectStatus(name=name, path=target, is_repo=False, **extra)
 
     env = {
         **os.environ,
@@ -77,7 +106,8 @@ def read_status(path: Path) -> ProjectStatus:
     }
     try:
         result = subprocess.run(
-            ["git", "-C", str(path), "status", "--porcelain=v2", "--branch"],
+            ["git", "-C", str(path), "status", "--porcelain=v2", "--branch",
+             *(["--", folder] if folder else [])],
             capture_output=True,
             text=True,
             timeout=GIT_TIMEOUT_SECONDS,
@@ -85,32 +115,80 @@ def read_status(path: Path) -> ProjectStatus:
             check=False,
         )
     except (OSError, subprocess.TimeoutExpired) as exc:
-        return ProjectStatus(name=path.name, path=path, is_repo=True, error=str(exc))
+        return ProjectStatus(name=name, path=target, is_repo=True, error=str(exc), **extra)
 
     if result.returncode != 0:
         message = result.stderr.strip().splitlines()
         return ProjectStatus(
-            name=path.name,
-            path=path,
+            name=name,
+            path=target,
             is_repo=True,
             error=message[-1] if message else f"git exited with {result.returncode}",
+            **extra,
         )
 
     branch, changes, ahead, behind = parse_porcelain_v2(result.stdout)
     return ProjectStatus(
-        name=path.name,
-        path=path,
+        name=name,
+        path=target,
         is_repo=True,
         branch=branch,
         changes=changes,
         ahead=ahead,
         behind=behind,
+        **extra,
     )
 
 
+def find_projects(root: Path, max_depth: int = MAX_DEPTH) -> list[Path]:
+    """Return the project folders below `root` (not `root` itself), in folder order.
+
+    A project is a separate git repo or a folder with a CLAUDE.md / AGENTS.md.
+    The search doesn't go inside separate repos: they are one project each.
+    """
+    found: list[Path] = []
+
+    def walk(folder: Path, depth: int) -> None:
+        try:
+            entries = sorted(
+                (e for e in os.scandir(folder) if e.is_dir(follow_symlinks=False)),
+                key=lambda e: e.name.lower(),
+            )
+        except OSError:
+            return  # unreadable folder: skip it rather than fail the whole scan
+        for entry in entries:
+            if entry.name.startswith(".") or entry.name in SKIP_DIRS:
+                continue
+            path = Path(entry.path)
+            if is_git_repo(path):
+                found.append(path)
+                continue
+            if any((path / marker).is_file() for marker in PROJECT_MARKERS):
+                found.append(path)
+            if depth < max_depth:
+                walk(path, depth + 1)
+
+    walk(root, 1)
+    return found
+
+
 def scan_projects(root: Path) -> list[ProjectStatus]:
-    """Return the status of every visible sub-folder of `root`, sorted by name."""
+    """Return the status of every project, in display order.
+
+    Order: the root repo, the projects inside it, then the separate repos.
+    """
     if not root.is_dir():
         return []
-    folders = [p for p in root.iterdir() if p.is_dir() and not p.name.startswith(".")]
-    return [read_status(p) for p in sorted(folders, key=lambda p: p.name.lower())]
+    root_is_repo = is_git_repo(root)
+    inside: list[ProjectStatus] = []
+    separate: list[ProjectStatus] = []
+    for path in find_projects(root):
+        key = path.relative_to(root).as_posix()
+        if is_git_repo(path):
+            separate.append(read_status(path, key=key))
+        elif root_is_repo:
+            inside.append(read_status(root, folder=key, key=key))
+        else:
+            inside.append(ProjectStatus(name=key, path=path, is_repo=False, key=key))
+    head = [read_status(root, key=".")] if root_is_repo else []
+    return head + inside + separate

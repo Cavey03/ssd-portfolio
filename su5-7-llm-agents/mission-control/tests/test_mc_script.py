@@ -58,15 +58,18 @@ class ScriptTests(unittest.TestCase):
 
 
 class McLauncherTests(ScriptTests):
-    def fake_venv(self, repo: Path, works_on_host: bool = True) -> Path:
-        """A fake .venv python: `-c ...` is the host check, anything else "runs the app"."""
-        python = repo / ".venv/bin/python"
+    def fake_venv(self, repo: Path, works_on_host: bool = True, venv: str = ".venv") -> Path:
+        """A fake venv python: `-c ...` is the host check, anything else "runs the app".
+
+        It prints its own venv name first, so tests can see which venv ran the app.
+        """
+        python = repo / venv / "bin/python"
         python.parent.mkdir(parents=True)
         check = "exit 0" if works_on_host else "exit 1"
         python.write_text(
             '#!/bin/bash\n'
             f'if [[ "${{1-}}" == -c ]]; then {check}; fi\n'
-            'printf "%s\\n" "$PWD" "$@"\n'
+            f'printf "%s\\n" {venv} "$PWD" "$@"\n'
         )
         python.chmod(0o755)
         return python
@@ -80,8 +83,36 @@ class McLauncherTests(ScriptTests):
         result = self.run_script(link, "--example", "two words", "$(literal)")
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(result.stdout.splitlines(), [
-            str(repo), "-m", "mission_control", "--example", "two words", "$(literal)",
+            ".venv", str(repo), "-m", "mission_control", "--example", "two words", "$(literal)",
         ])
+
+    def test_host_prefers_host_venv(self) -> None:
+        script = self.copy_launcher()
+        repo = script.parent.parent
+        self.fake_venv(repo)
+        self.fake_venv(repo, venv=".venv-host")
+        result = self.run_script(script)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout.splitlines()[0], ".venv-host")
+
+    def test_host_venv_used_when_dev_venv_breaks_on_host(self) -> None:
+        # The real case: dev's .venv is Python 3.14, the host has 3.15.
+        script = self.copy_launcher()
+        repo = script.parent.parent
+        self.fake_venv(repo, works_on_host=False)
+        self.fake_venv(repo, venv=".venv-host")
+        result = self.run_script(script)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout.splitlines()[:2], [".venv-host", str(repo)])
+
+    def test_broken_host_venv_falls_through_to_dev_venv(self) -> None:
+        script = self.copy_launcher()
+        repo = script.parent.parent
+        self.fake_venv(repo)
+        self.fake_venv(repo, works_on_host=False, venv=".venv-host")
+        result = self.run_script(script)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout.splitlines()[0], ".venv")
 
     def test_host_falls_back_to_dev_when_venv_does_not_work(self) -> None:
         script = self.copy_launcher()
