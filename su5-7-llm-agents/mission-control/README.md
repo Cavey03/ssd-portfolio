@@ -106,7 +106,7 @@ Each panel remembers its last data and redraws instantly when the theme changes.
 ## Setup
 ```bash
 distrobox enter dev
-cd ~/Projects/mission-control
+cd ~/Projects/su5-7-llm-agents/mission-control
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt

@@ -14,7 +14,7 @@ A terminal "mission control" dashboard (TUI) for the dev setup, built with Pytho
 | Launch | Open the selected project with an agent in a new Konsole tab | `1` Claude, `2` Codex, `3` Agy |
 
 ## Dev setup
-- Run everything inside `dev`: `distrobox enter dev`, then `cd ~/Projects/mission-control && source .venv/bin/activate`.
+- Run everything inside `dev`: `distrobox enter dev`, then `cd ~/Projects/su5-7-llm-agents/mission-control && source .venv/bin/activate`.
 - Run tests with `.venv/bin/python -m unittest -v`.
 - Dependencies are in `requirements.txt`. After adding a package, run `pip freeze > requirements.txt`.
 - The app runs on the host or inside `dev`, and must work in both. `mc` prefers the host (avoids orphaned processes when a window closes). Inside `dev`, use `distrobox-host-exec <cmd>` for host things (podman, Konsole).

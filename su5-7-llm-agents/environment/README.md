@@ -32,13 +32,23 @@ containers.
   agents (Claude, ChatGPT/Codex, Google) over local models such as Ollama,
   because they are much stronger at coding and need no GPU driver setup
   inside the container. Local models remain a possible future extension.
+  - **Update (2026-11-05):** a local model was added next to the cloud agents,
+    running on the host GPU rather than in the container. See
+    [`../local-llm`](../local-llm/README.md).
+- **Update (2026-11-18): one portfolio repo.** At first each project had its own
+  repo. They are now one repo, `~/Projects` itself, with a folder per ITRI626
+  study unit. The old repos' history was merged in, so no commits were lost.
 
 ```
 Bazzite host (read-only system)
 └── /var/home/Kyle/            ← shared with the container
-    └── Projects/
-        ├── ssd-portfolio/     ← this repository
-        └── <other projects>/
+    └── Projects/              ← the portfolio repo
+        ├── su2-…/ su3-…/ su4-…/
+        ├── su5-7-llm-agents/
+        │   ├── environment/   ← this write-up
+        │   ├── local-llm/
+        │   └── mission-control/
+        └── models/
 
 Distrobox container "dev" (Fedora 44)
 └── node, npm, python3, git, gh, codex
