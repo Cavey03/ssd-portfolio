@@ -59,8 +59,8 @@ No deliverable. The outcomes are covered in the [SU1 study summary](su1-machine-
 ### SU4 – Convolutional neural networks → [`su4-cnn/`](su4-cnn/)
 | Item | Status | Where |
 |---|---|---|
-| Group project report | ❌ | |
-| Group project presentation slides | ❌ | |
+| Group project report | ✅ | [`su4-cnn/ITRI626-Report-GravitySpy.docx`](su4-cnn/ITRI626-Report-GravitySpy.docx) |
+| Group project presentation slides | ✅ | [`su4-cnn/ITRI626-Presentation-GravitySpy.pptx`](su4-cnn/ITRI626-Presentation-GravitySpy.pptx) |
 | All experiments in the report (scripts, notebooks, results, comments) | 🟡 | [`su4-cnn/group-repo/`](su4-cnn/README.md) (submodule of [Gravity-Spy-Glitch-Spectrogram-Classification](https://github.com/Cavey03/Gravity-Spy-Glitch-Spectrogram-Classification)) |
 | Dataset(s) in different stages of cleanup | ✅ | [`su4-cnn/group-repo/`](su4-cnn/README.md): `splits/` (train, validation, test, blank-image list) and the `data/` loading and inspection code |
 | ➖ More experiments, Trask Chapters 10 and 11 | ❌ | |
