@@ -1,0 +1,3 @@
+[submodule "su4-cnn/group-repo"]
+	path = su4-cnn/group-repo
+	url = https://github.com/Cavey03/Gravity-Spy-Glitch-Spectrogram-Classification.git

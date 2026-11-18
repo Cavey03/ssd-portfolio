@@ -1,15 +1,19 @@
 # SU3 – Learning models: basic applications
 
-Based on Trask, *Grokking Deep Learning*. Keep each notebook twice: the original file and a copy with my
-comments (suggested names: `original/` and `commented/` subfolders).
+Based on Trask, *Grokking Deep Learning*. Each notebook is kept twice: the original in `original/` and my
+annotated copy in `commented/`.
+
+The originals come unchanged from the book's official repo,
+[iamtrask/Grokking-Deep-Learning](https://github.com/iamtrask/Grokking-Deep-Learning) (commit `e665168`),
+downloaded on 2026-11-18.
 
 ## Checklist
 | Item | Status | Where |
 |---|---|---|
-| Chapter 3 – Forward Propagation – Intro to Neural Prediction (original) | ❌ | |
-| Chapter 3 – Forward Propagation – Intro to Neural Prediction (with my comments) | ❌ | |
-| Chapter 4 – Gradient Descent – Intro to Neural Learning (original) | ❌ | |
-| Chapter 4 – Gradient Descent – Intro to Neural Learning (with my comments) | ❌ | |
+| Chapter 3 – Forward Propagation – Intro to Neural Prediction (original) | ✅ | [original/](original/Chapter%203%20-%20Forward%20Propagation%20-%20Intro%20to%20Neural%20Prediction.ipynb) |
+| Chapter 3 – Forward Propagation – Intro to Neural Prediction (with my comments) | ❌ | `commented/` |
+| Chapter 4 – Gradient Descent – Intro to Neural Learning (original) | ✅ | [original/](original/Chapter%204%20-%20Gradient%20Descent%20-%20Intro%20to%20Neural%20Learning.ipynb) |
+| Chapter 4 – Gradient Descent – Intro to Neural Learning (with my comments) | ❌ | `commented/` |
 | Optional: Chapter 5 – Generalizing Gradient Descent | ❌ | |
 | Optional: Chapter 6 – Intro to Backpropagation | ❌ | |
 | Optional: Chapter 8 – Intro to Regularization | ❌ | |

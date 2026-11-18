@@ -29,8 +29,8 @@ Legend: ✅ done · 🟡 partly done · ❌ not yet · ➖ optional
 ### SU3 – Learning models: basic applications → [`su3-learning-models/`](su3-learning-models/)
 | Item | Status | Where |
 |---|---|---|
-| Chapter 3 – Forward Propagation (original + with my comments) | ❌ | |
-| Chapter 4 – Gradient Descent (original + with my comments) | ❌ | |
+| Chapter 3 – Forward Propagation (original + with my comments) | 🟡 original added, comments to do | [`su3-learning-models/`](su3-learning-models/README.md) |
+| Chapter 4 – Gradient Descent (original + with my comments) | 🟡 original added, comments to do | [`su3-learning-models/`](su3-learning-models/README.md) |
 | ➖ Chapters 5, 6, 8, 9 and other notebooks | ❌ | |
 
 ### SU4 – Convolutional neural networks → [`su4-cnn/`](su4-cnn/)
@@ -38,7 +38,7 @@ Legend: ✅ done · 🟡 partly done · ❌ not yet · ➖ optional
 |---|---|---|
 | Group project report | ❌ | |
 | Group project presentation slides | ❌ | |
-| All experiments in the report (scripts, notebooks, results, comments) | 🟡 linked | [Gravity-Spy-Glitch-Spectrogram-Classification](https://github.com/Cavey03/Gravity-Spy-Glitch-Spectrogram-Classification) |
+| All experiments in the report (scripts, notebooks, results, comments) | 🟡 | [`su4-cnn/group-repo/`](su4-cnn/README.md) (submodule of [Gravity-Spy-Glitch-Spectrogram-Classification](https://github.com/Cavey03/Gravity-Spy-Glitch-Spectrogram-Classification)) |
 | Dataset(s) in different stages of cleanup | ❌ | |
 | ➖ More experiments, Trask Chapters 10 and 11 | ❌ | |
 
