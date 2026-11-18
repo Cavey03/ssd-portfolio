@@ -4,8 +4,9 @@ A terminal dashboard (TUI) for my Linux agentic coding setup. From one screen I 
 
 - see and start/stop my Distrobox containers
 - see the git status of every project in `~/Projects`
-- see which AI coding agents (Claude Code, Codex, Antigravity) are running
-- launch any agent in any project with one keypress
+- see which AI coding agents (Claude Code, Codex, Antigravity) are running, and which run on my **local model**
+- see the **local LLM** (Ollama on my RTX 5070): server, models, what's loaded, GPU memory; start/stop it
+- launch any agent, including Codex on a local model, in any project with one keypress
 
 Built with **Python 3.14** and **[Textual](https://textual.textualize.io/)**.
 Part of my SSD portfolio: [ssd-portfolio](https://github.com/Cavey03/ssd-portfolio).
@@ -78,8 +79,31 @@ no `distrobox-host-exec` workarounds needed.
     it. Run `/usage` in Claude Code for the freshest numbers. This is an internal format, so the parser
     treats every field as optional.
 
+## How the Local LLM panel works
+The local model server is **Ollama**, running on the host as a user service (see
+[`../local-llm`](../local-llm/README.md)). `localllm.py` reads it every 10 seconds:
+
+| Line | Source |
+|---|---|
+| `● Ollama 0.40.14 running` / `○ Ollama stopped` | `GET /api/version` on `127.0.0.1:11434`. No answer = stopped (normal, not an error) |
+| GPU bar, used / total GB, % busy | `nvidia-smi --query-gpu=...`. Not Ollama's own numbers: `ollama ps` under-reports `gemma4:12b`, and other programs use the GPU too |
+| One row per installed model, with its size | `GET /api/tags` |
+| `● loaded · 64K ctx · 100% GPU` | `GET /api/ps`. Below 100% means part of the model spilled into normal RAM (it works, but much slower) |
+
+- **★** marks the default model of the Codex `local` profile (`~/.codex/local.config.toml`).
+- **`o`** starts the server (`systemctl --user start ollama`). Stopping asks first, and warns when agent
+  sessions are using the local model. The server is never started automatically, so the GPU stays free.
+- Inside `dev`, `systemctl --user` and `nvidia-smi` belong to the host, so they go through `distrobox-host-exec`.
+
+## Local agents
+- **Detection:** a Codex session runs on the local model when its command line uses the `local` profile
+  (`-p local`) or `--oss`. The Agents panel then shows `● codex · ornith-1.5:9b` (the model from `-m`, or the
+  profile's default), and the panel label counts them (`codex 2 (1 local)`).
+- **Key `4`** opens Codex on the model selected in the Local LLM panel (`codex -p local -m <model>`) in the
+  project selected in the Projects panel. If Ollama isn't running, it says so instead.
+
 ## Launching agents
-Select a project and press `1` (Claude), `2` (Codex) or `3` (Antigravity). A **new Konsole window** opens in
+Select a project and press `1` (Claude), `2` (Codex), `3` (Antigravity) or `4` (Codex on the local model). A **new Konsole window** opens in
 that project, inside the `dev` container. It is started detached, so it stays open when Mission Control closes.
 (A new tab isn't used, because Konsole adds tabs to whichever window was used last, which can be hard to find.)
 
@@ -156,6 +180,8 @@ Rebuild `.venv-host` (delete it and repeat step 2) when a Bazzite update changes
 | `mc` launcher, KDE menu entry, install script, script tests | Codex (**GPT-6.1 Sol**), reviewed by Claude Code |
 | Review: found that closing the window orphaned the app inside `dev` (pty test); `mc` now runs on the host with a fallback; menu category fix | Claude Code |
 | Found that a host update (Python 3.15) broke `mc` on the host; `.venv-host` and launcher order, 3 tests | Claude Code |
+| `localllm.py` parse functions + 15 tests | **Local model `ornith-1.5:9b`** via `codex exec -p local` in a worktree (2nd attempt; 1st looped), reviewed by Claude Code: fixed one bug (`self.` missing) and two broken test samples. [Write-up](../local-llm/agentic-runs/2026-11-18-localllm/README.md) |
+| Local LLM panel, `localllm.py` server/GPU/service functions, local-agent detection, keys `4` and `o`, Usage fix for local sessions, 24 tests | Claude Code |
 | Projects panel for the one-repo portfolio (projects = marked folders + separate repos, changes per folder), agents named by project, fixed a date-dependent usage test, 6 tests | Claude Code (owner chose "real projects only") |
 
 ### Agent review notes

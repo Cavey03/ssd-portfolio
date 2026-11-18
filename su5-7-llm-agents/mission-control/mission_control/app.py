@@ -15,12 +15,15 @@ from mission_control.containers import (
     current_container_name, list_containers, start_container, stop_container,
 )
 from mission_control.agents import (
-    AgentProcess, describe_folder, find_agents, format_age, stop_agent,
+    AgentProcess, describe_folder, find_agents, format_age, profile_model, stop_agent,
 )
 from mission_control.dialogs import ConfirmScreen
 from mission_control.gitinfo import ProjectStatus, default_projects_root, scan_projects
 from mission_control.launcher import launch_agent
-from mission_control.panels import AgentsPanel, ContainersPanel, ProjectsPanel, UsagePanel, _ThemedPanel
+from mission_control.localllm import read_gpu, read_ollama, set_service
+from mission_control.panels import (
+    AgentsPanel, ContainersPanel, LocalLLMPanel, ProjectsPanel, UsagePanel, _ThemedPanel,
+)
 from mission_control.settings import load_settings, save_setting
 from mission_control.themes import (
     AGENT_VARIABLE_DEFAULTS, DEFAULT_THEME, THEME_NAMES, THEMES, next_theme,
@@ -43,6 +46,8 @@ class MissionControlApp(App[None]):
         Binding("1", "launch('Claude')", "Claude"),
         Binding("2", "launch('Codex')", "Codex"),
         Binding("3", "launch('Agy')", "Agy"),
+        Binding("4", "launch_local", "Local"),
+        Binding("o", "toggle_ollama", "Ollama"),
         Binding("k", "stop_agent", "Stop agent"),
         Binding("t", "cycle_theme", "Theme"),
         Binding("tab", "focus_next", "Next panel", priority=True),
@@ -67,6 +72,7 @@ class MissionControlApp(App[None]):
                 yield UsagePanel(id="usage", classes="panel")
             with Vertical(id="side-panels"):
                 yield ContainersPanel(id="containers", classes="panel")
+                yield LocalLLMPanel(id="local-llm", classes="panel")
                 yield AgentsPanel(id="agents", classes="panel")
         yield Footer()
 
@@ -97,7 +103,9 @@ class MissionControlApp(App[None]):
         self.refresh_containers()
         self.refresh_agents()
         self.refresh_usage()
+        self.refresh_local_llm()
         self.set_interval(AUTO_REFRESH_SECONDS, self.refresh_projects)
+        self.set_interval(AUTO_REFRESH_SECONDS, self.refresh_local_llm)
         self.set_interval(AUTO_REFRESH_SECONDS, self.refresh_containers)
         self.set_interval(AUTO_REFRESH_SECONDS, self.refresh_agents)
         self.set_interval(USAGE_REFRESH_SECONDS, self.refresh_usage)
@@ -137,12 +145,20 @@ class MissionControlApp(App[None]):
         if not get_current_worker().is_cancelled:
             self.call_from_thread(self.query_one(UsagePanel).show, codex, claude)
 
+    @work(thread=True, exclusive=True, group="local-llm")
+    def refresh_local_llm(self) -> None:
+        """Ask Ollama and nvidia-smi for the local model status in a background thread."""
+        status, gpu, default = read_ollama(), read_gpu(), profile_model()
+        if not get_current_worker().is_cancelled:
+            self.call_from_thread(self.query_one(LocalLLMPanel).show, status, gpu, default)
+
     def action_refresh(self) -> None:
         """Refresh all live panels now."""
         self.refresh_projects()
         self.refresh_containers()
         self.refresh_agents()
         self.refresh_usage()
+        self.refresh_local_llm()
         self.notify("Refreshing…", timeout=2)
 
     def action_toggle_container(self) -> None:
@@ -214,12 +230,59 @@ class MissionControlApp(App[None]):
         if project is None:
             self.notify("Select a project first.", severity="warning")
             return
-        project_dir = self.projects_root / project
+        self._launch_worker(agent, self.projects_root / project)
+
+    def action_launch_local(self) -> None:
+        """Launch Codex on the local model selected in the Local LLM panel."""
+        project = self.query_one(ProjectsPanel).selected_name
+        if project is None:
+            self.notify("Select a project first.", severity="warning")
+            return
+        panel = self.query_one(LocalLLMPanel)
+        if not panel.running:
+            self.notify("Ollama isn't running. Press o to start it first.", severity="warning")
+            return
+        self._launch_worker("Local", self.projects_root / project, panel.selected_model)
+
+    def _launch_worker(self, agent: str, project_dir: Path, model: str | None = None) -> None:
+        """Run launch_agent in a thread and report the result."""
 
         def launch() -> None:
-            ok, message = launch_agent(agent, project_dir)
+            args = (agent, project_dir, model) if model else (agent, project_dir)
+            ok, message = launch_agent(*args)
             self.call_from_thread(
                 self.notify, message, severity="information" if ok else "error"
             )
 
         self.run_worker(launch, thread=True, group="launch")
+
+    def action_toggle_ollama(self) -> None:
+        """Start the Ollama server, or stop it after asking (local sessions lose their model)."""
+        panel = self.query_one(LocalLLMPanel)
+        if panel.status is None:
+            self.notify("Still checking Ollama…", severity="warning")
+            return
+        if not panel.running:
+            self.notify("Starting Ollama…", timeout=2)
+            self.ollama_worker(True)
+            return
+        local = [a for a in self.query_one(AgentsPanel).agents.values() if a.local_model]
+        detail = "This frees the GPU. Models are loaded again on the next request."
+        if local:
+            detail = (
+                f"{len(local)} agent session(s) use the local model and will lose it.\n" + detail
+            )
+
+        def answered(confirmed: bool | None) -> None:
+            if confirmed:
+                self.ollama_worker(False)
+
+        self.push_screen(ConfirmScreen("Stop the Ollama server?", detail), answered)
+
+    @work(thread=True, exclusive=True, group="ollama-service")
+    def ollama_worker(self, start: bool) -> None:
+        """Start or stop the Ollama user service, then refresh once it has settled."""
+        ok, message = set_service(start)
+        self.call_from_thread(self.notify, message, severity="information" if ok else "error")
+        # The server needs a moment to open its port after systemd starts it.
+        self.call_from_thread(self.set_timer, 1.5, self.refresh_local_llm)

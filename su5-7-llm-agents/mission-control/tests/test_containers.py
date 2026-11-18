@@ -22,6 +22,7 @@ from mission_control.containers import (
     start_container,
     stop_container,
 )
+from mission_control.localllm import OllamaStatus
 from mission_control.panels import (
     ALERT,
     MUTED,
@@ -193,6 +194,9 @@ class ContainersAppTests(unittest.IsolatedAsyncioTestCase):
         self.listing = ContainerResult([self.dev, self.work])
         self.list_mock = patch("mission_control.app.list_containers", return_value=self.listing).start()
         patch("mission_control.app.scan_projects", return_value=[]).start()
+        # Never contact the real Ollama server or GPU from tests.
+        patch("mission_control.app.read_ollama", return_value=OllamaStatus(running=False)).start()
+        patch("mission_control.app.read_gpu", return_value=None).start()
         patch("mission_control.app.current_container_name", return_value="dev").start()
         self.start = patch("mission_control.app.start_container", return_value=(True, "Started work.")).start()
         self.stop = patch("mission_control.app.stop_container", return_value=(True, "Stopped work.")).start()

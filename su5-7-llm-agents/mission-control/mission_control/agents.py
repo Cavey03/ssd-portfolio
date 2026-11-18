@@ -15,6 +15,7 @@ import shutil
 import signal
 import subprocess
 import time
+import tomllib
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Sequence
@@ -32,6 +33,8 @@ class AgentProcess:
     cwd: Path | None
     started: float | None
     """Start time as a Unix timestamp, if known."""
+    local_model: str | None = None
+    """For a Codex session on a local model (Ollama): the model name, or "local" if unknown."""
 
 
 def identify_agent(argv0: str, comm: str) -> str | None:
@@ -52,6 +55,47 @@ def identify_agent(argv0: str, comm: str) -> str | None:
     if base == "agy" or comm == "agy":
         return "agy"
     return None
+
+
+CODEX_LOCAL_PROFILE = Path.home() / ".codex" / "local.config.toml"
+"""The Codex profile for the local model (see local-llm/README.md, "Connecting Codex")."""
+LOCAL_PROFILE_NAME = "local"
+
+
+def profile_model(profile_path: Path = CODEX_LOCAL_PROFILE) -> str | None:
+    """Return the `model = "..."` setting of the local Codex profile, if it can be read."""
+    try:
+        with profile_path.open("rb") as f:
+            model = tomllib.load(f).get("model")
+    except (OSError, tomllib.TOMLDecodeError):
+        return None
+    return model if isinstance(model, str) and model else None
+
+
+def codex_local_model(args: list[str], default_model: str | None) -> str | None:
+    """Return which local model a Codex command line uses, or None for a cloud (GPT) session.
+
+    `args` are the arguments after the program name. A session is local when it uses the
+    local profile (`-p local`, `--profile local`, `--profile=local`) or `--oss`. The model comes
+    from `-m`/`--model`, else the profile's default model, else just "local".
+    """
+    local = False
+    model: str | None = None
+    for i, arg in enumerate(args):
+        following = args[i + 1] if i + 1 < len(args) else None
+        if arg == "--oss":
+            local = True
+        elif arg in ("-p", "--profile") and following == LOCAL_PROFILE_NAME:
+            local = True
+        elif arg == f"--profile={LOCAL_PROFILE_NAME}":
+            local = True
+        elif arg in ("-m", "--model") and following:
+            model = following
+        elif arg.startswith("--model="):
+            model = arg.removeprefix("--model=")
+    if not local:
+        return None
+    return model or default_model or "local"
 
 
 def _boot_time(proc: Path) -> float | None:
@@ -117,6 +161,7 @@ def find_agents(proc: Path = PROC, ask_host: bool = True) -> list[AgentProcess]:
     skipped, so each session appears once.
     """
     boot_time = _boot_time(proc)
+    default_local_model = profile_model()
     found: list[AgentProcess] = []
     parents: dict[int, int] = {}
     for entry in proc.iterdir():
@@ -141,7 +186,11 @@ def find_agents(proc: Path = PROC, ask_host: bool = True) -> list[AgentProcess]:
             parents[int(entry.name)] = int(_stat_fields(stat_text)[1])  # field 4: parent pid
         except (OSError, IndexError, ValueError):
             started = None
-        found.append(AgentProcess(agent, int(entry.name), cwd, started))
+        local_model = None
+        if agent == "codex":
+            args = [a.decode(errors="replace") for a in argv[1:] if a]
+            local_model = codex_local_model(args, default_local_model)
+        found.append(AgentProcess(agent, int(entry.name), cwd, started, local_model))
 
     by_pid = {a.pid: a for a in found}
     found = [
@@ -153,7 +202,8 @@ def find_agents(proc: Path = PROC, ask_host: bool = True) -> list[AgentProcess]:
     if ask_host and missing:
         host = _host_cwds(missing)
         found = [
-            AgentProcess(a.agent, a.pid, host.get(a.pid, a.cwd), a.started) for a in found
+            AgentProcess(a.agent, a.pid, host.get(a.pid, a.cwd), a.started, a.local_model)
+            for a in found
         ]
     return sorted(found, key=lambda a: (a.started or 0, a.pid))
 

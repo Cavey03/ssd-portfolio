@@ -78,10 +78,15 @@ def parse_codex_rate_limits(line: str, observed_at: float, now: float) -> CodexU
     limits = payload.get("rate_limits") if isinstance(payload, dict) else None
     if not isinstance(limits, dict):
         return None
+    five_hour, weekly = _window(limits.get("primary"), now), _window(limits.get("secondary"), now)
+    if five_hour is None and weekly is None:
+        # No limits at all: a session on the local model (Ollama has no plan) writes
+        # all-null rate_limits. It says nothing about the ChatGPT plan, so skip it.
+        return None
     return CodexUsage(
         plan=limits.get("plan_type"),
-        five_hour=_window(limits.get("primary"), now),
-        weekly=_window(limits.get("secondary"), now),
+        five_hour=five_hour,
+        weekly=weekly,
         observed_at=observed_at,
     )
 

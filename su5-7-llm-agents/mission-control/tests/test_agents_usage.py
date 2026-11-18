@@ -167,6 +167,27 @@ class CodexUsageTests(unittest.TestCase):
         assert usage is not None
         self.assertEqual(usage.five_hour.used_percent, 15.0)
 
+    LOCAL_LINE = json.dumps({  # what a session on the local model (Ollama) writes
+        "type": "event_msg",
+        "payload": {"type": "token_count", "rate_limits": {
+            "limit_id": "codex", "primary": None, "secondary": None, "plan_type": None}},
+    })
+
+    def test_local_model_snapshot_is_skipped(self) -> None:
+        self.assertIsNone(parse_codex_rate_limits(self.LOCAL_LINE, 1.0, self.NOW))
+        future = time.time() + 3600
+        with tempfile.TemporaryDirectory() as tmp:
+            day = Path(tmp) / "2026" / "11" / "18"
+            day.mkdir(parents=True)
+            gpt = day / "rollout-gpt.jsonl"
+            gpt.write_text(self.line(future, future) + "\n")
+            local = day / "rollout-local.jsonl"  # newer, but has no limits
+            local.write_text(self.LOCAL_LINE + "\n")
+            os.utime(gpt, (1_000, 1_000))
+            usage = read_codex_usage(Path(tmp))
+        assert usage is not None
+        self.assertEqual(usage.five_hour.used_percent, 15.0)
+
     def test_no_logs(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             self.assertIsNone(read_codex_usage(Path(tmp)))

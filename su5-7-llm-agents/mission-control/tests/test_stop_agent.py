@@ -15,6 +15,7 @@ from mission_control.app import MissionControlApp
 from mission_control.containers import ContainerResult
 from mission_control.dialogs import ConfirmScreen
 from mission_control.panels import AgentsPanel
+from mission_control.localllm import OllamaStatus
 
 
 class StopAgentTests(unittest.TestCase):
@@ -88,6 +89,9 @@ class StopAgentAppTests(unittest.IsolatedAsyncioTestCase):
         self.agent = AgentProcess("codex", 4242, Path.home() / "Projects" / "demo", None)
         patch("mission_control.app.find_agents", return_value=[self.agent]).start()
         patch("mission_control.app.scan_projects", return_value=[]).start()
+        # Never contact the real Ollama server or GPU from tests.
+        patch("mission_control.app.read_ollama", return_value=OllamaStatus(running=False)).start()
+        patch("mission_control.app.read_gpu", return_value=None).start()
         patch("mission_control.app.list_containers", return_value=ContainerResult([])).start()
         patch("mission_control.app.read_codex_usage", return_value=None).start()
         patch("mission_control.app.read_claude_usage", return_value=None).start()

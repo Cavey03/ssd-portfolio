@@ -15,6 +15,7 @@ from mission_control.containers import ContainerResult
 from mission_control.gitinfo import ProjectStatus
 from mission_control.launcher import AGENTS, build_launch_command, launch_agent
 from mission_control.panels import ProjectsPanel
+from mission_control.localllm import OllamaStatus
 
 
 class LaunchCommandTests(unittest.TestCase):
@@ -137,6 +138,9 @@ class LaunchAppTests(unittest.IsolatedAsyncioTestCase):
             ("mission_control.app.scan_projects", self.projects),
             ("mission_control.app.list_containers", ContainerResult([])),
             ("mission_control.app.current_container_name", "dev"),
+            # Never contact the real Ollama server or GPU from tests.
+            ("mission_control.app.read_ollama", OllamaStatus(running=False)),
+            ("mission_control.app.read_gpu", None),
         ):
             mock_patch = patch(target, return_value=value)
             mock_patch.start()

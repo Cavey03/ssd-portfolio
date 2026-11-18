@@ -19,6 +19,7 @@ from textual.widgets import DataTable, Static
 from mission_control.agents import AgentProcess, describe_folder, format_age
 from mission_control.containers import ContainerInfo, ContainerResult
 from mission_control.gitinfo import ProjectStatus
+from mission_control.localllm import GpuInfo, LoadedModel, OllamaStatus
 from mission_control.themes import DEFAULT_PALETTE, Palette, palette_from_variables
 from mission_control.usage import ClaudeUsage, CodexUsage
 
@@ -289,8 +290,11 @@ class AgentsPanel(_TablePanel):
         self.table.clear()
         self.agents = {str(a.pid): a for a in agents}
         for agent in agents:
+            name = Text(f"● {agent.agent}", style=f"bold {pal.agent(agent.agent)}")
+            if agent.local_model:
+                name.append(f" · {agent.local_model}", style=pal.info)  # running on the local GPU
             self.table.add_row(
-                Text(f"● {agent.agent}", style=f"bold {pal.agent(agent.agent)}"),
+                name,
                 Text(describe_folder(agent.cwd, projects_root, projects)),
                 Text(format_age(agent.started), style=pal.muted),
                 key=str(agent.pid),
@@ -303,8 +307,107 @@ class AgentsPanel(_TablePanel):
             if label:
                 label.append("  ·  ", style=pal.muted)
             label.append(f"{name} {count}", style=pal.agent(name) if count else pal.muted)
+            local = sum(a.agent == name and a.local_model is not None for a in agents)
+            if local:
+                label.append(f" ({local} local)", style=pal.info)
         self.set_label(label if agents else Text("No agents running", style=pal.muted))
         self.border_subtitle = f"updated {datetime.now():%H:%M:%S}"
+
+
+class LocalLLMPanel(_TablePanel):
+    """The local model server (Ollama): its models, what's loaded, and the GPU.
+
+    The selected row is the model that key 4 launches Codex with. The profile's
+    default model (★) is selected until you pick another one.
+    """
+
+    PANEL_TITLE = "Local LLM"
+    COLUMNS = ("Model", "Size", "State")
+    BAR_WIDTH = 16
+
+    def compose(self) -> ComposeResult:
+        yield Static("", classes="panel-label")
+        yield Static("", classes="gpu-line")
+        yield DataTable(cursor_type="row", zebra_stripes=True)
+
+    def populate(self) -> None:
+        """Show a loading label until the first check finishes."""
+        self.status: OllamaStatus | None = None
+        self.default_model: str | None = None
+        self.set_label("Checking Ollama…")
+
+    @property
+    def running(self) -> bool:
+        """True if the last check found the Ollama server running."""
+        return self.status is not None and self.status.running
+
+    @property
+    def selected_model(self) -> str | None:
+        """The model to launch: the selected row, else the profile's default."""
+        if not self.running:
+            return None
+        return self.selected_name or self.default_model
+
+    def show(self, status: OllamaStatus, gpu: GpuInfo | None, default_model: str | None) -> None:
+        """Replace the rows and the status lines."""
+        self._last = (status, gpu, default_model)
+        pal = self.palette
+        first_fill = self.status is None or not self.status.running
+        selected = None if first_fill else self.selected_name
+        self.status, self.default_model = status, default_model
+        self.table.clear()
+        loaded = {m.name: m for m in status.loaded}
+        for model in status.installed:
+            name = Text(model.name, style="bold" if model.name in loaded else "")
+            if model.name == default_model:
+                name.append(" ★", style=pal.info)
+            size = Text(f"{model.size_bytes / 1e9:.1f} GB", style=pal.muted)
+            self.table.add_row(name, size, _loaded_cell(loaded.get(model.name), pal), key=model.name)
+        names = [m.name for m in status.installed]
+        self._restore_selection(selected or default_model, names)
+
+        if not status.running:
+            label = Text("○ Ollama stopped", style=pal.muted).append("  ·  press o to start", style=pal.muted)
+        else:
+            label = Text(f"● Ollama {status.version or ''} running".replace("  ", " "), style=pal.ok)
+            if status.error:
+                label.append(f"  ⚠ {status.error}", style=pal.alert)
+        self.set_label(label)
+        self.query_one(".gpu-line", Static).update(_gpu_line(gpu, self.BAR_WIDTH, pal))
+        self.border_subtitle = f"updated {datetime.now():%H:%M:%S}"
+
+
+def _loaded_cell(model: LoadedModel | None, pal: Palette = DEFAULT_PALETTE) -> Text:
+    """The State cell: idle, or loaded with its context size and how much is on the GPU."""
+    if model is None:
+        return Text("idle", style=pal.muted)
+    cell = Text("● loaded", style=pal.ok)
+    if model.context_length:
+        cell.append(f" · {model.context_length // 1024}K ctx", style=pal.muted)
+    if model.gpu_percent >= 100:
+        cell.append(" · 100% GPU", style=pal.muted)
+    else:
+        # Part of the model spilled into normal RAM: it works, but much slower.
+        cell.append(f" · {model.gpu_percent}% GPU", style=pal.warn)
+    return cell
+
+
+def _gpu_line(gpu: GpuInfo | None, bar_width: int, pal: Palette = DEFAULT_PALETTE) -> Text:
+    """One line: GPU name, a memory bar, used/total and how busy it is.
+
+    The memory comes from nvidia-smi, not Ollama: `ollama ps` under-reports
+    gemma4 (local-llm/README.md), and other programs use the GPU too.
+    """
+    if gpu is None:
+        return Text("GPU  not available (nvidia-smi)", style=pal.muted)
+    name = gpu.name.removeprefix("NVIDIA ").removeprefix("GeForce ")
+    percent = 100 * gpu.memory_used_mb / gpu.memory_total_mb if gpu.memory_total_mb else 0
+    line = Text(f"GPU  {name}  ", style="bold")
+    line.append_text(_bar(percent, bar_width, pal))
+    line.append(f"  {gpu.memory_used_mb / 1024:.1f} / {gpu.memory_total_mb / 1024:.1f} GB", style="")
+    if gpu.utilization_percent is not None:
+        line.append(f"  ·  {gpu.utilization_percent}% busy", style=pal.muted)
+    return line
 
 
 class UsagePanel(_ThemedPanel):

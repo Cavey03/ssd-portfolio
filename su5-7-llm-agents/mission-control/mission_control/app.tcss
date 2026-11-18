@@ -56,6 +56,22 @@ Header {
     margin-bottom: 1;
 }
 
+/* The Local LLM panel is only as tall as its content, between Containers and Agents. */
+#local-llm {
+    height: auto;
+    margin-bottom: 1;
+}
+
+#local-llm DataTable {
+    height: auto;
+    max-height: 8;
+}
+
+.gpu-line {
+    height: 1;
+    margin: 0 0 1 0;
+}
+
 .panel-label {
     height: 1;
     margin: 0 0 1 0;
