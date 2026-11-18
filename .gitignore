@@ -1,0 +1,17 @@
+# Rebuildable or machine-local files
+node_modules/
+.venv/
+__pycache__/
+*.pyc
+.codex-task.txt
+
+# Model weights never go in git (GitHub caps files at 100 MB); they live in ~/.ollama
+*.gguf
+*.safetensors
+
+# particle-sim's git worktrees (in-progress agent work)
+/.worktrees/
+
+# particle-sim is still its own repo here until its worktree work is finished, then it moves
+# into su5-7-llm-agents/ like the others
+/particle-sim/
