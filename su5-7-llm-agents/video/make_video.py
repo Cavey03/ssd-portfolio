@@ -8,7 +8,7 @@
 
 Only ffmpeg is needed (on the Bazzite host). Edit SHOTS to change a caption, speed up a slow part or trim.
 Each shot: caption (one or two lines), speed (2 = twice as fast), trim_start / trim_end in seconds (cut from
-the start / end of the clip), position "bottom" (just above Mission Control's key hints) or "top".
+the start / end of the clip), crop (x, y, w, h) to zoom into part of the screen, position "bottom" (just above Mission Control's key hints) or "top".
 If a shot is shorter than its narration, its last frame is held until the narration ends.
 Avoid arrows (→) in captions: the font has no glyph for them.
 """
@@ -42,12 +42,14 @@ SHOTS = [
     {"caption": "Mission Control: one hub for all the coding agents"},
     {"caption": "Panels: projects, tasks, usage · containers, local LLM, running agents"},
     {"caption": "o starts the local model server (Ollama) on the GPU"},
-    {"caption": "4 opens Codex on the local model: free, offline and private"},
-    {"caption": "d = Dispatch: the fine-tuned router suggests a worker at once,\nthen Opus plans the task and writes the brief"},
-    {"caption": "The worker runs in its own copy of the project (a git worktree), with a time limit", "speed": 8},
-    {"caption": "Opus reviews the change, then a human decides: m merges, x discards"},
-    {"caption": "Router fine-tuned with Unsloth: from 52% to 63% balanced accuracy,\nas good as a 9B model that thinks first, ~100× faster"},
-    {"caption": "Everything is documented in the portfolio repo"},
+    {"caption": "4 opens Codex on the local model: free, offline and private", "speed": 3},
+    {"caption": "d = Dispatch: the fine-tuned router suggests a worker at once,\nthen Opus plans the task and writes the brief",
+     "trim_start": 2.5, "speed": 1.5},
+    {"caption": "The worker runs in its own copy of the project (a git worktree), with a time limit", "speed": 32},
+    {"caption": "Opus reviews the change, then a human decides: m merges, x discards", "speed": 1.5},
+    {"caption": "Router fine-tuned with Unsloth: from 52% to 63% balanced accuracy,\nas good as a 9B model that thinks first, ~100× faster",
+     "crop": (0, 40, 1152, 648), "trim_end": 3},
+    {"caption": "Everything is documented in the portfolio repo", "crop": (0, 0, 1600, 900)},
 ]
 
 ENCODE = ["-c:v", "libx264", "-preset", "medium", "-crf", "20", "-pix_fmt", "yuv420p",
@@ -142,7 +144,12 @@ def shot(clip: Path, spec: dict, index: int) -> Path:
     video_seconds = (end - start) / speed
     seconds = max(video_seconds, needed_length(voice))
     hold = seconds - video_seconds  # freeze the last frame while the narration finishes
+    zoom = []
+    if "crop" in spec:  # (x, y, w, h): zoom into that part of the screen
+        x, y, w, h = spec["crop"]
+        zoom = [f"crop={w}:{h}:{x}:{y}"]
     filters = [
+        *zoom,
         f"scale={W}:{H}:force_original_aspect_ratio=decrease", f"pad={W}:{H}:(ow-iw)/2:(oh-ih)/2:color=black",
         f"setpts=(PTS-STARTPTS)/{speed}", f"fps={FPS}",
         *([f"tpad=stop_mode=clone:stop_duration={hold + 0.1:.3f}"] if hold > 0 else []),
