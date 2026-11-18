@@ -54,6 +54,6 @@ before using Claude/GPT output in training data again.
 - [x] Phase 3: Usage panel "Local" row (tokens from Codex session logs with `model_provider: ollama`)
 - [x] Phase 4: Dispatch (`d`): orchestrator, `mc task start/status/diff/merge`, Tasks panel, decision log
 - [x] Phase 5a: design + usage docs with architecture diagrams (`../DESIGN.md`, `../USAGE.md`), screenshots
-- [ ] Phase 5b: intro video (demo: d → Opus plan → local worker → review → merge)
-- [ ] Later (after phases 0–4 work): routing fine-tune in Colab (Unsloth) and on the RTX 5070, GGUF → Ollama,
+- [x] Phase 5b: intro video (demo: d → Opus plan → local worker → review → merge)
+- [x] Later (after phases 0–4 work): routing fine-tune in Colab (Unsloth) and on the RTX 5070, GGUF → Ollama,
       evaluation on held-out tasks; label source to be chosen (see above)
