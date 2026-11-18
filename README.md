@@ -70,9 +70,9 @@ No deliverable. The outcomes are covered in the [SU1 study summary](su1-machine-
 |---|---|---|
 | Document outlining my learning process (from the "Starting points", each model tried and what I learned) | 🟡 | template: [`learning-process.md`](su5-7-llm-agents/learning-process.md); facts recorded in [`local-llm`](su5-7-llm-agents/local-llm/README.md) and [`models/`](models/) |
 | My system that uses a local LLM for agentic workflow(s) (suggested: Unsloth) | 🟡 | Ollama + Codex works ([`local-llm`](su5-7-llm-agents/local-llm/README.md)); Mission Control shows and launches the local model; **Dispatch**: Opus routes each task to the local model, Codex or Claude, the worker runs in its own git worktree, Opus reviews, I merge ([how it works](su5-7-llm-agents/mission-control/README.md#dispatch-orchestrator-and-workers), [end-to-end test](su5-7-llm-agents/local-llm/agentic-runs/2026-11-18-dispatch-e2e/README.md)); the local model built part of it ([agentic run](su5-7-llm-agents/local-llm/agentic-runs/2026-11-18-localllm/README.md)); fine-tune to do |
-| System documentation: design and development | 🟡 | decisions and install log exist; no design section yet |
+| System documentation: design and development | ✅ | [`su5-7-llm-agents/DESIGN.md`](su5-7-llm-agents/DESIGN.md) |
 | System documentation: intro video | ❌ | |
-| System documentation: usage instructions | 🟡 | commands exist, spread through the log |
+| System documentation: usage instructions | ✅ | [`su5-7-llm-agents/USAGE.md`](su5-7-llm-agents/USAGE.md) |
 
 ## Learning outcomes still to cover (SU5–7)
 All of these are explained in the [SU5–7 study summary](su5-7-llm-agents/SU5-7-summary.html). What's still

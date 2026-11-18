@@ -50,6 +50,7 @@ training models on it): labels come from the owner, an open-weight teacher whose
 - [x] Phase 2: Agents panel tags local Codex sessions (`codex · local (<model>)`); `4` launches `codex -p local`
 - [x] Phase 3: Usage panel "Local" row (tokens from Codex session logs with `model_provider: ollama`)
 - [x] Phase 4: Dispatch (`d`): orchestrator, `mc task start/status/diff/merge`, Tasks panel, decision log
-- [ ] Phase 5: design + usage docs, architecture diagram, tests, screenshot check, intro video demo
+- [x] Phase 5a: design + usage docs with architecture diagrams (`../DESIGN.md`, `../USAGE.md`), screenshots
+- [ ] Phase 5b: intro video (demo: d → Opus plan → local worker → review → merge)
 - [ ] Later (after phases 0–4 work): routing fine-tune in Colab (Unsloth) and on the RTX 5070, GGUF → Ollama,
       evaluation on held-out tasks; label source to be chosen (see above)

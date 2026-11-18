@@ -2,11 +2,14 @@
 
 The main deliverable is **my system that uses a local LLM for agentic workflows**, fully documented.
 
+**Start here:** [`DESIGN.md`](DESIGN.md) (how the system is designed and was built) ·
+[`USAGE.md`](USAGE.md) (how to use it) · [`learning-process.md`](learning-process.md) (what I learned).
+
 | Part | What it is |
 |---|---|
 | [`environment/`](environment/README.md) | The agentic coding environment: Bazzite host, the `dev` container, Claude Code, Codex and Antigravity |
 | [`local-llm/`](local-llm/README.md) | Ollama on the RTX 5070, driven by `codex --oss`: install, models, context/GPU tests, coding test |
-| [`mission-control/`](mission-control/README.md) | Terminal dashboard for containers, projects and agents (will also show the local LLM) |
+| [`mission-control/`](mission-control/README.md) | The hub: dashboard for containers, projects, agents, the local LLM and usage, plus Dispatch (Opus routes tasks to the local model, Codex or Claude) |
 | [`../models/`](../models/README.md) | Every model downloaded or tried, and what I learned from it |
 | [`SU5-7-summary.html`](SU5-7-summary.html) | Study summary of the SU5–7 outcomes (download it and open it in a browser) |
 
@@ -14,10 +17,10 @@ The main deliverable is **my system that uses a local LLM for agentic workflows*
 | Item | Status | Notes |
 |---|---|---|
 | Document outlining my learning process (from the "Starting points" in *Update for Study Units 5,6,7.pdf*; each model tried and what I learned) | 🟡 | Template: [`learning-process.md`](learning-process.md). The facts are in `local-llm` and `models/` |
-| My system which uses a local LLM for agentic workflow(s) (suggested platform: Unsloth) | 🟡 | Ollama + Codex works; still to add a fine-tuned model (Unsloth) and a clear workflow of my own |
-| Documentation: design and development | 🟡 | Decisions and install log exist; needs an architecture/design section |
+| My system which uses a local LLM for agentic workflow(s) (suggested platform: Unsloth) | 🟡 | Built: Mission Control + Dispatch with the local model as a worker ([DESIGN](DESIGN.md)). Still to do: the Unsloth fine-tune |
+| Documentation: design and development | ✅ | [`DESIGN.md`](DESIGN.md): requirements, architecture, Dispatch, decisions, how it was built and tested, limitations |
 | Documentation: intro video | ❌ | |
-| Documentation: usage instructions | 🟡 | Needs one "How to use" section |
+| Documentation: usage instructions | ✅ | [`USAGE.md`](USAGE.md): setup, keys, local model, Dispatch, command line, troubleshooting |
 
 ## Learning outcomes
 | Outcome | Covered? |
@@ -27,5 +30,5 @@ The main deliverable is **my system that uses a local LLM for agentic workflows*
 | Tools that use semi-supervised learning | ❌ |
 | Transfer learning to a different domain | ❌ (fine-tuning would cover it) |
 | Building blocks and operation of LLMs | 🟡 context window, speculative decoding, sliding-window attention, thinking tokens |
-| Using LLMs effectively as they exist | 🟡 Codex with a local model, context sizing, temperature lesson |
+| Using LLMs effectively as they exist | ✅ Codex with a local model, context sizing, temperature lesson, orchestrator–workers routing, measured local vs cloud agents ([runs](local-llm/agentic-runs/)) |
 | Fine-tuning an LLM to a specific domain | ❌ (Unsloth) |
