@@ -37,7 +37,7 @@ VOICE_TAIL = 0.7   # seconds of quiet after it, before the next part
 
 TITLE = ("Agentic coding system", "Mission Control · local LLM · Dispatch · fine-tuned router", "626 portfolio · SU5–7")
 END = ("Thanks for watching",
-       "Voices: Kokoro text-to-speech, run locally on the GPU · script structured by Claude",
+       "Voices: Kokoro text-to-speech, run locally on the GPU",
        "Design: su5-7-llm-agents/DESIGN.md   ·   Usage: su5-7-llm-agents/USAGE.md")
 
 SHOTS = [

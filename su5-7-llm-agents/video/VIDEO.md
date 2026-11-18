@@ -56,7 +56,7 @@ ffmpeg is used (already on the host); raw clips are not committed.
 | 9 | The repo on GitHub, or the `su5-7-llm-agents/` folder (`DESIGN.md`, `USAGE.md`) | Everything is documented in the portfolio repo | am_puck: "The design and the usage guide and every experiment are documented in the portfolio repo." |
 
 Title card narration (am_puck): "This is an agentic coding system that was built for the six-two-six portfolio."
-Closing line (am_puck, robot effect): "The voices in this video were made with Kokoro. It is an open-source text-to-speech model that runs locally on the same GPU. The script was structured by Claude."
+Closing line (am_puck, robot effect): "The voices in this video were made with Kokoro. It is an open-source text-to-speech model that runs locally on the same GPU."
 
 ## Who built what
 | Part | By |

@@ -62,7 +62,7 @@ NARRATION = {
          "while being about a hundred times faster.",
     "9": "The design and the usage guide and every experiment are documented in the portfolio repo.",
     "end": "The voices in this video were made with Kokoro. It is an open-source text-to-speech model that runs "
-           "locally on the same GPU. The script was structured by Claude.",
+           "locally on the same GPU.",
 }
 
 # The narration voices: one per part of the video, each with its own caption colour (make_video.py uses it).
