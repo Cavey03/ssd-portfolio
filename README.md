@@ -8,6 +8,8 @@ Legend: ✅ done · 🟡 partly done · ❌ not yet · ➖ optional
 ## Layout
 ```
 ~/Projects/
+├── summary-all.html          every learning outcome on one page (study summary)
+├── su1-machine-learning/     SU1  Machine learning (summary only; no deliverable)
 ├── su2-neural-networks/      SU2  Neural networks – introduction
 ├── su3-learning-models/      SU3  Learning models – basic applications (Trask notebooks)
 ├── su4-cnn/                  SU4  Convolutional neural networks (group project)
@@ -15,10 +17,31 @@ Legend: ✅ done · 🟡 partly done · ❌ not yet · ➖ optional
 │   ├── environment/          the agentic coding environment on Linux
 │   ├── local-llm/            local LLM (Ollama on the RTX 5070) driven by Codex
 │   └── mission-control/      terminal dashboard for containers, projects and agents
-└── models/                   every model downloaded or tried, and what I learned from it
+├── models/                   every model downloaded or tried, and what I learned from it
+└── tools/summaries/          generator for the study-summary pages
 ```
 
+## Study summaries
+One page per study unit covers its learning outcomes, summarised from Trask's *Grokking Deep Learning*
+with chapter and page references. Anything not in the book (Scikit-Learn, clustering, semi-supervised
+learning, LLMs, fine-tuning) is filled in from other sources and hatched as **Not in Trask**. GitHub shows
+HTML files as code, so download a page (or clone the repo) and open it in a browser.
+
+| Unit | Page |
+|---|---|
+| All units | [`summary-all.html`](summary-all.html): every outcome, with search and a unit filter |
+| SU1 | [`su1-machine-learning/summary.html`](su1-machine-learning/summary.html) |
+| SU2 | [`su2-neural-networks/summary.html`](su2-neural-networks/summary.html) |
+| SU3 | [`su3-learning-models/summary.html`](su3-learning-models/summary.html) |
+| SU4 | [`su4-cnn/summary.html`](su4-cnn/summary.html) |
+| SU5–7 | [`su5-7-llm-agents/summary.html`](su5-7-llm-agents/summary.html) |
+
+To change a page, edit `tools/summaries/content.py`, then run `python3 tools/summaries/build.py`.
+
 ## Checklist
+
+### SU1 – Machine learning → [`su1-machine-learning/`](su1-machine-learning/)
+No deliverable. The outcomes are covered in the [SU1 study summary](su1-machine-learning/summary.html).
 
 ### SU2 – Neural networks: introduction → [`su2-neural-networks/`](su2-neural-networks/)
 | Item | Status | Where |
@@ -52,10 +75,15 @@ Legend: ✅ done · 🟡 partly done · ❌ not yet · ➖ optional
 | System documentation: usage instructions | 🟡 | commands exist, spread through the log |
 
 ## Learning outcomes still to cover (SU5–7)
-- Fine-tuning an LLM to a specific domain, and transfer learning (the reason Unsloth is suggested)
-- Labelled vs unlabelled data, clustering, semi-supervised tools
+All of these are explained in the [SU5–7 study summary](su5-7-llm-agents/summary.html). What's still
+missing is hands-on evidence:
+- Fine-tuning an LLM to a specific domain (Unsloth). Transfer learning is shown by the SU4 group project's
+  ImageNet-pretrained EfficientNetV2-S.
+- Running clustering and a semi-supervised tool on real data (the summary has ready-to-run Scikit-Learn code)
 - Building blocks of LLMs (partly covered: context window, speculative decoding, sliding-window attention)
 
 ## Who built what
 Each folder's README has its own "Who built what" table. The portfolio restructure (one repo, one folder per
 study unit, history of the old repos kept) was done by Claude Code at the owner's request on 2026-11-18.
+The study summaries and their generator (`tools/summaries/`) were written by Claude Code on 2026-11-18,
+from the owner's copy of Trask's book and an example page the owner supplied for the theme.
