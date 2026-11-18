@@ -69,9 +69,11 @@ def cmd_start(args: argparse.Namespace) -> int:
     return 0
 
 
-def cmd_list(_: argparse.Namespace) -> int:
+def cmd_list(args: argparse.Namespace) -> int:
     rows = [tasks.mark_lost(t) for t in tasks.list_tasks()]
-    if not rows:
+    if args.status:
+        rows = [t for t in rows if t.status == args.status]
+    if not rows and not args.status:
         print("No tasks yet.")
     for t in rows:
         worker = f"{t.agent}:{t.model}" if t.model else t.agent
@@ -151,7 +153,10 @@ def build_parser() -> argparse.ArgumentParser:
     start.add_argument("-y", "--yes", action="store_true", help="don't ask before starting")
     start.set_defaults(func=cmd_start)
 
-    sub.add_parser("list", help="recent tasks").set_defaults(func=cmd_list)
+    list = sub.add_parser("list", help="recent tasks")
+    list.add_argument("--status", default=None,
+                      help="only show tasks with this status, e.g. done")
+    list.set_defaults(func=cmd_list)
     for name, func, text in (("show", cmd_show, "details, review and summary"),
                              ("diff", cmd_diff, "the worker's changes"),
                              ("_run", cmd_run, None)):  # internal: the supervisor

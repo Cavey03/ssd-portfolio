@@ -285,6 +285,21 @@ class CliTests(unittest.TestCase):
         self.assertIn("  - c1", details)
 
 
+    def test_list_status_filters(self) -> None:
+        done = tasks.Task(id="20261118-1200-abcd", title="Add x", project=str(self.repo), agent="local",
+                          model="ornith-1.5:9b", brief="b", reason="small", time_limit=600, status="done",
+                          files=["app.py"])
+        running = tasks.Task(id="20261118-1230-efgh", title="Refactor y", project=str(self.repo), agent="codex",
+                             model=None, brief="b", reason="small", time_limit=600, status="running",
+                             files=["y.py"])
+        tasks.save_task(done)
+        tasks.save_task(running)
+        code, listing = self.run_cli("list", "--status", "done")
+        self.assertEqual(code, 0)
+        self.assertIn("20261118-1200-abcd  done", listing)  # the matching task is shown
+        self.assertNotIn("20261118-1230-efgh", listing)  # the other task is filtered out
+        self.assertNotIn("No tasks yet.", listing)  # a filter that matches is not treated as empty
+
 if __name__ == "__main__":
     unittest.main()
 
