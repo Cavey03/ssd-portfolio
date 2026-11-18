@@ -24,6 +24,8 @@ One entry per step, newest at the bottom.
 |---|---|---|---|---|
 | 2026-11-05 | Ran two local models with Codex (example row) | Both 5/5 on the coding test with thinking on; gemma looped at temperature 0 | Don't force temperature 0 on thinking models | Benchmark local vs cloud |
 | 2026-11-18 | Let my local model (`ornith-1.5:9b`) build part of Mission Control by itself ([write-up](local-llm/agentic-runs/2026-11-18-localllm/README.md)) | Full task: thought in circles for 6 min, wrote nothing. A third of the task: working code in 2½ min, but stuck on a stray bracket in its own tests | Small models need small tasks, a time limit and a reviewer; overthinking, not bad code, is what stops them | Try lower reasoning effort; split work in Dispatch |
+| 2026-11-18 | Same kind of task for Codex with a cloud model (GPT) ([write-up](local-llm/agentic-runs/2026-11-18-worktrees-gpt/README.md)) | Finished in 3 min with 5 commands and 27 passing tests; nothing to fix | On multi-step agentic work the gap between a 9B local model and a frontier model is large | Route only small tasks to the local model |
+| 2026-11-18 | Built Dispatch: Opus routes each task, a worker runs in its own git worktree, Opus reviews, I merge ([end-to-end test](local-llm/agentic-runs/2026-11-18-dispatch-e2e/README.md)) | The local model did two one-function tasks in ~1 min each; Opus's review caught `.pyc` files that would have been merged | Orchestrator–workers: a strong model plans and checks, cheap models do small steps; a review step catches what workers can't see | Use Dispatch for real tasks; fine-tune the router later |
 
 ## 4. Models tried
 Full notes per model: [`../models/`](../models/README.md). Here only the verdict.

@@ -1,0 +1,42 @@
+diff --git a/mathutils.py b/mathutils.py
+index c8ace38..cd2c006 100644
+--- a/mathutils.py
++++ b/mathutils.py
+@@ -9,3 +9,8 @@ def add(a: int, b: int) -> int:
+ def is_even(n: int) -> bool:
+     """Return True if n is even, False otherwise."""
+     return n % 2 == 0
++
++
++def is_odd(n: int) -> bool:
++    """Return True if n is odd, False otherwise."""
++    return n % 2 == 1
+diff --git a/test_mathutils.py b/test_mathutils.py
+index 46ba97c..30d8270 100644
+--- a/test_mathutils.py
++++ b/test_mathutils.py
+@@ -1,6 +1,6 @@
+ import unittest
+ 
+-from mathutils import add, is_even
++from mathutils import add, is_even, is_odd
+ 
+ 
+ class AddTests(unittest.TestCase):
+@@ -22,5 +22,16 @@ class IsEvenTests(unittest.TestCase):
+         self.assertTrue(is_even(-2))
+ 
+ 
++class IsOddTests(unittest.TestCase):
++    def test_odd(self):
++        self.assertTrue(is_odd(3))
++
++    def test_even(self):
++        self.assertFalse(is_odd(4))
++
++    def test_negative(self):
++        self.assertTrue(is_odd(-3))
++
++
+ if __name__ == "__main__":
+     unittest.main()

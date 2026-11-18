@@ -1,0 +1,53 @@
+diff --git a/__pycache__/mathutils.cpython-314.pyc b/__pycache__/mathutils.cpython-314.pyc
+new file mode 100644
+index 0000000..e73e9ac
+Binary files /dev/null and b/__pycache__/mathutils.cpython-314.pyc differ
+diff --git a/__pycache__/test_mathutils.cpython-314.pyc b/__pycache__/test_mathutils.cpython-314.pyc
+new file mode 100644
+index 0000000..27d051a
+Binary files /dev/null and b/__pycache__/test_mathutils.cpython-314.pyc differ
+diff --git a/mathutils.py b/mathutils.py
+index 278b44f..c8ace38 100644
+--- a/mathutils.py
++++ b/mathutils.py
+@@ -4,3 +4,8 @@
+ def add(a: int, b: int) -> int:
+     """Return a + b."""
+     return a + b
++
++
++def is_even(n: int) -> bool:
++    """Return True if n is even, False otherwise."""
++    return n % 2 == 0
+diff --git a/test_mathutils.py b/test_mathutils.py
+index fe0a8ea..46ba97c 100644
+--- a/test_mathutils.py
++++ b/test_mathutils.py
+@@ -1,6 +1,6 @@
+ import unittest
+ 
+-from mathutils import add
++from mathutils import add, is_even
+ 
+ 
+ class AddTests(unittest.TestCase):
+@@ -8,5 +8,19 @@ class AddTests(unittest.TestCase):
+         self.assertEqual(add(2, 3), 5)
+ 
+ 
++class IsEvenTests(unittest.TestCase):
++    def test_even(self):
++        self.assertTrue(is_even(4))
++
++    def test_odd(self):
++        self.assertFalse(is_even(3))
++
++    def test_zero(self):
++        self.assertTrue(is_even(0))
++
++    def test_negative(self):
++        self.assertTrue(is_even(-2))
++
++
+ if __name__ == "__main__":
+     unittest.main()

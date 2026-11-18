@@ -1,0 +1,41 @@
+{
+  "id": "20261118-1344-9b2f",
+  "title": "Add a function is_even(n: int) -> bool to mathutils.py, with a docstring, and a unit test for it in test_mathutils.py (even, odd, zero and a negative number).",
+  "project": "/var/home/Kyle/.cache/mc-e2e/repo",
+  "agent": "local",
+  "model": "ornith-1.5:9b",
+  "brief": "Add a function is_even(n: int) -> bool to mathutils.py, with a docstring, and a unit test for it in test_mathutils.py (even, odd, zero and a negative number).",
+  "reason": "chosen by the owner",
+  "time_limit": 300,
+  "status": "merged",
+  "created": 1795002296.5070984,
+  "started": 1795002296.5810483,
+  "finished": 1795002338.734532,
+  "exit_code": 0,
+  "workspace": {
+    "repo": "/var/home/Kyle/.cache/mc-e2e/repo",
+    "worktree": "/var/home/Kyle/.cache/mc-e2e/.worktrees/task-20261118-1344-9b2f",
+    "branch": "task/20261118-1344-9b2f",
+    "base": "fb8cead83931176831d22324076f170b9912a0b9",
+    "workdir": "/var/home/Kyle/.cache/mc-e2e/.worktrees/task-20261118-1344-9b2f"
+  },
+  "files": [
+    "__pycache__/mathutils.cpython-314.pyc",
+    "__pycache__/test_mathutils.cpython-314.pyc",
+    "mathutils.py",
+    "test_mathutils.py"
+  ],
+  "insertions": 20,
+  "deletions": 1,
+  "review": {
+    "verdict": "changes",
+    "summary": "The code is correct and matches the task. `is_even` has a docstring and uses `n % 2 == 0`, which works for negative numbers in Python. The four requested test cases (4, 3, 0 and -2) are present, and the existing `add` test is unchanged. The one problem is that the diff also adds two compiled `__pycache__/*.pyc` files. They need to be removed before merging; with that fixed, this is ready to approve.",
+    "concerns": [
+      "The diff adds two compiled bytecode files that shouldn't go into git: `__pycache__/mathutils.cpython-314.pyc` and `__pycache__/test_mathutils.cpython-314.pyc`. They were created when the tests ran. Delete them from the worktree, and ideally add `__pycache__/` and `*.pyc` to `.gitignore` so later tasks don't pick them up again.",
+      "I only had the diff to review and didn't rerun the tests myself. The worker's 'Ran 5 tests \u2026 OK' result matches the code in the diff, but run `python -m unittest -v` once before merging to confirm it.",
+      "Optional: the negative-number test only checks an even value (-2). Adding a negative odd check such as `assertFalse(is_even(-3))` would make it stronger. The task only asked for one negative number, so this isn't required."
+    ]
+  },
+  "error": null,
+  "pid": null
+}

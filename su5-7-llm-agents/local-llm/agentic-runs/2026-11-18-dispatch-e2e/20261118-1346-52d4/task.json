@@ -1,0 +1,38 @@
+{
+  "id": "20261118-1346-52d4",
+  "title": "Add a function is_odd(n: int) -> bool to mathutils.py with a docstring, and one unit test for it.",
+  "project": "/var/home/Kyle/.cache/mc-e2e/repo",
+  "agent": "local",
+  "model": "ornith-1.5:9b",
+  "brief": "Add a function is_odd(n: int) -> bool to mathutils.py with a docstring, and one unit test for it.",
+  "reason": "chosen by the owner",
+  "time_limit": 300,
+  "status": "discarded",
+  "created": 1795002401.413183,
+  "started": 1795002401.4879873,
+  "finished": 1795002461.9853384,
+  "exit_code": 0,
+  "workspace": {
+    "repo": "/var/home/Kyle/.cache/mc-e2e/repo",
+    "worktree": "/var/home/Kyle/.cache/mc-e2e/.worktrees/task-20261118-1346-52d4",
+    "branch": "task/20261118-1346-52d4",
+    "base": "eed17508e023383348528c4283b50e30fbf54bf5",
+    "workdir": "/var/home/Kyle/.cache/mc-e2e/.worktrees/task-20261118-1346-52d4"
+  },
+  "files": [
+    "mathutils.py",
+    "test_mathutils.py"
+  ],
+  "insertions": 17,
+  "deletions": 1,
+  "review": {
+    "verdict": "approve",
+    "summary": "The worker added `is_odd(n: int) -> bool` with a docstring, placed right after `is_even` in the same style. It is correct for negative numbers too, because Python's `%` returns 1 for `-3 % 2`. Only `mathutils.py` and `test_mathutils.py` were changed. The brief asked for one unit test, but the worker added three (odd, even and negative). That goes beyond the brief, but it does no harm and is worth merging.",
+    "concerns": [
+      "The brief asked for one unit test, but the worker added an `IsOddTests` class with three test methods. That's a small departure from the brief. It's harmless, but if you want the exact scope you could cut it down to one.",
+      "The log's claim that 8 tests pass is the worker's own report. I didn't re-run the tests in this review. Run `python3 -m unittest -v` in the worktree before merging to confirm."
+    ]
+  },
+  "error": null,
+  "pid": null
+}

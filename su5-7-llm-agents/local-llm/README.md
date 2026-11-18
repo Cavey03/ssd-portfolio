@@ -260,6 +260,10 @@ parsing module for Mission Control's Local LLM panel. Full write-up, briefs, log
 | 1 | Full module: 4 data classes, 9 functions, tests | Looped in its reasoning for 6 min ("let me write…" ×42, "reconsider" ×40); **no files written**; stopped |
 | 2 | A third: 3 data classes, 4 parse functions, tests; "write first, then fix"; 10-min limit | Wrote the module in 2½ min; 13/15 tests; stuck 7 min on a stray bracket in its own test data. One real bug (`self.` missing). Fixed in review, merged |
 
+More runs the same day: [Codex with GPT on a similar task](agentic-runs/2026-11-18-worktrees-gpt/README.md)
+(3 min, no review findings) and [the first end-to-end Dispatch runs](agentic-runs/2026-11-18-dispatch-e2e/README.md)
+(the local model did two one-function tasks in about a minute each).
+
 **Lessons:** give small models small, single-step tasks; overthinking (Codex ran it at `reasoning effort: high`)
 is the main failure, not wrong code; they struggle to *find* their own small errors; always set a time limit
 and review the output.

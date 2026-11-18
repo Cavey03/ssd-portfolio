@@ -1,0 +1,101 @@
+Read AGENTS.md first. Your task: create TWO new files, and nothing else.
+  1. mission_control/worktrees.py   (no UI code; Python standard library only)
+  2. tests/test_worktrees.py        (unittest)
+Copy the style of mission_control/gitinfo.py: module docstring, `from __future__ import annotations`,
+frozen dataclasses, type hints, a short docstring on every function, comments that explain WHY.
+
+## Rules
+- Do NOT edit any other file. Do NOT commit in this repository. Do NOT install packages.
+- Tests must only touch temporary git repos they create themselves (tempfile.TemporaryDirectory). Never
+  run git against ~/Projects or this checkout from the tests.
+- In tests, give temp repos an identity (`git config user.name Test`, `git config user.email t@example.com`).
+- Run the tests with:  python3 -m unittest tests.test_worktrees -v   and finish when they all pass.
+  Then print a short summary, including anything you were unsure about.
+
+## What it is for
+Mission Control is getting a "Dispatch" feature: a task is handed to an AI coding agent that works in its
+own **git worktree** (a second checkout of the same repo on its own branch), so it can never touch the
+main checkout. Afterwards the changes are summarised for review, and, if the owner approves, committed and
+merged into the main checkout; otherwise thrown away. This module is that git layer. The rest of the
+feature is written by someone else against EXACTLY the names below, so keep every name and signature.
+
+Projects can sit in a sub-folder of a repo: ~/Projects is one repo, and a project like
+~/Projects/su5-7-llm-agents/mission-control is a folder inside it. The worktree is always of the WHOLE repo;
+the agent works in the same sub-folder inside the worktree.
+
+## Exact API
+
+class WorkspaceError(Exception): raised with a short readable message when a git step fails.
+
+TASK_ID_PATTERN = re.compile(r"[a-z0-9][a-z0-9-]{0,39}")   # fullmatch; anything else -> WorkspaceError
+
+@dataclass(frozen=True)
+class Workspace:
+    repo: Path        # top folder of the repo (the main checkout)
+    worktree: Path    # <worktrees_dir>/task-<id>
+    branch: str       # "task/<id>"
+    base: str         # full sha of the commit the worktree started from
+    workdir: Path     # where the agent works: worktree / (project folder relative to repo)
+    def to_dict(self) -> dict[str, str]:            # all fields as strings (for a JSON file)
+    @classmethod
+    def from_dict(cls, data: dict[str, str]) -> Workspace
+
+@dataclass(frozen=True)
+class ChangeSummary:
+    files: tuple[str, ...]   # changed / added (including NEW UNTRACKED files) / deleted paths, relative
+                             # to the repo top, sorted
+    insertions: int
+    deletions: int
+    diff: str                # full unified diff against `base`, including new files
+
+def repo_root(path: Path) -> Path
+    `git -C path rev-parse --show-toplevel`. WorkspaceError if path isn't inside a git repo.
+
+def create_workspace(project_dir: Path, worktrees_dir: Path, task_id: str) -> Workspace
+    Validate task_id. repo = repo_root(project_dir). base = `git rev-parse HEAD`.
+    `git -C repo worktree add -b task/<id> <worktrees_dir>/task-<id> <base>` (create worktrees_dir if
+    missing). workdir = worktree / project_dir.relative_to(repo) (equal to worktree for the repo top).
+    WorkspaceError if the branch or folder already exists, or git fails.
+    NOTE: the worktree starts from the last COMMIT; uncommitted changes in the main checkout are not in it.
+
+def summarize_changes(ws: Workspace) -> ChangeSummary
+    Everything the agent changed since base, whether or not it committed: run `git add -A` in the
+    worktree (staging is harmless there, it's our private checkout) and then compare the index with base:
+    `git diff --cached --numstat <base>` for files and counts (binary files show "-": count them as 0)
+    and `git diff --cached <base>` for the text.
+
+def commit_all(ws: Workspace, message: str) -> str | None
+    `git add -A` + commit in the worktree. Return the new commit sha, or None if there was nothing to
+    commit (no error).
+
+def merge_into_main(ws: Workspace, message: str) -> tuple[bool, str]
+    In ws.repo (the main checkout): `git merge --no-ff -m <message> <branch>`.
+    Success: (True, "Merged task/<id> into <current branch>").
+    Failure: if the merge stopped with conflicts, run `git merge --abort` so the main checkout is left
+    exactly as before, and return (False, "Merge conflict in: a.py, b.py"). If git refused to start
+    (for example uncommitted changes in the main checkout would be overwritten), return (False, <git's last
+    stderr line>). Never raise for these; raise WorkspaceError only if git can't run at all.
+
+def remove_workspace(ws: Workspace, delete_branch: bool = True) -> None
+    `git -C repo worktree remove --force <worktree>`, then `git -C repo branch -D <branch>` if asked.
+    Don't fail if they're already gone.
+
+All git calls: subprocess.run([...], capture_output=True, text=True, timeout=60, check=False), with
+env LC_ALL=C. Never use shell=True.
+
+## Tests to write (at least these)
+- create_workspace in a temp repo whose project is a sub-folder (repo/sub/proj): branch exists,
+  worktree exists, workdir == worktree/"sub/proj", base == HEAD sha. Also for the repo top itself.
+- Invalid task ids ("", "Bad", "a b", "../x", 41 chars) and a folder that isn't a repo -> WorkspaceError.
+- Same id twice -> WorkspaceError.
+- summarize_changes: modify a file, delete a file, add a NEW untracked file, add a file in a new folder:
+  all appear in files; insertions/deletions right; diff contains the new file's content. Also when the
+  agent made its own commit in the worktree. Nothing changed -> empty files, 0, 0, "".
+- commit_all returns a sha, then None when called again.
+- merge_into_main: after commit, the main checkout has the file, and the log has a merge commit.
+- Conflict: after the workspace is created, change the same line in the main checkout and commit it; then
+  merge -> (False, "Merge conflict in: ..."), and the main checkout is clean afterwards
+  (`git status --porcelain` empty, no .git/MERGE_HEAD).
+- Uncommitted change in the main checkout to the same file -> (False, message), nothing changed.
+- remove_workspace removes the folder and branch; calling it twice doesn't raise.
+- Workspace.to_dict / from_dict round trip.
