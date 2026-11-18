@@ -9,7 +9,59 @@ offline, private, and in a fraction of a second. **Base model:** Gemma 4 E2B (ab
 **Tool:** [Unsloth](https://unsloth.ai) (QLoRA). Trained twice with the same code and data: in **Google Colab on a
 free T4** and on **my RTX 5070**, then both are measured against the untrained base model.
 
-RESULTS_PLACEHOLDER
+## Results (76 held-out test tasks, never trained on)
+| Model | Prompt | Accuracy | **Balanced accuracy** | Recall local | Recall codex | Recall claude | Time per task |
+|---|---|---|---|---|---|---|---|
+| **router-rtx5070**: Gemma 4 E2B fine-tuned on my RTX 5070 | one line | **82%** | **63%** | 90% | 50% | 50% | 0.05 s |
+| COLAB_ROW
+| `gemma4:e2b`: the same model, **not** fine-tuned | full routing guidelines | 75% | 52% | 80% | 75% | 0% | 0.08 s |
+| `ornith-1.5:9b`, thinking on | full routing guidelines | 51% | 62% | 52% | 33% | 100% | ~5 s |
+| `ornith-1.5:9b`, thinking off | full routing guidelines | 78% | 41% | 97% | 0% | 25% | ~0.2 s |
+| always "local" (baseline) | – | 79% | 33% | 100% | 0% | 0% | – |
+| router v1 (training bug, see below) | one line | 75% | 32% | 95% | 0% | 0% | 0.05 s |
+
+Balanced accuracy = the mean of the three recalls; it is the fair measure here because 79% of the tasks are
+"local". Full numbers, including confusion tables and every prediction: [`results/eval.json`](results/eval.json).
+
+**What it shows**
+- **Fine-tuning taught the task.** The same 2B model went from 52% to 63% balanced accuracy, and needs only a
+  one-line instruction instead of a page of rules: the rules are now in its weights. That is transfer learning:
+  general language understanding from pre-training, adapted with ~300 examples to one narrow job.
+- **A 2B fine-tune matches a 9B model that reasons first** (62%), about 100× faster and with no thinking step.
+- **Caveats:** the test set is small, especially the rare classes (12 codex, 4 claude: "50% claude" is 2 of 4),
+  so the per-class numbers would move a lot with another split. Many mistakes are on tasks a person could
+  label either way ("Refactor to follow style guides", "Update for latest version of Rust"): a one-line commit
+  message often doesn't say how big the job is. The labels are one reviewer's judgement.
+
+**Training** (`runs/*/metrics.json`)
+| | RTX 5070 (12 GB), `gpu` container | Colab free T4 (16 GB) |
+|---|---|---|
+| Training time (409 examples × 3 epochs) | 247 s | COLAB_TIME |
+| Peak GPU memory | 7.98 GB | COLAB_VRAM |
+| Loss at the end | 0.012 | COLAB_LOSS |
+| LoRA adapter | 97 MB | |
+| Exported model (GGUF Q4_K_M) | 3.4 GB | |
+
+## What went wrong first, and how it was found
+The first trained router (v1) answered "local" for nearly everything, **worse than the untrained model**.
+Finding out why ([`diagnose_router.py`](diagnose_router.py), logs in [`logs/`](logs/)):
+
+| Test | Result | Conclusion |
+|---|---|---|
+| Ask v1 about tasks it was **trained** on | 0% codex, 0% claude | Not a generalisation problem: training or export |
+| Read the adapter's label probabilities directly (no export, no Ollama) | ≈ 0.6 / 0.15 / 0.25 for **every** task | The export is fine; the model only learned how common each label is |
+| Train on 24 examples for 30 epochs, on purpose to overfit | training loss 0.000016, but only **11/24** right when asked | It learned perfectly but answered wrongly: training and inference saw different input |
+| The same, with the KV cache off as in training | 11/24 | Not the cache (my first guess was wrong) |
+| Compare the training text and the inference prompt token by token | training started with `<\|turn>`, inference with `<bos>` | **The training data had no `<bos>` token** |
+| The same 24, with `<bos>` removed from the prompt | **24/24** | Proven |
+
+**Cause:** Unsloth's Gemma guide removes `<bos>` from the training text because "the tokenizer adds it"; Gemma
+4's tokenizer does not, so every training example lacked the start-of-sequence token that every real prompt
+(Ollama's included) has. Gemma relies heavily on that first token, so the model learned the task in a setting it
+never meets in use. **Fix:** keep `<bos>`, and `train_router.py` now refuses to train unless every example starts
+with exactly one `<bos>`. **Lesson:** a falling training loss doesn't prove a model learned the right thing; test
+the trained model the way it will be used, and overfit a tiny set first to check the pipeline.
+
 
 ## 1. The data
 | Step | What | File |

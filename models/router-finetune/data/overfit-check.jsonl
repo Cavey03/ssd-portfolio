@@ -1,0 +1,24 @@
+{"id": "t049", "text": "Add Hibernate Type to store null Date values as 9999-01-01", "label": "codex"}
+{"id": "t353", "text": "Add minimap, typeahead (autocomplete for search bar) component", "label": "codex"}
+{"id": "t143", "text": "Handle multiple sites in single request", "label": "codex"}
+{"id": "t184", "text": "Fix update remote to ConanCenter and grpc to highest buildable/supported version", "label": "codex"}
+{"id": "t135", "text": "Update author name on Mangan theme", "label": "local"}
+{"id": "t224", "text": "Enable service compositions command to instantiate the linked ontology", "label": "claude"}
+{"id": "t115", "text": "Use less strict condition to avoid problems with concurrency", "label": "claude"}
+{"id": "t276", "text": "Add backwards compatibility for Node.js 0.10", "label": "claude"}
+{"id": "t160", "text": "Remove unused import of ui-typogrphy", "label": "local"}
+{"id": "t238", "text": "Add keyword to echo worker", "label": "local"}
+{"id": "t209", "text": "Fix web components not loading properly", "label": "claude"}
+{"id": "t079", "text": "Update readme to be markdown format", "label": "local"}
+{"id": "t084", "text": "Update bip_disk To Use bip_metainfo 0.10", "label": "codex"}
+{"id": "t134", "text": "Make it possible to set custom Lock", "label": "codex"}
+{"id": "t345", "text": "Fix broken build on master", "label": "claude"}
+{"id": "t109", "text": "Upgrade to 0.2 : Centralized logging support", "label": "claude"}
+{"id": "t342", "text": "Allow triggering of event at any time", "label": "codex"}
+{"id": "t256", "text": "Switch from f64 to f32", "label": "codex"}
+{"id": "t306", "text": "Add swagger metadata for instance console", "label": "local"}
+{"id": "t068", "text": "Make libxcb compile with gcc 4.9", "label": "claude"}
+{"id": "t104", "text": "Fix error on date save", "label": "claude"}
+{"id": "t121", "text": "Remove pancurses from windows build", "label": "local"}
+{"id": "t076", "text": "Change avatar image alt to emtry string", "label": "local"}
+{"id": "t267", "text": "Make sure this is numeric", "label": "local"}

@@ -143,6 +143,12 @@ and the Tasks panel picks them up again on the next start.
 - The plan is checked before use: the local model can't be chosen while Ollama is off, and an unknown model
   falls back to the default.
 
+**The local router:** next to Opus's plan, the Dispatch dialog shows the suggestion of `router-rtx5070`, a small
+model I fine-tuned with Unsloth to route tasks ([write-up](../../models/router-finetune/README.md)). It answers in
+about 0.05 s, for free and offline. If Opus can't be reached, its choice is preselected, and every decision log
+entry records it, so its agreement with Opus can be measured over time. Set `MISSION_CONTROL_ROUTER` to use
+another router model.
+
 **You stay in control:** nothing starts until you press Start (you can change the worker; Opus's brief is
 kept), and nothing is merged until you confirm `m`. If Opus can't be reached, choose a worker yourself and
 the task text becomes the brief.
@@ -156,8 +162,8 @@ the task text becomes the brief.
 - A worktree starts from the last **commit**: uncommitted changes in the main checkout aren't in it.
 - Merging commits the worktree as `Task <id>: <title>` (no AI names in commit messages, see the portfolio
   rules) and merges with `--no-ff`. On a conflict the merge is aborted and the main checkout is left as it was.
-- `decisions.jsonl` records every plan and whether I changed it. It's for transparency, **not training data**:
-  Anthropic's and OpenAI's terms forbid training models on their output.
+- `decisions.jsonl` records every plan, whether I changed it, and the local router's suggestion. It's for
+  transparency and for measuring the router against Opus, not training data: the providers' terms restrict using their output to build competing models.
 
 **Limits:** Opus reviews the diff and the worker's log; it doesn't run the tests itself. A worktree has no
 `.venv` (it's gitignored), so the brief tells the worker to use the main checkout's `.venv`.
@@ -255,6 +261,7 @@ Rebuild `.venv-host` (delete it and repeat step 2) when a Bazzite update changes
 | Local LLM panel, `localllm.py` server/GPU/service functions, local-agent detection, keys `4` and `o`, Usage fix for local sessions, 24 tests | Claude Code |
 | `worktrees.py` (git layer of Dispatch) + 27 tests | **Codex (`gpt-6.1-sol`)** in a worktree, 3 min, accepted unchanged after review. [Comparison with the local model](../local-llm/agentic-runs/2026-11-18-worktrees-gpt/README.md) |
 | Dispatch: orchestrator (Opus planning + review), task store and supervisor, `mc task` CLI, Dispatch dialog, Tasks panel, task view, 25 tests; Usage panel Local row, 4 tests | Claude Code (owner allowed GPT for Phases 3–4) |
+| Local router in Dispatch (`router.py`: suggestion, fallback, logging), 4 tests | Claude Code |
 | End-to-end test of Dispatch with the local model; fixes it found (`.pyc` files, commit messages) | Claude Code. [Evidence](../local-llm/agentic-runs/2026-11-18-dispatch-e2e/README.md) |
 | Projects panel for the one-repo portfolio (projects = marked folders + separate repos, changes per folder), agents named by project, fixed a date-dependent usage test, 6 tests | Claude Code (owner chose "real projects only") |
 

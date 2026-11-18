@@ -157,8 +157,9 @@ stateDiagram-v2
 - **Opus reviews every change** before I see it. It reads the diff and the worker's log; it doesn't run code.
 - **Everything is a file** (`~/.local/state/mission-control/tasks/<id>/`): the dashboard, the CLI and the
   supervisor share state without a server or database, and a task can be inspected with `cat`.
-- **Decisions are logged** (`decisions.jsonl`) for transparency, **not for training**: Anthropic's and OpenAI's
-  terms forbid training models on their output.
+- **Decisions are logged** (`decisions.jsonl`) for transparency and to measure the local router against Opus,
+  not as training data: the providers' terms restrict using their output to build competing models. (The router fine-tune's labels were reviewed by Claude as a documented,
+  non-competing coursework exception: [write-up](../models/router-finetune/README.md#who-labelled-and-the-terms-of-use).)
 
 ![The Dispatch dialog with a real plan from Opus](images/dispatch-plan.png)
 
@@ -230,10 +231,11 @@ with `git diff` before merging. Each README has a "Who built what" table; in sho
 - Cosmetic: the Containers panel sometimes draws squashed on startup and corrects itself within 10 s.
 
 ## 8. Future work
-1. **Fine-tune the router** so the routing step runs on the local model (free, offline, private), with Unsloth:
-   once in Google Colab and once on the RTX 5070, exported to GGUF and loaded into Ollama, then compared with the
-   base model on held-out tasks. The training labels must come from me, an open-weight teacher whose license
-   allows it, or rules, **never from Claude or GPT** (their terms forbid it).
+1. ~~Fine-tune the router~~ **Done (2026-11-18)**: Gemma 4 E2B fine-tuned with Unsloth (QLoRA) on 380 reviewed
+   routing labels; 63% balanced accuracy on unseen tasks against 52% untrained. Dispatch shows its suggestion next
+   to Opus's plan and uses it when Opus can't be reached ([write-up](../models/router-finetune/README.md)). Next:
+   more and better-balanced data, so it can take over routing from Opus. (On the labels and Anthropic's terms:
+   the review was done by Claude at my request, judged acceptable for non-competing coursework; see the write-up.)
 2. Try the local model with lower reasoning effort (`-c model_reasoning_effort=low`), which may reduce the looping.
 3. Let the review run the project's tests in the worktree.
 4. Split large tasks into steps automatically, so more of them fit the local model.

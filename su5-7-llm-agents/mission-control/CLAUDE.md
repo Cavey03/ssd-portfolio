@@ -40,8 +40,11 @@ Mission Control is the main point of the SU5–7 system: it tracks containers, p
 local) and usage, and dispatches tasks. Design: **orchestrator–workers**. Opus 5.5 (`claude -p`) plans,
 picks the agent/model, starts workers in git worktrees, reviews their results; the owner approves merges.
 Later, a fine-tuned local model takes over the routing step (free, offline, private); Opus keeps planning
-and reviewing. **Never use Claude or GPT output as training data** (Anthropic's and OpenAI's terms forbid
-training models on it): labels come from the owner, an open-weight teacher whose license allows it, or rules.
+and reviewing. **Training data:** Anthropic's and OpenAI's terms restrict using their output to build products
+or models that compete with theirs. Default: labels come from the owner, an open-weight teacher whose licence
+allows it, or rules. The router fine-tune (2026-11-18) is a documented exception: the owner asked Claude to
+review the labels, judged as non-competing coursework (see models/router-finetune/README.md). Ask the owner
+before using Claude/GPT output in training data again.
 
 - [x] Phase 0: Projects panel lists real projects only (folders with their own CLAUDE.md/AGENTS.md, or own
       repo: mission-control, local-llm, tools/summaries, particle-sim) plus one row for the portfolio repo

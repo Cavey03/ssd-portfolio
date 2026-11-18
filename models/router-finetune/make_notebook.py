@@ -23,33 +23,31 @@ def code(text: str) -> dict:
 
 def main() -> None:
     script = (HERE / "train_router.py").read_text()
+    # The training data is built into the notebook (it is small), so nothing has to be uploaded to Colab.
+    train_data = (HERE / "data" / "train.jsonl").read_text()
     cells = [
         md("""
 # Router fine-tune: Gemma 4 E2B with Unsloth (free Colab T4)
 ITRI626 SU5–7. Teaches a small model to route coding tasks to `local`, `codex` or `claude`, from ~300 labelled
 tasks. The **same** `train_router.py` also runs on my RTX 5070, so the two runs can be compared.
 
-**Before you start:** *Runtime → Change runtime type → T4 GPU*. Then run the cells in order
-(*Runtime → Run all* works too; the upload cell waits for you to choose the file).
+**Before you start:** *Runtime → Change runtime type → T4 GPU*. Then *Runtime → Run all*.
+Everything needed (the training data and the script) is inside this notebook. At the end the result
+(`colab-lora.zip`, ~100 MB) downloads by itself; if the browser asks, allow the download.
 """),
         md("## 1. Install Unsloth (2–4 minutes)"),
         code("!pip install -q unsloth\n!nvidia-smi --query-gpu=name,memory.total --format=csv"),
-        md("## 2. Upload the training data\nChoose `train.jsonl` from `models/router-finetune/data/` in the portfolio."),
-        code("""
-import os, shutil
-from google.colab import files
-uploaded = files.upload()
-os.makedirs("data", exist_ok=True)
-shutil.move(next(iter(uploaded)), "data/train.jsonl")
-print(sum(1 for _ in open("data/train.jsonl")), "examples")
-"""),
+        md("## 2. The training data (identical to `data/train.jsonl` in the repo: 409 rows)"),
+        code("!mkdir -p data"),
+        code("%%writefile data/train.jsonl\n" + train_data),
         md("## 3. The training script (identical to `train_router.py` in the repo)"),
         code("%%writefile train_router.py\n" + script),
         md("## 4. Train (about 5–15 minutes on a T4)"),
         code("!python train_router.py --data data/train.jsonl --out runs/colab"),
-        md("## 5. Download the result\nThe adapter is small (tens of MB). Put the zip in `models/router-finetune/runs/` "
-           "and unzip it there; `export_gguf.py` turns it into an Ollama model on my PC."),
+        md("## 5. Download the result\nThe adapter is about 100 MB. It downloads to your Downloads folder; "
+           "on the PC, `export_gguf.py` turns it into an Ollama model."),
         code("""
+!cat runs/colab/metrics.json | head -12
 !cd runs && zip -qr colab-lora.zip colab/lora colab/metrics.json && ls -lh colab-lora.zip
 from google.colab import files
 files.download("runs/colab-lora.zip")

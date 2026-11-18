@@ -1,0 +1,313 @@
+{
+  "test_tasks": 76,
+  "results": {
+    "gemma4:e2b": {
+      "accuracy": 0.75,
+      "balanced_accuracy": 0.517,
+      "recall": {
+        "local": 0.8,
+        "codex": 0.75,
+        "claude": 0.0
+      },
+      "confusion": {
+        "local": {
+          "local": 48,
+          "codex": 10,
+          "claude": 2,
+          "invalid": 0
+        },
+        "codex": {
+          "local": 2,
+          "codex": 9,
+          "claude": 1,
+          "invalid": 0
+        },
+        "claude": {
+          "local": 4,
+          "codex": 0,
+          "claude": 0,
+          "invalid": 0
+        }
+      },
+      "prompt": "guidelines",
+      "median_seconds": 0.072,
+      "predictions": {
+        "t117": "local",
+        "t376": "claude",
+        "t284": "local",
+        "t061": "codex",
+        "t086": "local",
+        "t072": "codex",
+        "t042": "codex",
+        "t229": "codex",
+        "t091": "codex",
+        "t313": "local",
+        "t152": "local",
+        "t244": "local",
+        "t087": "local",
+        "t292": "local",
+        "t187": "local",
+        "t230": "local",
+        "t050": "local",
+        "t331": "codex",
+        "t037": "local",
+        "t168": "codex",
+        "t338": "local",
+        "t175": "local",
+        "t097": "local",
+        "t127": "local",
+        "t013": "codex",
+        "t215": "codex",
+        "t333": "local",
+        "t144": "codex",
+        "t124": "codex",
+        "t325": "codex",
+        "t257": "local",
+        "t114": "local",
+        "t147": "codex",
+        "t002": "codex",
+        "t327": "local",
+        "t312": "local",
+        "t304": "claude",
+        "t043": "local",
+        "t352": "local",
+        "t355": "local",
+        "t335": "local",
+        "t185": "codex",
+        "t137": "local",
+        "t273": "local",
+        "t018": "local",
+        "t156": "codex",
+        "t340": "codex",
+        "t319": "local",
+        "t228": "local",
+        "t067": "local",
+        "t203": "claude",
+        "t193": "local",
+        "t303": "local",
+        "t245": "local",
+        "t028": "local",
+        "t031": "local",
+        "t358": "codex",
+        "t012": "local",
+        "t363": "local",
+        "t298": "codex",
+        "t174": "local",
+        "t029": "local",
+        "t339": "local",
+        "t045": "local",
+        "t297": "local",
+        "t314": "local",
+        "t365": "local",
+        "t158": "local",
+        "t315": "local",
+        "t289": "local",
+        "t252": "local",
+        "t192": "local",
+        "t347": "local",
+        "t011": "local",
+        "t351": "local",
+        "t196": "local"
+      }
+    },
+    "router-rtx5070": {
+      "accuracy": 0.75,
+      "balanced_accuracy": 0.317,
+      "recall": {
+        "local": 0.95,
+        "codex": 0.0,
+        "claude": 0.0
+      },
+      "confusion": {
+        "local": {
+          "local": 57,
+          "codex": 0,
+          "claude": 3,
+          "invalid": 0
+        },
+        "codex": {
+          "local": 11,
+          "codex": 0,
+          "claude": 1,
+          "invalid": 0
+        },
+        "claude": {
+          "local": 4,
+          "codex": 0,
+          "claude": 0,
+          "invalid": 0
+        }
+      },
+      "prompt": "short",
+      "median_seconds": 0.046,
+      "predictions": {
+        "t117": "local",
+        "t376": "local",
+        "t284": "local",
+        "t061": "local",
+        "t086": "local",
+        "t072": "local",
+        "t042": "local",
+        "t229": "local",
+        "t091": "local",
+        "t313": "local",
+        "t152": "local",
+        "t244": "local",
+        "t087": "local",
+        "t292": "local",
+        "t187": "local",
+        "t230": "local",
+        "t050": "local",
+        "t331": "local",
+        "t037": "local",
+        "t168": "local",
+        "t338": "local",
+        "t175": "local",
+        "t097": "local",
+        "t127": "local",
+        "t013": "claude",
+        "t215": "local",
+        "t333": "local",
+        "t144": "local",
+        "t124": "local",
+        "t325": "claude",
+        "t257": "local",
+        "t114": "local",
+        "t147": "local",
+        "t002": "claude",
+        "t327": "local",
+        "t312": "local",
+        "t304": "local",
+        "t043": "local",
+        "t352": "local",
+        "t355": "local",
+        "t335": "local",
+        "t185": "local",
+        "t137": "local",
+        "t273": "local",
+        "t018": "local",
+        "t156": "local",
+        "t340": "local",
+        "t319": "local",
+        "t228": "local",
+        "t067": "local",
+        "t203": "local",
+        "t193": "local",
+        "t303": "local",
+        "t245": "local",
+        "t028": "local",
+        "t031": "local",
+        "t358": "local",
+        "t012": "local",
+        "t363": "local",
+        "t298": "local",
+        "t174": "local",
+        "t029": "local",
+        "t339": "local",
+        "t045": "local",
+        "t297": "local",
+        "t314": "local",
+        "t365": "local",
+        "t158": "local",
+        "t315": "local",
+        "t289": "claude",
+        "t252": "local",
+        "t192": "local",
+        "t347": "local",
+        "t011": "local",
+        "t351": "local",
+        "t196": "local"
+      }
+    },
+    "always local (baseline)": {
+      "accuracy": 0.789,
+      "balanced_accuracy": 0.333,
+      "recall": {
+        "local": 1.0,
+        "codex": 0.0,
+        "claude": 0.0
+      },
+      "confusion": {
+        "local": {
+          "local": 60,
+          "codex": 0,
+          "claude": 0,
+          "invalid": 0
+        },
+        "codex": {
+          "local": 12,
+          "codex": 0,
+          "claude": 0,
+          "invalid": 0
+        },
+        "claude": {
+          "local": 4,
+          "codex": 0,
+          "claude": 0,
+          "invalid": 0
+        }
+      },
+      "prompt": "\u2013"
+    },
+    "ornith-1.5:9b (no thinking)": {
+      "accuracy": 0.776,
+      "balanced_accuracy": 0.406,
+      "recall": {
+        "local": 0.967,
+        "codex": 0.0,
+        "claude": 0.25
+      },
+      "confusion": {
+        "local": {
+          "local": 58,
+          "codex": 0,
+          "claude": 2,
+          "invalid": 0
+        },
+        "codex": {
+          "local": 10,
+          "codex": 0,
+          "claude": 2,
+          "invalid": 0
+        },
+        "claude": {
+          "local": 3,
+          "codex": 0,
+          "claude": 1,
+          "invalid": 0
+        }
+      },
+      "prompt": "guidelines"
+    },
+    "ornith-1.5:9b (thinking)": {
+      "accuracy": 0.513,
+      "balanced_accuracy": 0.617,
+      "recall": {
+        "local": 0.517,
+        "codex": 0.333,
+        "claude": 1.0
+      },
+      "confusion": {
+        "local": {
+          "local": 31,
+          "codex": 0,
+          "claude": 29,
+          "invalid": 0
+        },
+        "codex": {
+          "local": 0,
+          "codex": 4,
+          "claude": 8,
+          "invalid": 0
+        },
+        "claude": {
+          "local": 0,
+          "codex": 0,
+          "claude": 4,
+          "invalid": 0
+        }
+      },
+      "prompt": "guidelines"
+    }
+  }
+}

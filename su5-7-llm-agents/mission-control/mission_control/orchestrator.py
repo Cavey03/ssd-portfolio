@@ -10,8 +10,9 @@ validated JSON. The routing rules below come from measured experience: the
 local 9B model looped on a large task but finished a small one quickly
 (local-llm/agentic-runs/2026-11-18-localllm/).
 
-The decisions are logged (tasks.DECISIONS) for transparency. They are NOT
-training data: Anthropic's terms forbid training models on Claude's output.
+The decisions are logged (tasks.DECISIONS) for transparency and to compare the
+local router with Opus. They are not training data: the providers' terms restrict
+using their output to build competing models.
 """
 
 from __future__ import annotations

@@ -68,11 +68,19 @@ def main() -> None:
     rows = [json.loads(line) for line in Path(args.data).read_text().splitlines()]
     texts = [
         tokenizer.apply_chat_template(to_messages(r["text"], r["label"]), tokenize=False,
-                                      add_generation_prompt=False).removeprefix("<bos>")
+                                      add_generation_prompt=False)
         for r in rows
     ]
+    # Every example must start with exactly one <bos>, as every prompt does at inference (Ollama adds it).
+    # Unsloth's Gemma guide removes <bos> from the text because "the tokenizer adds it", but Gemma 4's
+    # tokenizer does NOT: the first version of this script trained without <bos>, and the model then failed
+    # completely at inference (see README, "What went wrong first").
+    text_tokenizer = getattr(tokenizer, "tokenizer", tokenizer)
+    first_ids = text_tokenizer(texts[0], add_special_tokens=True)["input_ids"]
+    bos = text_tokenizer.bos_token_id
+    assert first_ids[0] == bos and first_ids[1] != bos, f"expected exactly one <bos>, got {first_ids[:3]}"
     dataset = Dataset.from_dict({"text": texts})
-    print(f"{len(texts)} training examples. First one:\n{texts[0]}")
+    print(f"{len(texts)} training examples (each starts with one <bos>). First one:\n{texts[0]}")
 
     # 4. Training: small batches, 3 passes over the data, the usual QLoRA learning rate.
     trainer = SFTTrainer(
