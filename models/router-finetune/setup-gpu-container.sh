@@ -15,6 +15,7 @@ fi
 
 distrobox enter gpu -- bash -lc "
     set -euo pipefail
+    cd \"\$HOME\"   # importing unsloth writes a cache folder into the current folder: not into the repo
     nvidia-smi --query-gpu=name,driver_version --format=csv,noheader
     # venv: isolated Python; dev headers + compiler: some packages build small extensions (Triton);
     # cmake/git/curl: needed by llama.cpp to export the model to GGUF for Ollama.
