@@ -1,0 +1,380 @@
+{"id": "t000", "text": "Update settings for reading config files", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t001", "text": "Add meta tag for google webmaster tools", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t002", "text": "Improve solution for Word Count", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t003", "text": "Add RLP encoding to RecentProposerRecord", "suggested": "codex", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t004", "text": "Replace PrintDegbugInfo with function SetDebugMode", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t005", "text": "Enable draggle attribute on handle", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t006", "text": "Add default profile picture url", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t007", "text": "Add Defer Panic middleware to the list", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t008", "text": "Update date from creation time", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t009", "text": "Remove deprecated sinon sandbox call", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t010", "text": "Fix import order picked up by isort", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t011", "text": "Fix ui-sref for cause show view", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t012", "text": "Update package docs of the command", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t013", "text": "Add method to get waifu according user and sharing status", "suggested": "codex", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t014", "text": "Add install for junit report generator", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t015", "text": "Make sure the clock didn't hang up somehow", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t016", "text": "Remove topicId function, define at creation", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t017", "text": "Add remove specific stuff from stylesheet", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t018", "text": "Update from Hackage at 2018-05-07T05:59:58Z", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t019", "text": "Add pull request url action", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t020", "text": "Use exception rather than Bad Request view", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t021", "text": "Order portfolio summary by ID", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t022", "text": "Update \"Get access to CI\"", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t023", "text": "Change lock reason -> info", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t024", "text": "Return None if no bed file exists to be opened", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t025", "text": "Add code comment for server-start-chatting", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t026", "text": "Add functools wraps to report_time decorator", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t027", "text": "Move the service creation to onStart, add onStop service termination", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t028", "text": "Fix issue with wrong import", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t029", "text": "Add misc to documentation index", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t030", "text": "Send signal when starting up", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t031", "text": "Update Development Status to stable", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t032", "text": "Expand map to 100% width", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t033", "text": "Fix aspect ratio and add an option to change it", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t034", "text": "Fix extra newline in Javadoc code example", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t035", "text": "Add titlePage to first page header", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t036", "text": "Fix wrong path in readme", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t037", "text": "Add some css love :/", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t038", "text": "Convert the summary from Markdown", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t039", "text": "Add css for the blinking cursor", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t040", "text": "Increase timeout for GM on Android", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t041", "text": "Update version number to 0.1.4", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t042", "text": "Make SuaDB Test Base class", "suggested": "codex", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t043", "text": "Kill _changed from the Base so subclassing makes more sense", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t044", "text": "Expand example to cover new Pi 4 ReadPull() interface", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t045", "text": "Improve background contrast for current song titles", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t046", "text": "Add back rotatation for scroll job", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t047", "text": "Add a compile-fail test for attribute/syntax parsing", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t048", "text": "Reorder zsh aliases and be more strict about default ruby version", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t049", "text": "Add Hibernate Type to store null Date values as 9999-01-01", "suggested": "codex", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t050", "text": "Update tokens benchmark to exhaust iterator", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t051", "text": "Install gdbm on Linux for Travis 18.04 bionic", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t052", "text": "Add topkg to travis configuration", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t053", "text": "Add 'electron' to ESLint configuration", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t054", "text": "Load Bootstrap and jQuery via CDN", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t055", "text": "Add a getOnlinePlayers() that support both old and new ones", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t056", "text": "Allow resource compression to be disabled", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t057", "text": "Update readme to conform with the change to docker-compose", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t058", "text": "Use lambda symbol for starhip character", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t059", "text": "Add documentation comment for wait.VMPowerOff", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t060", "text": "Use Travis's container-based architecture for faster builds", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t061", "text": "Add ignored stories that come from Apps Manager tracker", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t062", "text": "Use commit suggestion to use types", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t063", "text": "Use correct env to check if on github", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t064", "text": "Change entity id to projectName", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t065", "text": "Allow metadata to be shown whether v1 or v2 glance data (NG)", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t066", "text": "Use the Server class (an Actor derived class)", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t067", "text": "Use /var/cache rather than /tmp", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t068", "text": "Make libxcb compile with gcc 4.9", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t069", "text": "Add a `::new()` constructor for `NoIdDispatcher`", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t070", "text": "Rename Id field to ID", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t071", "text": "Add dependency on pylast, update project URL", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t072", "text": "Add all files in dist", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t073", "text": "Store in the current state, not the previous one", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t074", "text": "Remove border from top of page", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t075", "text": "Improve test coverage for onDecl()", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t076", "text": "Change avatar image alt to emtry string", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t077", "text": "Add path to game in router", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t078", "text": "Define is class property on constructor if it's not present", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t079", "text": "Update readme to be markdown format", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t080", "text": "Switch from //... to //:all when building with Bazel", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t081", "text": "Add input check when getting all nodes", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t082", "text": "Enable all features for docs.rs", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t083", "text": "Set foreign key information to Subscription", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t084", "text": "Update bip_disk To Use bip_metainfo 0.10", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t085", "text": "Add cleanup to prevent errors when it already exists", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t086", "text": "Refactor to follow style guides", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t087", "text": "Change the name of the action", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t088", "text": "Add targetType to JavaScripPaintWorklet prototype", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t089", "text": "Add flag for output file", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t090", "text": "Copy files from the bundlesPath", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t091", "text": "Add tests for request ids", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t092", "text": "Print heroku if debug is true", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t093", "text": "Make \"Emails\" link directly to composing an email", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t094", "text": "Add changelog entry for 0.5.0", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t095", "text": "Change Tok to Token for readability", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t096", "text": "Clean Up Mojave or later", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t097", "text": "Switch to using the GDS PP PPA TLA WOO", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t098", "text": "Hide Python 2.6 Exception.message deprecation warnings", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t099", "text": "Add github token to push changes back to github", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t100", "text": "Change titles for the site", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t101", "text": "Add a default value of None for reserved fields", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t102", "text": "Add highlighting for hbs and json", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t103", "text": "Implement openable check for door card", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t104", "text": "Fix error on date save", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t105", "text": "Update Linux native travis build", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t106", "text": "Update example base on the new implementation of ari.Client", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t107", "text": "Change ambiguous calls to Cortana", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t108", "text": "Change lib/image.Image.ListObjects() to use forEachObject() iterator", "suggested": "codex", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t109", "text": "Upgrade to 0.2 : Centralized logging support", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t110", "text": "Change condition of Jenkins start up judgement", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t111", "text": "Add partial search algorithm and data structure", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t112", "text": "Fix for new tag button with Turbolinks", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t113", "text": "Update Readme to include 'npm run deploy' and category wise pages", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t114", "text": "Update Readme with information about the login_attempts.py", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t115", "text": "Use less strict condition to avoid problems with concurrency", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t116", "text": "Refactor Largest Palindrome Product for range of n is", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t117", "text": "Correct a typo in the new changelog entry", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t118", "text": "Check for current timeout before calling cancel", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t119", "text": "Update primitive test to match the new behavior", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t120", "text": "Add tf to the requirements", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t121", "text": "Remove pancurses from windows build", "suggested": "codex", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t122", "text": "Increment version for 0.0.2 release", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t123", "text": "Fix call to renamed function", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t124", "text": "Add date field to edit form", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t125", "text": "Fix SAML auth behind load balancer issue", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t126", "text": "Add some params in for comment videos", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t127", "text": "Add env subdirectory to package list", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t128", "text": "Update get_lca_matrix test for develop", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t129", "text": "Remove periods in label value", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t130", "text": "Update title of dummy demo", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t131", "text": "Improve solution for Scrabble Score", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t132", "text": "Fix llvm sources in build script", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t133", "text": "Add documentation on build-dependencies for protoc-rust", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t134", "text": "Make it possible to set custom Lock", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t135", "text": "Update author name on Mangan theme", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t136", "text": "Add $ to format helper", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t137", "text": "Update for latest version of Rust", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t138", "text": "Add in FstalPvP spam remover", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t139", "text": "Remove initial state and add router", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t140", "text": "Replace matrixStack in test living renderer", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t141", "text": "Add fast_finish: and remove include:", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t142", "text": "Disable test not working on GitHub workflow", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t143", "text": "Handle multiple sites in single request", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t144", "text": "Update test to account for more core products", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t145", "text": "Remove namespace from RD2 enablement check", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t146", "text": "Add new kind of exception", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t147", "text": "Add example for injecting user transform", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t148", "text": "Add missing cred-alert-worker-ng build test", "suggested": "codex", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t149", "text": "Fix typo of an extra comma", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t150", "text": "Add `whoami` to check permissions in the folder", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t151", "text": "Allow importing StdinStream from antlr4 package", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t152", "text": "Add package docstring for skimage.future", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t153", "text": "Change url in favor of the re_path", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t154", "text": "Add contacts to internal storage", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t155", "text": "Fix a broken link in docs", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t156", "text": "Add a function for parsing command-line arguments", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t157", "text": "Add overflow hidden to a menu item by default to fix menu items with floats @rev rdewsbury@", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t158", "text": "Clean up, use time helper rather than util", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t159", "text": "Add constants for sound synthesis", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t160", "text": "Remove unused import of ui-typogrphy", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t161", "text": "Remove the apikey=\"\" stuff from the unit tests", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t162", "text": "Fix bug that multiple polyline translated when shapes are dragged over the line", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t163", "text": "Change speed for shooter in autonomous", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t164", "text": "Use Heroku database connection settings", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t165", "text": "Use bootstrap icons for edit/delete in product list", "suggested": "codex", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t166", "text": "Add task for pushing code with rsync", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t167", "text": "Add adapter example w/sync API", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t168", "text": "Fix event teams parser for new format", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t169", "text": "Change baseurl to correct host page on GitHub pages", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t170", "text": "Add text window data fields", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t171", "text": "Install url from the right place", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t172", "text": "Add default path to config", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t173", "text": "Fix process.nextTick, try to save context", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t174", "text": "Use Instance Objects for Start/Stop", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t175", "text": "Set production databse to test database", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t176", "text": "Fix error reporting in copy script", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t177", "text": "Set doc.rs metadata to pass system cargo feature", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t178", "text": "Add usage to the readme", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t179", "text": "Install PHP 5.6 w. opcache, mbstring, xml, intl", "suggested": "codex", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t180", "text": "Add pointers to render.js and shaders", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t181", "text": "Make sure email_access_validated_at is not null after being populated", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t182", "text": "Comment changes and removal of by-line class", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t183", "text": "Add a generator for association tables", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t184", "text": "Fix update remote to ConanCenter and grpc to highest buildable/supported version", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t185", "text": "Add test for key derivation", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t186", "text": "Add Arc test, triggering an unusual bug", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t187", "text": "Fix for today modifier not being added", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t188", "text": "Fix test failure due to missing Object.assign polyfill", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t189", "text": "Add instructions on S3 storage", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t190", "text": "Configure Travis for better build performance", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t191", "text": "Add switch-target to embedded media and text following immediatly", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t192", "text": "Make update previous key name", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t193", "text": "Add license header to file. Change: 134564823", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t194", "text": "Fix an invalid coordinate in SpriteSheet", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t195", "text": "Build proper version based on tag + commit id", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t196", "text": "Fix segfault on invalid address", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t197", "text": "Set consistent line height in definition lists", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t198", "text": "Support loading appenders that reference other appenders", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t199", "text": "Fix Docker image tag inconsistency after merge commits", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t200", "text": "Add extra selector for new toggle", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t201", "text": "Remove old exports from subdue.core", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t202", "text": "Add doc for Arbitrary impl", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t203", "text": "Clean up quota cleanup migration", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t204", "text": "Allow multiple independent random walks for different indices of the same parameter", "suggested": "codex", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t205", "text": "Handle importerrors when f.x. we are installing", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t206", "text": "Add toggle animation to menu", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t207", "text": "Append PID to Django database to avoid conflicts", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t208", "text": "Update test to reflect new default version for node", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t209", "text": "Fix web components not loading properly", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t210", "text": "Disable atomic for delivery_email migration", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t211", "text": "Use Lang parser instead of Node parser", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t212", "text": "Change sections table title in dashboard pro", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t213", "text": "Replace 'write' method with '__str__'", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t214", "text": "Update home page with About and Work sections", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t215", "text": "Modify DynamoDBMapperFactory to return PUT configured mappers", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t216", "text": "Add branch tests for codegen", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t217", "text": "Stop polluting git workspace with temporary files created while running unit tests", "suggested": "codex", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t218", "text": "Add header, needed for the upcoming changes in the update_cronos.sh script", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t219", "text": "Use html tech from bemhtml library", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t220", "text": "Update Smart Flasher to v5.2 (43)", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t221", "text": "Remove unused crates from the main crate", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t222", "text": "Add tar-rs as a dependency", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t223", "text": "Add skipped and addSkip() to PageTestResults, for Python < 2.7", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t224", "text": "Enable service compositions command to instantiate the linked ontology", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t225", "text": "Use only one checkmark on chosen-stages", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t226", "text": "Use netlify url for docs for now", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t227", "text": "Allow either slash type to be used in command line to harness", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t228", "text": "Add local account support to make.conf.user", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t229", "text": "Allow script to take multiple paths, and adjust to standard __main__ idiom for cmdline scripts", "suggested": "codex", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t230", "text": "Update after-build on CI script for latest stable Rust version", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t231", "text": "Remove unused code in background script", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t232", "text": "Add styles for the disabled link", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t233", "text": "Format records before referencing the message attribute", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t234", "text": "Update UserSuForm to enhance compatibility with custom user models", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t235", "text": "Fix data type in extension point documenation", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t236", "text": "Use localStorage for *all* footure declarations", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t237", "text": "Fix shellish requirement bump rev to 2.3.1", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t238", "text": "Add keyword to echo worker", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t239", "text": "Add team info and user stories to readme", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t240", "text": "Update Trail Sense to 0.5.1 (8)", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t241", "text": "Make rating chart less high", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t242", "text": "Add test case for svg() (like h() is)", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t243", "text": "Add convenience method for shorter code", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t244", "text": "Make scroll faster in test", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t245", "text": "Remove units for zero values in CSS", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t246", "text": "Add note about use case", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t247", "text": "Change iter.First to return the value", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t248", "text": "Add Rails 4.2 to Travis", "suggested": "codex", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t249", "text": "Fix typo in issue description", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t250", "text": "Add description how to run the python demo", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t251", "text": "Fix formatting in tokenizer state file", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t252", "text": "Fix problem lines in nmap parsing", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t253", "text": "Load DB migrations before testing and use verbose=2 and failfast", "suggested": "codex", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t254", "text": "Fix readonly being applied twice for user color", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t255", "text": "Stop forwarding flash by default, it breaks more than it doesn't", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t256", "text": "Switch from f64 to f32", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t257", "text": "Copy graph examples (build with EXAMPLES=NEON=1)", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t258", "text": "Improve test case and add working comparison", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t259", "text": "Set nose.collector as the test_suite", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t260", "text": "Add note about precompiling static assets", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t261", "text": "Exclude tests package from distribution", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t262", "text": "Change the example search to be 'is:dupe'", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t263", "text": "Add create Postgresql user setup step", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t264", "text": "Update CI configs to v0.4.6", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t265", "text": "Fix specification of Python 3.6 and 3.7", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t266", "text": "Remove getAzureZone from init, no longer needed", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t267", "text": "Make sure this is numeric", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t268", "text": "Add pytest fixture to avoid leakage of cwd changes", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t269", "text": "Add allowed field name positionValues", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t270", "text": "Add missing export for IProviderInfo", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t271", "text": "Improve unit testing of zipstream utilities", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t272", "text": "Use custom Link component for SideNav", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t273", "text": "Remove leftover commented out code", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t274", "text": "Fix the benchmark so it's not throwing exceptions every time a message is written", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t275", "text": "Add base set of rule's invalid syntax tests", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t276", "text": "Add backwards compatibility for Node.js 0.10", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t277", "text": "Use clean content to avoid invalid mentions", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t278", "text": "Test that the compiler adds the punctuation", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t279", "text": "Mark test as xfail so that releases can be cut", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t280", "text": "Adjust hashtag to be consistently one word", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t281", "text": "Switch off Sonos devices when going to bed", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t282", "text": "Update fabric examples to reflect changes", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t283", "text": "Add defKeys as second argument for mutators", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t284", "text": "Set the publication with a parameter", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t285", "text": "Add methods to skip editor installation and PR creation", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t286", "text": "Fix Jenkins script to exit on error", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t287", "text": "Add Google Analytics tracking to page transitions", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t288", "text": "Remove get-started because we have it on the landing page", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t289", "text": "Add better instructions to the Gitter example", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t290", "text": "Add a retry when connecting stdin/stdout/stderr", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t291", "text": "Make func list item active class into a getter", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t292", "text": "Add the class-level vars we need for pod angular components to PodPlugin", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t293", "text": "Add unit test for EditLogOperation. For now adding just for CREATE_DEPENDENCY", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t294", "text": "Disable default features of `askama_shared` in `askama_derive`", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t295", "text": "Fix instruction to install using curl", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t296", "text": "Add dependency install to update script", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t297", "text": "Fix pep8 problem, extra new line after header", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t298", "text": "Add DB query to whole-file example", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t299", "text": "Add more padding to tables", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t300", "text": "Make Rust strprintf::fmt work for one argument", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t301", "text": "Refactor test to use user", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t302", "text": "Change message of semver tag check", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t303", "text": "Adjust to install GT.M 5.5-000", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t304", "text": "Use a simpler way to create the faux-std module", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t305", "text": "Fix test file first line", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t306", "text": "Add swagger metadata for instance console", "suggested": "codex", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t307", "text": "Test creation of HTTP credentials", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t308", "text": "Add documentation for Direct Send Message", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t309", "text": "Remove unused `fs` feature gate", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t310", "text": "Put example code in comment block", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t311", "text": "Fix typo in prediction.io domain", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t312", "text": "Fix assign member to the team", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t313", "text": "Fix usage of use login state", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t314", "text": "Handle newlines when building strings", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t315", "text": "Add eul2quat function. Currently only accept scalar. Need to do input checking", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t316", "text": "Use require all the way", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t317", "text": "Add test for sock path length", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t318", "text": "Update CSS for New Blogs", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t319", "text": "Add mock X-Forwarded-For header in trackable tests", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t320", "text": "Update task now updates all dependencies", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t321", "text": "Use 3.6 in Travis instead of 3.5", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t322", "text": "Fix api 502 error when competition id is invalid", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t323", "text": "Update footer_url with updated username", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t324", "text": "Index file documentation has been removed", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t325", "text": "Use external resources to make gh-pages work", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t326", "text": "Use checksum when pushing code with rsync", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t327", "text": "Add the Travis CI badge", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t328", "text": "Remove unnecessary code from post page due to blocking ballback usage", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t329", "text": "Set the focus highlight correctly if an element has focus while the page is being loaded", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t330", "text": "Build packages for various platforms (Fedora, EL)", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t331", "text": "Fix tests for running floodplain model in ci", "suggested": "codex", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t332", "text": "Add udp echo server example", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t333", "text": "Build status badge in readme file", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t334", "text": "Remove last reference to generators", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t335", "text": "Convert colors to rgb for putty", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t336", "text": "Fix live expression e2e test", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t337", "text": "Add extra space below ending of import", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t338", "text": "Add /api/ in front of API-URLs", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t339", "text": "Update from Hackage at 2016-02-29T21:45:18+0000", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t340", "text": "Update ppa script to build package for trusty, utopic and vivid", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t341", "text": "Refactor Expr object to be more self contained", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t342", "text": "Allow triggering of event at any time", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t343", "text": "Add a method to quickly clean up the files created during testing", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t344", "text": "Edit view pre-populates with data from user object", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t345", "text": "Fix broken build on master", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t346", "text": "Add docs to Selection Sort", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t347", "text": "Make converter props optional where necessary", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t348", "text": "Simplify using new data source methods", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t349", "text": "Add Classes of font sizes", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t350", "text": "Use RubyLinter instead of Linter so rbenv and rvm are supported", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t351", "text": "Add doc URL to the crate", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t352", "text": "Use Go 1.5.1 on Travis", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t353", "text": "Add minimap, typeahead (autocomplete for search bar) component", "suggested": "codex", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t354", "text": "Simplify code to find template path", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t355", "text": "Add python_requires to help pip", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t356", "text": "Add --params flag to get-capacity", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t357", "text": "Change to viewing pre created powerpoint", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t358", "text": "Replace google maps with openstreetmaps", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t359", "text": "Fix Travis CI failing because of \"error TS7006: Parameter 'res' and 'next' implicitly have an 'any' type.\"", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t360", "text": "Fix typo for JDK in documentation", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t361", "text": "Add a TODO to gulp tasks", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t362", "text": "Increase build timeout to 1800s", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t363", "text": "Fix Ctrl-/ shortcut on AZERTY keyboards", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t364", "text": "Update to remove requirement for unused 'lexicons' dir", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t365", "text": "Convert spec_help to printf and make colors portable", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t366", "text": "Add method to get lands with most color identities", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t367", "text": "Fix The Seven Deadly Sins search. Bug reported on chrome web store", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t368", "text": "Edit \"Clone repo into a new directory in your project\"", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t369", "text": "Test more edge cases of the highlighting parser", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t370", "text": "Update description and fix small typos", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t371", "text": "Set LC_TYPE to fix compilation on Mac OSX", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t372", "text": "Remove deployState parameter, forgotten during rebase to master", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t373", "text": "Add travis build status to Readme", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t374", "text": "Change order of CSP: style-src and CSP: font-src", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t375", "text": "Add dependencies we'll need soon", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t376", "text": "Remove iTunes - Who uses iTunes anymore?", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t377", "text": "Create module should not expose babel properties", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t378", "text": "Implement .destroy method in MemoryCookieStorage", "suggested": "local", "suggested_by": "ornith-1.5:9b (thinking)"}
+{"id": "t379", "text": "Fix GStreamer packages use of prefix", "suggested": "claude", "suggested_by": "ornith-1.5:9b (thinking)"}

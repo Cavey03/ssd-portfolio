@@ -1,0 +1,76 @@
+{"id": "t117", "text": "Correct a typo in the new changelog entry", "label": "local"}
+{"id": "t376", "text": "Remove iTunes - Who uses iTunes anymore?", "label": "local"}
+{"id": "t284", "text": "Set the publication with a parameter", "label": "local"}
+{"id": "t061", "text": "Add ignored stories that come from Apps Manager tracker", "label": "codex"}
+{"id": "t086", "text": "Refactor to follow style guides", "label": "codex"}
+{"id": "t072", "text": "Add all files in dist", "label": "local"}
+{"id": "t042", "text": "Make SuaDB Test Base class", "label": "codex"}
+{"id": "t229", "text": "Allow script to take multiple paths, and adjust to standard __main__ idiom for cmdline scripts", "label": "codex"}
+{"id": "t091", "text": "Add tests for request ids", "label": "codex"}
+{"id": "t313", "text": "Fix usage of use login state", "label": "local"}
+{"id": "t152", "text": "Add package docstring for skimage.future", "label": "local"}
+{"id": "t244", "text": "Make scroll faster in test", "label": "local"}
+{"id": "t087", "text": "Change the name of the action", "label": "local"}
+{"id": "t292", "text": "Add the class-level vars we need for pod angular components to PodPlugin", "label": "local"}
+{"id": "t187", "text": "Fix for today modifier not being added", "label": "local"}
+{"id": "t230", "text": "Update after-build on CI script for latest stable Rust version", "label": "local"}
+{"id": "t050", "text": "Update tokens benchmark to exhaust iterator", "label": "local"}
+{"id": "t331", "text": "Fix tests for running floodplain model in ci", "label": "codex"}
+{"id": "t037", "text": "Add some css love :/", "label": "local"}
+{"id": "t168", "text": "Fix event teams parser for new format", "label": "codex"}
+{"id": "t338", "text": "Add /api/ in front of API-URLs", "label": "local"}
+{"id": "t175", "text": "Set production databse to test database", "label": "local"}
+{"id": "t097", "text": "Switch to using the GDS PP PPA TLA WOO", "label": "claude"}
+{"id": "t127", "text": "Add env subdirectory to package list", "label": "local"}
+{"id": "t013", "text": "Add method to get waifu according user and sharing status", "label": "codex"}
+{"id": "t215", "text": "Modify DynamoDBMapperFactory to return PUT configured mappers", "label": "codex"}
+{"id": "t333", "text": "Build status badge in readme file", "label": "local"}
+{"id": "t144", "text": "Update test to account for more core products", "label": "local"}
+{"id": "t124", "text": "Add date field to edit form", "label": "local"}
+{"id": "t325", "text": "Use external resources to make gh-pages work", "label": "local"}
+{"id": "t257", "text": "Copy graph examples (build with EXAMPLES=NEON=1)", "label": "local"}
+{"id": "t114", "text": "Update Readme with information about the login_attempts.py", "label": "local"}
+{"id": "t147", "text": "Add example for injecting user transform", "label": "local"}
+{"id": "t002", "text": "Improve solution for Word Count", "label": "local"}
+{"id": "t327", "text": "Add the Travis CI badge", "label": "local"}
+{"id": "t312", "text": "Fix assign member to the team", "label": "local"}
+{"id": "t304", "text": "Use a simpler way to create the faux-std module", "label": "codex"}
+{"id": "t043", "text": "Kill _changed from the Base so subclassing makes more sense", "label": "claude"}
+{"id": "t352", "text": "Use Go 1.5.1 on Travis", "label": "local"}
+{"id": "t355", "text": "Add python_requires to help pip", "label": "local"}
+{"id": "t335", "text": "Convert colors to rgb for putty", "label": "local"}
+{"id": "t185", "text": "Add test for key derivation", "label": "local"}
+{"id": "t137", "text": "Update for latest version of Rust", "label": "claude"}
+{"id": "t273", "text": "Remove leftover commented out code", "label": "local"}
+{"id": "t018", "text": "Update from Hackage at 2018-05-07T05:59:58Z", "label": "local"}
+{"id": "t156", "text": "Add a function for parsing command-line arguments", "label": "local"}
+{"id": "t340", "text": "Update ppa script to build package for trusty, utopic and vivid", "label": "local"}
+{"id": "t319", "text": "Add mock X-Forwarded-For header in trackable tests", "label": "local"}
+{"id": "t228", "text": "Add local account support to make.conf.user", "label": "local"}
+{"id": "t067", "text": "Use /var/cache rather than /tmp", "label": "local"}
+{"id": "t203", "text": "Clean up quota cleanup migration", "label": "local"}
+{"id": "t193", "text": "Add license header to file. Change: 134564823", "label": "local"}
+{"id": "t303", "text": "Adjust to install GT.M 5.5-000", "label": "local"}
+{"id": "t245", "text": "Remove units for zero values in CSS", "label": "local"}
+{"id": "t028", "text": "Fix issue with wrong import", "label": "local"}
+{"id": "t031", "text": "Update Development Status to stable", "label": "local"}
+{"id": "t358", "text": "Replace google maps with openstreetmaps", "label": "codex"}
+{"id": "t012", "text": "Update package docs of the command", "label": "local"}
+{"id": "t363", "text": "Fix Ctrl-/ shortcut on AZERTY keyboards", "label": "local"}
+{"id": "t298", "text": "Add DB query to whole-file example", "label": "local"}
+{"id": "t174", "text": "Use Instance Objects for Start/Stop", "label": "codex"}
+{"id": "t029", "text": "Add misc to documentation index", "label": "local"}
+{"id": "t339", "text": "Update from Hackage at 2016-02-29T21:45:18+0000", "label": "local"}
+{"id": "t045", "text": "Improve background contrast for current song titles", "label": "local"}
+{"id": "t297", "text": "Fix pep8 problem, extra new line after header", "label": "local"}
+{"id": "t314", "text": "Handle newlines when building strings", "label": "local"}
+{"id": "t365", "text": "Convert spec_help to printf and make colors portable", "label": "local"}
+{"id": "t158", "text": "Clean up, use time helper rather than util", "label": "local"}
+{"id": "t315", "text": "Add eul2quat function. Currently only accept scalar. Need to do input checking", "label": "local"}
+{"id": "t289", "text": "Add better instructions to the Gitter example", "label": "local"}
+{"id": "t252", "text": "Fix problem lines in nmap parsing", "label": "local"}
+{"id": "t192", "text": "Make update previous key name", "label": "local"}
+{"id": "t347", "text": "Make converter props optional where necessary", "label": "local"}
+{"id": "t011", "text": "Fix ui-sref for cause show view", "label": "local"}
+{"id": "t351", "text": "Add doc URL to the crate", "label": "local"}
+{"id": "t196", "text": "Fix segfault on invalid address", "label": "claude"}

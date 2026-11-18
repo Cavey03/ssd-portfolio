@@ -198,16 +198,16 @@ class MissionControlApp(App[None]):
 
         def answered(result: tuple | None) -> None:
             if result is not None:
-                text, plan, suggested = result
-                self.start_task_worker(text, project_dir, plan, suggested)
+                text, plan, suggested, router = result
+                self.start_task_worker(text, project_dir, plan, suggested, router)
 
         self.push_screen(DispatchScreen(project_dir, models, local.running, local.default_model), answered)
 
     @work(thread=True, group="task-actions")
-    def start_task_worker(self, text: str, project_dir: Path, plan, suggested) -> None:
+    def start_task_worker(self, text: str, project_dir: Path, plan, suggested, router=None) -> None:
         """Create and start the task off the UI thread."""
         try:
-            task = task_store.start_task(task_store.make_task(text, project_dir, plan, suggested))
+            task = task_store.start_task(task_store.make_task(text, project_dir, plan, suggested, router))
         except OSError as exc:
             self.call_from_thread(self.notify, f"Could not start the task: {exc}", severity="error")
             return

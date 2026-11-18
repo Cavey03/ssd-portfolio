@@ -252,8 +252,10 @@ class CliTests(unittest.TestCase):
 
     def test_dry_run_with_planning(self) -> None:
         plan = Plan("codex", None, "multi-file", "Do it well", 25)
-        with patch("mission_control.tasks.ask_plan", return_value=plan):
+        with patch("mission_control.tasks.ask_plan", return_value=plan), \
+                patch("mission_control.cli.local_route", return_value="local"):
             code, out = self.run_cli("start", "Add x", "--project", str(self.repo), "--dry-run")
+        self.assertIn("): local", out)
         self.assertEqual(code, 0)
         self.assertIn("Worker:     codex", out)
         self.assertIn("Not started.", out)
@@ -317,7 +319,8 @@ class DispatchAppTests(unittest.IsolatedAsyncioTestCase):
         self.start = patch("mission_control.tasks.start_task", side_effect=lambda t: t).start()
         self.merge = patch("mission_control.tasks.merge_task", return_value=(True, "Merged")).start()
         self.discard = patch("mission_control.tasks.discard_task", return_value=(True, "Discarded")).start()
-        patch("mission_control.tasks.log_decision").start()
+        self.log = patch("mission_control.tasks.log_decision").start()
+        patch("mission_control.router.local_route", return_value="codex").start()
         self.addCleanup(patch.stopall)
 
     async def test_dispatch_plans_then_starts(self) -> None:
@@ -334,12 +337,14 @@ class DispatchAppTests(unittest.IsolatedAsyncioTestCase):
             await app.workers.wait_for_complete()
             await pilot.pause()
             self.assertIn("Worker: codex", str(app.screen.query_one("#dispatch-plan").render()))
+            self.assertIn("suggests: codex  (agrees with Opus)", str(app.screen.query_one("#dispatch-router").render()))
             await pilot.click("#start")
             await app.workers.wait_for_complete()
             await pilot.pause()
         task = self.start.call_args.args[0]
         self.assertEqual((task.title, task.agent, task.brief), ("Add x", "codex", "Do it well"))
         self.assertEqual(task.project, str(self.root / "demo"))
+        self.assertEqual(self.log.call_args.args[0]["router"], "codex")
 
     async def test_task_keys(self) -> None:
         from mission_control.app import MissionControlApp
@@ -373,3 +378,37 @@ class DispatchAppTests(unittest.IsolatedAsyncioTestCase):
             await pilot.press("n")  # No: nothing discarded
             await app.workers.wait_for_complete()
             self.discard.assert_not_called()
+
+
+class RouterTests(unittest.TestCase):
+    """The fine-tuned router client: the right prompt, and None whenever it can't answer."""
+
+    def reply(self, content: str):
+        body = json.dumps({"message": {"content": content}}).encode()
+        return patch("mission_control.router.urllib.request.urlopen", return_value=io.BytesIO(body))
+
+    def test_suggestion(self) -> None:
+        from mission_control import router
+        with self.reply('{"agent": "claude"}') as urlopen:
+            self.assertEqual(router.local_route("Redesign the auth layer"), "claude")
+        sent = json.loads(urlopen.call_args.args[0].data)
+        self.assertEqual(sent["messages"][0]["content"], router.SYSTEM_PROMPT)  # exactly the training prompt
+        self.assertEqual(sent["messages"][1]["content"], "Task: Redesign the auth layer")
+        self.assertEqual(sent["options"]["temperature"], 0)
+
+    def test_unavailable_or_odd_answers(self) -> None:
+        from mission_control import router
+        for content in ('{"agent": "robot"}', "not json", "[]"):
+            with self.subTest(content=content), self.reply(content):
+                self.assertIsNone(router.local_route("x"))
+        import urllib.error
+        with patch("mission_control.router.urllib.request.urlopen", side_effect=urllib.error.URLError("down")):
+            self.assertIsNone(router.local_route("x"))
+
+    def test_prompt_matches_training_script(self) -> None:
+        """The router must be asked exactly as it was trained (models/router-finetune/train_router.py)."""
+        from mission_control import router
+        script = Path(__file__).resolve().parents[3] / "models/router-finetune/train_router.py"
+        if not script.exists():
+            self.skipTest("training script not in this checkout")
+        self.assertIn(f'SYSTEM_PROMPT = "{router.SYSTEM_PROMPT}"', script.read_text())

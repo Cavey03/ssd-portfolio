@@ -200,6 +200,12 @@ DispatchScreen, TaskScreen {
     color: $foreground;
 }
 
+#dispatch-router {
+    height: auto;
+    margin-bottom: 1;
+    color: $secondary;
+}
+
 #dispatch-controls {
     height: auto;
 }

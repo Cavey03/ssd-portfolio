@@ -56,8 +56,11 @@ class ConfirmScreen(ModalScreen[bool]):
 class DispatchScreen(ModalScreen["tuple[str, Plan, Plan | None] | None"]):
     """Describe a task, let the orchestrator plan it, then confirm or change the worker.
 
-    Returns (task text, plan to run, orchestrator's original plan or None), or None if cancelled.
-    The caller starts the task; this screen only asks.
+    Returns (task text, plan to run, orchestrator's original plan or None, local router's suggestion or None),
+    or None if cancelled. The caller starts the task; this screen only asks.
+
+    The fine-tuned local router (router.py) is asked first: it answers in under a second, its suggestion is
+    shown next to Opus's plan, and it is preselected if Opus can't be reached.
     """
 
     BINDINGS = [Binding("escape", "cancel", "Cancel")]
@@ -69,6 +72,7 @@ class DispatchScreen(ModalScreen["tuple[str, Plan, Plan | None] | None"]):
         self.local_models = local_models if local_running else []
         self.default_local = default_local
         self.plan: Plan | None = None
+        self.router: str | None = None
 
     def compose(self) -> ComposeResult:
         options = [(f"local · {m}", f"local:{m}") for m in self.local_models]
@@ -78,6 +82,7 @@ class DispatchScreen(ModalScreen["tuple[str, Plan, Plan | None] | None"]):
             yield Input(placeholder="What should be done? (Enter: ask Opus for a plan)", id="dispatch-task")
             yield Static("Opus picks the worker and writes its brief. You confirm before it starts.",
                          id="dispatch-plan")
+            yield Static("", id="dispatch-router")
             with Horizontal(id="dispatch-controls"):
                 yield Select(options, prompt="Worker (after planning, or choose to skip it)",
                              id="dispatch-worker", allow_blank=True)
@@ -97,7 +102,11 @@ class DispatchScreen(ModalScreen["tuple[str, Plan, Plan | None] | None"]):
 
     @work(thread=True, exclusive=True, group="plan")
     def ask(self, text: str) -> None:
+        from mission_control.router import local_route
         from mission_control.tasks import ask_plan  # imported here: tasks pulls in git and HTTP helpers
+        router = local_route(text)  # fast; None if the router model or Ollama isn't available
+        if not get_current_worker().is_cancelled:
+            self.app.call_from_thread(self.show_router, router)
         try:
             plan: Plan | OrchestratorError = ask_plan(text, self.project)
         except OrchestratorError as exc:
@@ -105,10 +114,31 @@ class DispatchScreen(ModalScreen["tuple[str, Plan, Plan | None] | None"]):
         if not get_current_worker().is_cancelled:
             self.app.call_from_thread(self.show_plan, plan)
 
+    def show_router(self, router: str | None) -> None:
+        """Show the local router's suggestion (or that it isn't available)."""
+        from mission_control.router import ROUTER_MODEL
+        self.router = router
+        line = self.query_one("#dispatch-router", Static)
+        if router is None:
+            line.update(Text(f"Local router ({ROUTER_MODEL}): not available (is Ollama running?)", style="italic"))
+        else:
+            line.update(Text(f"Local router ({ROUTER_MODEL}) suggests: {router}", style="bold"))
+
+    def _worker_value(self, agent: str) -> str:
+        """The Select value for an agent; the local model gets the default model."""
+        if agent == "local":
+            model = self.default_local if self.default_local in self.local_models else (self.local_models or [""])[0]
+            return f"local:{model}"
+        return f"{agent}:"
+
     def show_plan(self, plan: Plan | OrchestratorError) -> None:
         box = self.query_one("#dispatch-plan", Static)
         if isinstance(plan, OrchestratorError):
-            box.update(Text(f"Planning failed: {plan}\nChoose a worker yourself to start anyway.", style="bold"))
+            hint = "Choose a worker yourself to start anyway."
+            if self.router is not None and (self.router != "local" or self.local_models):
+                self.query_one(Select).value = self._worker_value(self.router)
+                hint = f"The local router's choice ({self.router}) is selected; change it or press Start."
+            box.update(Text(f"Planning failed: {plan}\n{hint}", style="bold"))
             return
         self.plan = plan
         worker = f"{plan.agent} · {plan.model}" if plan.model else plan.agent
@@ -119,6 +149,10 @@ class DispatchScreen(ModalScreen["tuple[str, Plan, Plan | None] | None"]):
         brief = plan.brief.splitlines()
         text.append("Brief:\n" + "\n".join(brief[:14]) + ("\n…" if len(brief) > 14 else ""))
         box.update(text)
+        if self.router is not None:
+            agrees = "agrees with Opus" if self.router == plan.agent else f"Opus chose {plan.agent}"
+            self.query_one("#dispatch-router", Static).update(
+                Text(f"Local router suggests: {self.router}  ({agrees})", style="bold"))
         self.query_one(Select).value = f"{plan.agent}:{plan.model or ''}"
         self.query_one("#start", Button).disabled = False
 
@@ -137,14 +171,14 @@ class DispatchScreen(ModalScreen["tuple[str, Plan, Plan | None] | None"]):
             return
         agent, _, model = str(choice).partition(":")
         if self.plan is not None and (agent, model or None) == (self.plan.agent, self.plan.model):
-            self.dismiss((self._task_text(), self.plan, self.plan))
+            self.dismiss((self._task_text(), self.plan, self.plan, self.router))
             return
         from mission_control.tasks import manual_plan
         chosen = manual_plan(self._task_text(), agent, model or None)
         if self.plan is not None:  # keep Opus's brief, change only the worker
             chosen = Plan(agent, chosen.model, f"changed by the owner (Opus suggested {self.plan.agent})",
                           self.plan.brief, chosen.time_limit_minutes)
-        self.dismiss((self._task_text(), chosen, self.plan))
+        self.dismiss((self._task_text(), chosen, self.plan, self.router))
 
     def action_cancel(self) -> None:
         self.dismiss(None)

@@ -18,6 +18,7 @@ from pathlib import Path
 
 from mission_control import tasks
 from mission_control.orchestrator import AGENTS, OrchestratorError, Plan
+from mission_control.router import ROUTER_MODEL, local_route
 from mission_control.worktrees import WorkspaceError, repo_root
 
 
@@ -51,16 +52,19 @@ def _age(seconds: float) -> str:
 def cmd_start(args: argparse.Namespace) -> int:
     project = _project(args.project)
     suggested: Plan | None = None
+    router: str | None = None
     if args.agent:
         plan = tasks.manual_plan(args.text, args.agent, args.model, args.minutes)
     else:
+        router = local_route(args.text)
+        print(f"Local router ({ROUTER_MODEL}): {router or 'not available'}")
         print(f"Asking the orchestrator about {project.name}…", flush=True)
         suggested = plan = tasks.ask_plan(args.text, project)
     _print_plan(plan)
     if args.dry_run or not _confirm("Start this task?", args.yes):
         print("Not started.")
         return 0
-    task = tasks.start_task(tasks.make_task(args.text, project, plan, suggested))
+    task = tasks.start_task(tasks.make_task(args.text, project, plan, suggested, router))
     print(f"Started task {task.id}. Follow it with: mc task show {task.id}")
     return 0
 

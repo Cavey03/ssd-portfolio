@@ -1,0 +1,409 @@
+{"id": "t109", "text": "Upgrade to 0.2 : Centralized logging support", "label": "claude"}
+{"id": "t173", "text": "Fix process.nextTick, try to save context", "label": "claude"}
+{"id": "t161", "text": "Remove the apikey=\"\" stuff from the unit tests", "label": "local"}
+{"id": "t219", "text": "Use html tech from bemhtml library", "label": "codex"}
+{"id": "t083", "text": "Set foreign key information to Subscription", "label": "local"}
+{"id": "t143", "text": "Handle multiple sites in single request", "label": "codex"}
+{"id": "t224", "text": "Enable service compositions command to instantiate the linked ontology", "label": "claude"}
+{"id": "t285", "text": "Add methods to skip editor installation and PR creation", "label": "codex"}
+{"id": "t321", "text": "Use 3.6 in Travis instead of 3.5", "label": "local"}
+{"id": "t111", "text": "Add partial search algorithm and data structure", "label": "codex"}
+{"id": "t068", "text": "Make libxcb compile with gcc 4.9", "label": "claude"}
+{"id": "t096", "text": "Clean Up Mojave or later", "label": "claude"}
+{"id": "t305", "text": "Fix test file first line", "label": "local"}
+{"id": "t285", "text": "Add methods to skip editor installation and PR creation", "label": "codex"}
+{"id": "t129", "text": "Remove periods in label value", "label": "local"}
+{"id": "t191", "text": "Add switch-target to embedded media and text following immediatly", "label": "local"}
+{"id": "t055", "text": "Add a getOnlinePlayers() that support both old and new ones", "label": "codex"}
+{"id": "t260", "text": "Add note about precompiling static assets", "label": "local"}
+{"id": "t058", "text": "Use lambda symbol for starhip character", "label": "local"}
+{"id": "t044", "text": "Expand example to cover new Pi 4 ReadPull() interface", "label": "local"}
+{"id": "t000", "text": "Update settings for reading config files", "label": "local"}
+{"id": "t140", "text": "Replace matrixStack in test living renderer", "label": "local"}
+{"id": "t154", "text": "Add contacts to internal storage", "label": "codex"}
+{"id": "t231", "text": "Remove unused code in background script", "label": "local"}
+{"id": "t375", "text": "Add dependencies we'll need soon", "label": "local"}
+{"id": "t234", "text": "Update UserSuForm to enhance compatibility with custom user models", "label": "codex"}
+{"id": "t359", "text": "Fix Travis CI failing because of \"error TS7006: Parameter 'res' and 'next' implicitly have an 'any' type.\"", "label": "local"}
+{"id": "t240", "text": "Update Trail Sense to 0.5.1 (8)", "label": "local"}
+{"id": "t015", "text": "Make sure the clock didn't hang up somehow", "label": "claude"}
+{"id": "t243", "text": "Add convenience method for shorter code", "label": "local"}
+{"id": "t213", "text": "Replace 'write' method with '__str__'", "label": "local"}
+{"id": "t342", "text": "Allow triggering of event at any time", "label": "codex"}
+{"id": "t016", "text": "Remove topicId function, define at creation", "label": "local"}
+{"id": "t125", "text": "Fix SAML auth behind load balancer issue", "label": "claude"}
+{"id": "t116", "text": "Refactor Largest Palindrome Product for range of n is", "label": "local"}
+{"id": "t162", "text": "Fix bug that multiple polyline translated when shapes are dragged over the line", "label": "codex"}
+{"id": "t159", "text": "Add constants for sound synthesis", "label": "local"}
+{"id": "t142", "text": "Disable test not working on GitHub workflow", "label": "local"}
+{"id": "t109", "text": "Upgrade to 0.2 : Centralized logging support", "label": "claude"}
+{"id": "t291", "text": "Make func list item active class into a getter", "label": "local"}
+{"id": "t248", "text": "Add Rails 4.2 to Travis", "label": "local"}
+{"id": "t164", "text": "Use Heroku database connection settings", "label": "local"}
+{"id": "t276", "text": "Add backwards compatibility for Node.js 0.10", "label": "claude"}
+{"id": "t181", "text": "Make sure email_access_validated_at is not null after being populated", "label": "local"}
+{"id": "t219", "text": "Use html tech from bemhtml library", "label": "codex"}
+{"id": "t264", "text": "Update CI configs to v0.4.6", "label": "local"}
+{"id": "t361", "text": "Add a TODO to gulp tasks", "label": "local"}
+{"id": "t280", "text": "Adjust hashtag to be consistently one word", "label": "local"}
+{"id": "t306", "text": "Add swagger metadata for instance console", "label": "local"}
+{"id": "t027", "text": "Move the service creation to onStart, add onStop service termination", "label": "codex"}
+{"id": "t214", "text": "Update home page with About and Work sections", "label": "codex"}
+{"id": "t239", "text": "Add team info and user stories to readme", "label": "local"}
+{"id": "t057", "text": "Update readme to conform with the change to docker-compose", "label": "local"}
+{"id": "t224", "text": "Enable service compositions command to instantiate the linked ontology", "label": "claude"}
+{"id": "t236", "text": "Use localStorage for *all* footure declarations", "label": "codex"}
+{"id": "t341", "text": "Refactor Expr object to be more self contained", "label": "claude"}
+{"id": "t316", "text": "Use require all the way", "label": "codex"}
+{"id": "t274", "text": "Fix the benchmark so it's not throwing exceptions every time a message is written", "label": "codex"}
+{"id": "t309", "text": "Remove unused `fs` feature gate", "label": "local"}
+{"id": "t200", "text": "Add extra selector for new toggle", "label": "local"}
+{"id": "t253", "text": "Load DB migrations before testing and use verbose=2 and failfast", "label": "local"}
+{"id": "t098", "text": "Hide Python 2.6 Exception.message deprecation warnings", "label": "local"}
+{"id": "t115", "text": "Use less strict condition to avoid problems with concurrency", "label": "claude"}
+{"id": "t274", "text": "Fix the benchmark so it's not throwing exceptions every time a message is written", "label": "codex"}
+{"id": "t106", "text": "Update example base on the new implementation of ari.Client", "label": "local"}
+{"id": "t184", "text": "Fix update remote to ConanCenter and grpc to highest buildable/supported version", "label": "codex"}
+{"id": "t107", "text": "Change ambiguous calls to Cortana", "label": "local"}
+{"id": "t033", "text": "Fix aspect ratio and add an option to change it", "label": "codex"}
+{"id": "t150", "text": "Add `whoami` to check permissions in the folder", "label": "local"}
+{"id": "t281", "text": "Switch off Sonos devices when going to bed", "label": "codex"}
+{"id": "t071", "text": "Add dependency on pylast, update project URL", "label": "local"}
+{"id": "t054", "text": "Load Bootstrap and jQuery via CDN", "label": "local"}
+{"id": "t283", "text": "Add defKeys as second argument for mutators", "label": "codex"}
+{"id": "t064", "text": "Change entity id to projectName", "label": "local"}
+{"id": "t224", "text": "Enable service compositions command to instantiate the linked ontology", "label": "claude"}
+{"id": "t370", "text": "Update description and fix small typos", "label": "local"}
+{"id": "t250", "text": "Add description how to run the python demo", "label": "local"}
+{"id": "t125", "text": "Fix SAML auth behind load balancer issue", "label": "claude"}
+{"id": "t130", "text": "Update title of dummy demo", "label": "local"}
+{"id": "t276", "text": "Add backwards compatibility for Node.js 0.10", "label": "claude"}
+{"id": "t065", "text": "Allow metadata to be shown whether v1 or v2 glance data (NG)", "label": "codex"}
+{"id": "t322", "text": "Fix api 502 error when competition id is invalid", "label": "local"}
+{"id": "t132", "text": "Fix llvm sources in build script", "label": "local"}
+{"id": "t003", "text": "Add RLP encoding to RecentProposerRecord", "label": "codex"}
+{"id": "t035", "text": "Add titlePage to first page header", "label": "local"}
+{"id": "t221", "text": "Remove unused crates from the main crate", "label": "local"}
+{"id": "t186", "text": "Add Arc test, triggering an unusual bug", "label": "claude"}
+{"id": "t379", "text": "Fix GStreamer packages use of prefix", "label": "local"}
+{"id": "t378", "text": "Implement .destroy method in MemoryCookieStorage", "label": "local"}
+{"id": "t082", "text": "Enable all features for docs.rs", "label": "local"}
+{"id": "t115", "text": "Use less strict condition to avoid problems with concurrency", "label": "claude"}
+{"id": "t373", "text": "Add travis build status to Readme", "label": "local"}
+{"id": "t276", "text": "Add backwards compatibility for Node.js 0.10", "label": "claude"}
+{"id": "t034", "text": "Fix extra newline in Javadoc code example", "label": "local"}
+{"id": "t190", "text": "Configure Travis for better build performance", "label": "local"}
+{"id": "t367", "text": "Fix The Seven Deadly Sins search. Bug reported on chrome web store", "label": "codex"}
+{"id": "t038", "text": "Convert the summary from Markdown", "label": "codex"}
+{"id": "t167", "text": "Add adapter example w/sync API", "label": "local"}
+{"id": "t125", "text": "Fix SAML auth behind load balancer issue", "label": "claude"}
+{"id": "t179", "text": "Install PHP 5.6 w. opcache, mbstring, xml, intl", "label": "local"}
+{"id": "t186", "text": "Add Arc test, triggering an unusual bug", "label": "claude"}
+{"id": "t026", "text": "Add functools wraps to report_time decorator", "label": "local"}
+{"id": "t081", "text": "Add input check when getting all nodes", "label": "local"}
+{"id": "t126", "text": "Add some params in for comment videos", "label": "local"}
+{"id": "t032", "text": "Expand map to 100% width", "label": "local"}
+{"id": "t052", "text": "Add topkg to travis configuration", "label": "local"}
+{"id": "t242", "text": "Add test case for svg() (like h() is)", "label": "local"}
+{"id": "t329", "text": "Set the focus highlight correctly if an element has focus while the page is being loaded", "label": "codex"}
+{"id": "t224", "text": "Enable service compositions command to instantiate the linked ontology", "label": "claude"}
+{"id": "t345", "text": "Fix broken build on master", "label": "claude"}
+{"id": "t249", "text": "Fix typo in issue description", "label": "local"}
+{"id": "t287", "text": "Add Google Analytics tracking to page transitions", "label": "codex"}
+{"id": "t001", "text": "Add meta tag for google webmaster tools", "label": "local"}
+{"id": "t183", "text": "Add a generator for association tables", "label": "codex"}
+{"id": "t216", "text": "Add branch tests for codegen", "label": "codex"}
+{"id": "t056", "text": "Allow resource compression to be disabled", "label": "codex"}
+{"id": "t293", "text": "Add unit test for EditLogOperation. For now adding just for CREATE_DEPENDENCY", "label": "local"}
+{"id": "t237", "text": "Fix shellish requirement bump rev to 2.3.1", "label": "local"}
+{"id": "t068", "text": "Make libxcb compile with gcc 4.9", "label": "claude"}
+{"id": "t111", "text": "Add partial search algorithm and data structure", "label": "codex"}
+{"id": "t039", "text": "Add css for the blinking cursor", "label": "local"}
+{"id": "t277", "text": "Use clean content to avoid invalid mentions", "label": "local"}
+{"id": "t308", "text": "Add documentation for Direct Send Message", "label": "local"}
+{"id": "t232", "text": "Add styles for the disabled link", "label": "local"}
+{"id": "t073", "text": "Store in the current state, not the previous one", "label": "local"}
+{"id": "t368", "text": "Edit \"Clone repo into a new directory in your project\"", "label": "local"}
+{"id": "t068", "text": "Make libxcb compile with gcc 4.9", "label": "claude"}
+{"id": "t108", "text": "Change lib/image.Image.ListObjects() to use forEachObject() iterator", "label": "codex"}
+{"id": "t241", "text": "Make rating chart less high", "label": "local"}
+{"id": "t133", "text": "Add documentation on build-dependencies for protoc-rust", "label": "local"}
+{"id": "t015", "text": "Make sure the clock didn't hang up somehow", "label": "claude"}
+{"id": "t224", "text": "Enable service compositions command to instantiate the linked ontology", "label": "claude"}
+{"id": "t195", "text": "Build proper version based on tag + commit id", "label": "codex"}
+{"id": "t112", "text": "Fix for new tag button with Turbolinks", "label": "local"}
+{"id": "t279", "text": "Mark test as xfail so that releases can be cut", "label": "local"}
+{"id": "t155", "text": "Fix a broken link in docs", "label": "local"}
+{"id": "t209", "text": "Fix web components not loading properly", "label": "claude"}
+{"id": "t092", "text": "Print heroku if debug is true", "label": "local"}
+{"id": "t139", "text": "Remove initial state and add router", "label": "codex"}
+{"id": "t246", "text": "Add note about use case", "label": "local"}
+{"id": "t265", "text": "Fix specification of Python 3.6 and 3.7", "label": "local"}
+{"id": "t332", "text": "Add udp echo server example", "label": "local"}
+{"id": "t295", "text": "Fix instruction to install using curl", "label": "local"}
+{"id": "t123", "text": "Fix call to renamed function", "label": "local"}
+{"id": "t055", "text": "Add a getOnlinePlayers() that support both old and new ones", "label": "codex"}
+{"id": "t173", "text": "Fix process.nextTick, try to save context", "label": "claude"}
+{"id": "t233", "text": "Format records before referencing the message attribute", "label": "local"}
+{"id": "t036", "text": "Fix wrong path in readme", "label": "local"}
+{"id": "t258", "text": "Improve test case and add working comparison", "label": "local"}
+{"id": "t006", "text": "Add default profile picture url", "label": "local"}
+{"id": "t336", "text": "Fix live expression e2e test", "label": "codex"}
+{"id": "t088", "text": "Add targetType to JavaScripPaintWorklet prototype", "label": "local"}
+{"id": "t173", "text": "Fix process.nextTick, try to save context", "label": "claude"}
+{"id": "t059", "text": "Add documentation comment for wait.VMPowerOff", "label": "local"}
+{"id": "t135", "text": "Update author name on Mangan theme", "label": "local"}
+{"id": "t311", "text": "Fix typo in prediction.io domain", "label": "local"}
+{"id": "t209", "text": "Fix web components not loading properly", "label": "claude"}
+{"id": "t317", "text": "Add test for sock path length", "label": "local"}
+{"id": "t336", "text": "Fix live expression e2e test", "label": "codex"}
+{"id": "t353", "text": "Add minimap, typeahead (autocomplete for search bar) component", "label": "codex"}
+{"id": "t184", "text": "Fix update remote to ConanCenter and grpc to highest buildable/supported version", "label": "codex"}
+{"id": "t199", "text": "Fix Docker image tag inconsistency after merge commits", "label": "codex"}
+{"id": "t038", "text": "Convert the summary from Markdown", "label": "codex"}
+{"id": "t341", "text": "Refactor Expr object to be more self contained", "label": "claude"}
+{"id": "t208", "text": "Update test to reflect new default version for node", "label": "local"}
+{"id": "t330", "text": "Build packages for various platforms (Fedora, EL)", "label": "codex"}
+{"id": "t269", "text": "Add allowed field name positionValues", "label": "local"}
+{"id": "t345", "text": "Fix broken build on master", "label": "claude"}
+{"id": "t049", "text": "Add Hibernate Type to store null Date values as 9999-01-01", "label": "codex"}
+{"id": "t364", "text": "Update to remove requirement for unused 'lexicons' dir", "label": "local"}
+{"id": "t247", "text": "Change iter.First to return the value", "label": "local"}
+{"id": "t209", "text": "Fix web components not loading properly", "label": "claude"}
+{"id": "t128", "text": "Update get_lca_matrix test for develop", "label": "local"}
+{"id": "t049", "text": "Add Hibernate Type to store null Date values as 9999-01-01", "label": "codex"}
+{"id": "t197", "text": "Set consistent line height in definition lists", "label": "local"}
+{"id": "t342", "text": "Allow triggering of event at any time", "label": "codex"}
+{"id": "t267", "text": "Make sure this is numeric", "label": "local"}
+{"id": "t019", "text": "Add pull request url action", "label": "codex"}
+{"id": "t206", "text": "Add toggle animation to menu", "label": "local"}
+{"id": "t007", "text": "Add Defer Panic middleware to the list", "label": "local"}
+{"id": "t225", "text": "Use only one checkmark on chosen-stages", "label": "local"}
+{"id": "t238", "text": "Add keyword to echo worker", "label": "local"}
+{"id": "t320", "text": "Update task now updates all dependencies", "label": "local"}
+{"id": "t334", "text": "Remove last reference to generators", "label": "local"}
+{"id": "t276", "text": "Add backwards compatibility for Node.js 0.10", "label": "claude"}
+{"id": "t096", "text": "Clean Up Mojave or later", "label": "claude"}
+{"id": "t254", "text": "Fix readonly being applied twice for user color", "label": "local"}
+{"id": "t166", "text": "Add task for pushing code with rsync", "label": "local"}
+{"id": "t234", "text": "Update UserSuForm to enhance compatibility with custom user models", "label": "codex"}
+{"id": "t204", "text": "Allow multiple independent random walks for different indices of the same parameter", "label": "codex"}
+{"id": "t010", "text": "Fix import order picked up by isort", "label": "local"}
+{"id": "t172", "text": "Add default path to config", "label": "local"}
+{"id": "t188", "text": "Fix test failure due to missing Object.assign polyfill", "label": "local"}
+{"id": "t148", "text": "Add missing cred-alert-worker-ng build test", "label": "local"}
+{"id": "t109", "text": "Upgrade to 0.2 : Centralized logging support", "label": "claude"}
+{"id": "t372", "text": "Remove deployState parameter, forgotten during rebase to master", "label": "local"}
+{"id": "t077", "text": "Add path to game in router", "label": "local"}
+{"id": "t199", "text": "Fix Docker image tag inconsistency after merge commits", "label": "codex"}
+{"id": "t090", "text": "Copy files from the bundlesPath", "label": "local"}
+{"id": "t008", "text": "Update date from creation time", "label": "local"}
+{"id": "t350", "text": "Use RubyLinter instead of Linter so rbenv and rvm are supported", "label": "local"}
+{"id": "t093", "text": "Make \"Emails\" link directly to composing an email", "label": "local"}
+{"id": "t015", "text": "Make sure the clock didn't hang up somehow", "label": "claude"}
+{"id": "t138", "text": "Add in FstalPvP spam remover", "label": "codex"}
+{"id": "t341", "text": "Refactor Expr object to be more self contained", "label": "claude"}
+{"id": "t078", "text": "Define is class property on constructor if it's not present", "label": "local"}
+{"id": "t141", "text": "Add fast_finish: and remove include:", "label": "local"}
+{"id": "t070", "text": "Rename Id field to ID", "label": "local"}
+{"id": "t027", "text": "Move the service creation to onStart, add onStop service termination", "label": "codex"}
+{"id": "t371", "text": "Set LC_TYPE to fix compilation on Mac OSX", "label": "local"}
+{"id": "t119", "text": "Update primitive test to match the new behavior", "label": "local"}
+{"id": "t198", "text": "Support loading appenders that reference other appenders", "label": "codex"}
+{"id": "t015", "text": "Make sure the clock didn't hang up somehow", "label": "claude"}
+{"id": "t259", "text": "Set nose.collector as the test_suite", "label": "local"}
+{"id": "t154", "text": "Add contacts to internal storage", "label": "codex"}
+{"id": "t318", "text": "Update CSS for New Blogs", "label": "local"}
+{"id": "t261", "text": "Exclude tests package from distribution", "label": "local"}
+{"id": "t173", "text": "Fix process.nextTick, try to save context", "label": "claude"}
+{"id": "t263", "text": "Add create Postgresql user setup step", "label": "local"}
+{"id": "t222", "text": "Add tar-rs as a dependency", "label": "local"}
+{"id": "t357", "text": "Change to viewing pre created powerpoint", "label": "local"}
+{"id": "t186", "text": "Add Arc test, triggering an unusual bug", "label": "claude"}
+{"id": "t345", "text": "Fix broken build on master", "label": "claude"}
+{"id": "t104", "text": "Fix error on date save", "label": "claude"}
+{"id": "t328", "text": "Remove unnecessary code from post page due to blocking ballback usage", "label": "local"}
+{"id": "t104", "text": "Fix error on date save", "label": "claude"}
+{"id": "t122", "text": "Increment version for 0.0.2 release", "label": "local"}
+{"id": "t299", "text": "Add more padding to tables", "label": "local"}
+{"id": "t341", "text": "Refactor Expr object to be more self contained", "label": "claude"}
+{"id": "t205", "text": "Handle importerrors when f.x. we are installing", "label": "local"}
+{"id": "t066", "text": "Use the Server class (an Actor derived class)", "label": "codex"}
+{"id": "t160", "text": "Remove unused import of ui-typogrphy", "label": "local"}
+{"id": "t115", "text": "Use less strict condition to avoid problems with concurrency", "label": "claude"}
+{"id": "t084", "text": "Update bip_disk To Use bip_metainfo 0.10", "label": "codex"}
+{"id": "t075", "text": "Improve test coverage for onDecl()", "label": "local"}
+{"id": "t349", "text": "Add Classes of font sizes", "label": "local"}
+{"id": "t151", "text": "Allow importing StdinStream from antlr4 package", "label": "local"}
+{"id": "t139", "text": "Remove initial state and add router", "label": "codex"}
+{"id": "t120", "text": "Add tf to the requirements", "label": "local"}
+{"id": "t180", "text": "Add pointers to render.js and shaders", "label": "local"}
+{"id": "t346", "text": "Add docs to Selection Sort", "label": "local"}
+{"id": "t316", "text": "Use require all the way", "label": "codex"}
+{"id": "t053", "text": "Add 'electron' to ESLint configuration", "label": "local"}
+{"id": "t186", "text": "Add Arc test, triggering an unusual bug", "label": "claude"}
+{"id": "t109", "text": "Upgrade to 0.2 : Centralized logging support", "label": "claude"}
+{"id": "t266", "text": "Remove getAzureZone from init, no longer needed", "label": "local"}
+{"id": "t209", "text": "Fix web components not loading properly", "label": "claude"}
+{"id": "t163", "text": "Change speed for shooter in autonomous", "label": "local"}
+{"id": "t353", "text": "Add minimap, typeahead (autocomplete for search bar) component", "label": "codex"}
+{"id": "t096", "text": "Clean Up Mojave or later", "label": "claude"}
+{"id": "t348", "text": "Simplify using new data source methods", "label": "codex"}
+{"id": "t051", "text": "Install gdbm on Linux for Travis 18.04 bionic", "label": "local"}
+{"id": "t227", "text": "Allow either slash type to be used in command line to harness", "label": "local"}
+{"id": "t235", "text": "Fix data type in extension point documenation", "label": "local"}
+{"id": "t290", "text": "Add a retry when connecting stdin/stdout/stderr", "label": "local"}
+{"id": "t004", "text": "Replace PrintDegbugInfo with function SetDebugMode", "label": "local"}
+{"id": "t369", "text": "Test more edge cases of the highlighting parser", "label": "local"}
+{"id": "t145", "text": "Remove namespace from RD2 enablement check", "label": "local"}
+{"id": "t046", "text": "Add back rotatation for scroll job", "label": "local"}
+{"id": "t017", "text": "Add remove specific stuff from stylesheet", "label": "local"}
+{"id": "t096", "text": "Clean Up Mojave or later", "label": "claude"}
+{"id": "t354", "text": "Simplify code to find template path", "label": "local"}
+{"id": "t085", "text": "Add cleanup to prevent errors when it already exists", "label": "local"}
+{"id": "t220", "text": "Update Smart Flasher to v5.2 (43)", "label": "local"}
+{"id": "t068", "text": "Make libxcb compile with gcc 4.9", "label": "claude"}
+{"id": "t367", "text": "Fix The Seven Deadly Sins search. Bug reported on chrome web store", "label": "codex"}
+{"id": "t110", "text": "Change condition of Jenkins start up judgement", "label": "local"}
+{"id": "t186", "text": "Add Arc test, triggering an unusual bug", "label": "claude"}
+{"id": "t183", "text": "Add a generator for association tables", "label": "codex"}
+{"id": "t176", "text": "Fix error reporting in copy script", "label": "local"}
+{"id": "t302", "text": "Change message of semver tag check", "label": "local"}
+{"id": "t301", "text": "Refactor test to use user", "label": "local"}
+{"id": "t218", "text": "Add header, needed for the upcoming changes in the update_cronos.sh script", "label": "local"}
+{"id": "t278", "text": "Test that the compiler adds the punctuation", "label": "local"}
+{"id": "t076", "text": "Change avatar image alt to emtry string", "label": "local"}
+{"id": "t307", "text": "Test creation of HTTP credentials", "label": "local"}
+{"id": "t146", "text": "Add new kind of exception", "label": "local"}
+{"id": "t324", "text": "Index file documentation has been removed", "label": "local"}
+{"id": "t329", "text": "Set the focus highlight correctly if an element has focus while the page is being loaded", "label": "codex"}
+{"id": "t068", "text": "Make libxcb compile with gcc 4.9", "label": "claude"}
+{"id": "t025", "text": "Add code comment for server-start-chatting", "label": "local"}
+{"id": "t014", "text": "Add install for junit report generator", "label": "local"}
+{"id": "t310", "text": "Put example code in comment block", "label": "local"}
+{"id": "t226", "text": "Use netlify url for docs for now", "label": "local"}
+{"id": "t345", "text": "Fix broken build on master", "label": "claude"}
+{"id": "t326", "text": "Use checksum when pushing code with rsync", "label": "local"}
+{"id": "t256", "text": "Switch from f64 to f32", "label": "codex"}
+{"id": "t020", "text": "Use exception rather than Bad Request view", "label": "local"}
+{"id": "t041", "text": "Update version number to 0.1.4", "label": "local"}
+{"id": "t211", "text": "Use Lang parser instead of Node parser", "label": "codex"}
+{"id": "t105", "text": "Update Linux native travis build", "label": "local"}
+{"id": "t079", "text": "Update readme to be markdown format", "label": "local"}
+{"id": "t104", "text": "Fix error on date save", "label": "claude"}
+{"id": "t080", "text": "Switch from //... to //:all when building with Bazel", "label": "local"}
+{"id": "t271", "text": "Improve unit testing of zipstream utilities", "label": "codex"}
+{"id": "t143", "text": "Handle multiple sites in single request", "label": "codex"}
+{"id": "t063", "text": "Use correct env to check if on github", "label": "local"}
+{"id": "t095", "text": "Change Tok to Token for readability", "label": "local"}
+{"id": "t341", "text": "Refactor Expr object to be more self contained", "label": "claude"}
+{"id": "t121", "text": "Remove pancurses from windows build", "label": "local"}
+{"id": "t136", "text": "Add $ to format helper", "label": "local"}
+{"id": "t255", "text": "Stop forwarding flash by default, it breaks more than it doesn't", "label": "local"}
+{"id": "t294", "text": "Disable default features of `askama_shared` in `askama_derive`", "label": "local"}
+{"id": "t288", "text": "Remove get-started because we have it on the landing page", "label": "local"}
+{"id": "t366", "text": "Add method to get lands with most color identities", "label": "local"}
+{"id": "t033", "text": "Fix aspect ratio and add an option to change it", "label": "codex"}
+{"id": "t223", "text": "Add skipped and addSkip() to PageTestResults, for Python < 2.7", "label": "codex"}
+{"id": "t362", "text": "Increase build timeout to 1800s", "label": "local"}
+{"id": "t003", "text": "Add RLP encoding to RecentProposerRecord", "label": "codex"}
+{"id": "t162", "text": "Fix bug that multiple polyline translated when shapes are dragged over the line", "label": "codex"}
+{"id": "t217", "text": "Stop polluting git workspace with temporary files created while running unit tests", "label": "codex"}
+{"id": "t149", "text": "Fix typo of an extra comma", "label": "local"}
+{"id": "t134", "text": "Make it possible to set custom Lock", "label": "codex"}
+{"id": "t099", "text": "Add github token to push changes back to github", "label": "local"}
+{"id": "t283", "text": "Add defKeys as second argument for mutators", "label": "codex"}
+{"id": "t171", "text": "Install url from the right place", "label": "local"}
+{"id": "t024", "text": "Return None if no bed file exists to be opened", "label": "local"}
+{"id": "t344", "text": "Edit view pre-populates with data from user object", "label": "local"}
+{"id": "t104", "text": "Fix error on date save", "label": "claude"}
+{"id": "t113", "text": "Update Readme to include 'npm run deploy' and category wise pages", "label": "local"}
+{"id": "t282", "text": "Update fabric examples to reflect changes", "label": "local"}
+{"id": "t062", "text": "Use commit suggestion to use types", "label": "local"}
+{"id": "t015", "text": "Make sure the clock didn't hang up somehow", "label": "claude"}
+{"id": "t048", "text": "Reorder zsh aliases and be more strict about default ruby version", "label": "local"}
+{"id": "t115", "text": "Use less strict condition to avoid problems with concurrency", "label": "claude"}
+{"id": "t377", "text": "Create module should not expose babel properties", "label": "codex"}
+{"id": "t066", "text": "Use the Server class (an Actor derived class)", "label": "codex"}
+{"id": "t223", "text": "Add skipped and addSkip() to PageTestResults, for Python < 2.7", "label": "codex"}
+{"id": "t125", "text": "Fix SAML auth behind load balancer issue", "label": "claude"}
+{"id": "t170", "text": "Add text window data fields", "label": "local"}
+{"id": "t023", "text": "Change lock reason -> info", "label": "local"}
+{"id": "t271", "text": "Improve unit testing of zipstream utilities", "label": "codex"}
+{"id": "t173", "text": "Fix process.nextTick, try to save context", "label": "claude"}
+{"id": "t275", "text": "Add base set of rule's invalid syntax tests", "label": "local"}
+{"id": "t040", "text": "Increase timeout for GM on Android", "label": "local"}
+{"id": "t169", "text": "Change baseurl to correct host page on GitHub pages", "label": "local"}
+{"id": "t109", "text": "Upgrade to 0.2 : Centralized logging support", "label": "claude"}
+{"id": "t345", "text": "Fix broken build on master", "label": "claude"}
+{"id": "t189", "text": "Add instructions on S3 storage", "label": "local"}
+{"id": "t272", "text": "Use custom Link component for SideNav", "label": "local"}
+{"id": "t216", "text": "Add branch tests for codegen", "label": "codex"}
+{"id": "t210", "text": "Disable atomic for delivery_email migration", "label": "local"}
+{"id": "t270", "text": "Add missing export for IProviderInfo", "label": "local"}
+{"id": "t047", "text": "Add a compile-fail test for attribute/syntax parsing", "label": "local"}
+{"id": "t104", "text": "Fix error on date save", "label": "claude"}
+{"id": "t256", "text": "Switch from f64 to f32", "label": "codex"}
+{"id": "t204", "text": "Allow multiple independent random walks for different indices of the same parameter", "label": "codex"}
+{"id": "t178", "text": "Add usage to the readme", "label": "local"}
+{"id": "t374", "text": "Change order of CSP: style-src and CSP: font-src", "label": "local"}
+{"id": "t356", "text": "Add --params flag to get-capacity", "label": "local"}
+{"id": "t153", "text": "Change url in favor of the re_path", "label": "local"}
+{"id": "t194", "text": "Fix an invalid coordinate in SpriteSheet", "label": "local"}
+{"id": "t209", "text": "Fix web components not loading properly", "label": "claude"}
+{"id": "t019", "text": "Add pull request url action", "label": "codex"}
+{"id": "t009", "text": "Remove deprecated sinon sandbox call", "label": "local"}
+{"id": "t096", "text": "Clean Up Mojave or later", "label": "claude"}
+{"id": "t108", "text": "Change lib/image.Image.ListObjects() to use forEachObject() iterator", "label": "codex"}
+{"id": "t005", "text": "Enable draggle attribute on handle", "label": "local"}
+{"id": "t089", "text": "Add flag for output file", "label": "local"}
+{"id": "t084", "text": "Update bip_disk To Use bip_metainfo 0.10", "label": "codex"}
+{"id": "t348", "text": "Simplify using new data source methods", "label": "codex"}
+{"id": "t125", "text": "Fix SAML auth behind load balancer issue", "label": "claude"}
+{"id": "t195", "text": "Build proper version based on tag + commit id", "label": "codex"}
+{"id": "t377", "text": "Create module should not expose babel properties", "label": "codex"}
+{"id": "t323", "text": "Update footer_url with updated username", "label": "local"}
+{"id": "t074", "text": "Remove border from top of page", "label": "local"}
+{"id": "t287", "text": "Add Google Analytics tracking to page transitions", "label": "codex"}
+{"id": "t101", "text": "Add a default value of None for reserved fields", "label": "local"}
+{"id": "t201", "text": "Remove old exports from subdue.core", "label": "local"}
+{"id": "t207", "text": "Append PID to Django database to avoid conflicts", "label": "local"}
+{"id": "t286", "text": "Fix Jenkins script to exit on error", "label": "local"}
+{"id": "t360", "text": "Fix typo for JDK in documentation", "label": "local"}
+{"id": "t056", "text": "Allow resource compression to be disabled", "label": "codex"}
+{"id": "t262", "text": "Change the example search to be 'is:dupe'", "label": "local"}
+{"id": "t214", "text": "Update home page with About and Work sections", "label": "codex"}
+{"id": "t069", "text": "Add a `::new()` constructor for `NoIdDispatcher`", "label": "local"}
+{"id": "t021", "text": "Order portfolio summary by ID", "label": "local"}
+{"id": "t217", "text": "Stop polluting git workspace with temporary files created while running unit tests", "label": "codex"}
+{"id": "t281", "text": "Switch off Sonos devices when going to bed", "label": "codex"}
+{"id": "t022", "text": "Update \"Get access to CI\"", "label": "local"}
+{"id": "t202", "text": "Add doc for Arbitrary impl", "label": "local"}
+{"id": "t094", "text": "Add changelog entry for 0.5.0", "label": "local"}
+{"id": "t251", "text": "Fix formatting in tokenizer state file", "label": "local"}
+{"id": "t212", "text": "Change sections table title in dashboard pro", "label": "local"}
+{"id": "t337", "text": "Add extra space below ending of import", "label": "local"}
+{"id": "t060", "text": "Use Travis's container-based architecture for faster builds", "label": "local"}
+{"id": "t131", "text": "Improve solution for Scrabble Score", "label": "local"}
+{"id": "t343", "text": "Add a method to quickly clean up the files created during testing", "label": "local"}
+{"id": "t102", "text": "Add highlighting for hbs and json", "label": "local"}
+{"id": "t198", "text": "Support loading appenders that reference other appenders", "label": "codex"}
+{"id": "t296", "text": "Add dependency install to update script", "label": "local"}
+{"id": "t177", "text": "Set doc.rs metadata to pass system cargo feature", "label": "local"}
+{"id": "t100", "text": "Change titles for the site", "label": "local"}
+{"id": "t330", "text": "Build packages for various platforms (Fedora, EL)", "label": "codex"}
+{"id": "t182", "text": "Comment changes and removal of by-line class", "label": "local"}
+{"id": "t115", "text": "Use less strict condition to avoid problems with concurrency", "label": "claude"}
+{"id": "t211", "text": "Use Lang parser instead of Node parser", "label": "codex"}
+{"id": "t268", "text": "Add pytest fixture to avoid leakage of cwd changes", "label": "local"}
+{"id": "t300", "text": "Make Rust strprintf::fmt work for one argument", "label": "local"}
+{"id": "t103", "text": "Implement openable check for door card", "label": "local"}
+{"id": "t030", "text": "Send signal when starting up", "label": "local"}
+{"id": "t134", "text": "Make it possible to set custom Lock", "label": "codex"}
+{"id": "t276", "text": "Add backwards compatibility for Node.js 0.10", "label": "claude"}
+{"id": "t157", "text": "Add overflow hidden to a menu item by default to fix menu items with floats @rev rdewsbury@", "label": "local"}
+{"id": "t065", "text": "Allow metadata to be shown whether v1 or v2 glance data (NG)", "label": "codex"}
+{"id": "t118", "text": "Check for current timeout before calling cancel", "label": "local"}
+{"id": "t165", "text": "Use bootstrap icons for edit/delete in product list", "label": "local"}
+{"id": "t138", "text": "Add in FstalPvP spam remover", "label": "codex"}
+{"id": "t236", "text": "Use localStorage for *all* footure declarations", "label": "codex"}

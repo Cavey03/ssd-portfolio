@@ -374,10 +374,12 @@ def manual_plan(title: str, agent: str, model: str | None = None, minutes: int |
                 brief=title, time_limit_minutes=minutes or (10 if agent == "local" else 25))
 
 
-def make_task(title: str, project_dir: Path, plan: Plan, suggested: Plan | None = None) -> Task:
+def make_task(title: str, project_dir: Path, plan: Plan, suggested: Plan | None = None,
+              router: str | None = None) -> Task:
     """Create (but don't start) a task from a plan, and log the decision.
 
-    `suggested` is the orchestrator's original plan when the owner changed the worker.
+    `suggested` is the orchestrator's original plan when the owner changed the worker; `router` is the
+    fine-tuned local router's suggestion, logged so its agreement with Opus can be measured over time.
     """
     task = Task(
         id=new_task_id(), title=title, project=str(project_dir), agent=plan.agent, model=plan.model,
@@ -387,5 +389,6 @@ def make_task(title: str, project_dir: Path, plan: Plan, suggested: Plan | None 
         "task": task.id, "title": title, "project": str(project_dir),
         "suggested": (suggested or plan).to_dict(), "chosen": {"agent": plan.agent, "model": plan.model},
         "overridden": suggested is not None and (suggested.agent, suggested.model) != (plan.agent, plan.model),
+        "router": router,
     })
     return task

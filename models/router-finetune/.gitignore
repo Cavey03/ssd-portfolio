@@ -1,0 +1,6 @@
+# Trained weights and checkpoints stay out of git (large); metrics.json files are kept.
+runs/*/lora/
+runs/*/gguf/
+runs/*/checkpoints/
+runs/*.zip
+unsloth_compiled_cache/
