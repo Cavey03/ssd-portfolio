@@ -8,7 +8,7 @@ The main deliverable is **my system that uses a local LLM for agentic workflows*
 | [`local-llm/`](local-llm/README.md) | Ollama on the RTX 5070, driven by `codex --oss`: install, models, context/GPU tests, coding test |
 | [`mission-control/`](mission-control/README.md) | Terminal dashboard for containers, projects and agents (will also show the local LLM) |
 | [`../models/`](../models/README.md) | Every model downloaded or tried, and what I learned from it |
-| [`summary.html`](summary.html) | Study summary of the SU5–7 outcomes (download it and open it in a browser) |
+| [`SU5-7-summary.html`](SU5-7-summary.html) | Study summary of the SU5–7 outcomes (download it and open it in a browser) |
 
 ## Checklist
 | Item | Status | Notes |

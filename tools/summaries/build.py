@@ -1,7 +1,7 @@
 """Build the ITRI626 study-summary pages.
 
 Run from anywhere:  python3 tools/summaries/build.py
-Writes <unit folder>/summary.html for every study unit, plus summary-all.html at the portfolio root.
+Writes <unit folder>/SU<n>-summary.html (e.g. SU3-summary.html) for every study unit, plus summary-all.html at the portfolio root.
 Every page is self-contained (inline CSS, JS and SVG; only Google Fonts load from the web, with fallbacks),
 so each file works on its own when downloaded or opened from a clone.
 The theme follows the "Periodic Table of Local LLMs" page: graph paper, element tiles, one colour per group.
@@ -351,6 +351,11 @@ JS = r"""
 """
 
 
+def fname(u):
+    """SU3 -> SU3-summary.html; SU5–7 -> SU5-7-summary.html (plain dash, safe in URLs)."""
+    return u["code"].replace("–", "-") + "-summary.html"
+
+
 def gvars(u):
     return f'--h:{u["h"]};--c:{u["c"]}'
 
@@ -392,7 +397,7 @@ def topbar(current, prefix):
     for u in UNITS:
         cur = ' aria-current="page"' if u["id"] == current else ""
         # On the combined page, jump within the page so it works even when opened as a single file
-        href = f'#{u["id"]}' if current == "all" else f'{prefix}{u["folder"]}/summary.html'
+        href = f'#{u["id"]}' if current == "all" else f'{prefix}{u["folder"]}/{fname(u)}'
         links.append(f'<a class="ulink g" style="{gvars(u)}" href="{href}"{cur}>{u["code"]}</a>')
     cur = ' aria-current="page"' if current == "all" else ""
     links.append(f'<a class="ulink all" href="{prefix}summary-all.html"{cur}>All</a>')
@@ -492,7 +497,7 @@ def all_page():
     for u in UNITS:
         banner = (f'<div class="ubanner g" style="{gvars(u)}"><div class="usym">{u["code"]}</div>'
                   f'<div><h2>{u["title"]}</h2><p>{u["lede"]}</p></div>'
-                  f'<a href="{u["folder"]}/summary.html">Unit page →</a></div>')
+                  f'<a href="{u["folder"]}/{fname(u)}">Unit page →</a></div>')
         secs = "".join(section(o, u, f'{u["id"]}-{o["id"]}') for o in u["outcomes"])
         blocks.append(f'<div class="unit-block" id="{u["id"]}">{banner}{secs}</div>')
     empty = '<p class="empty" id="empty" hidden>No outcome matches that search.</p>'
@@ -503,7 +508,7 @@ def all_page():
 
 def main():
     for u in UNITS:
-        out = ROOT / u["folder"] / "summary.html"
+        out = ROOT / u["folder"] / fname(u)
         out.parent.mkdir(exist_ok=True)
         out.write_text(unit_page(u), encoding="utf-8")
         print(f"{out.relative_to(ROOT)}  {out.stat().st_size // 1024} KB")

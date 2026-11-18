@@ -20,7 +20,7 @@ ITRI626 checklist to where it lives. Keep that mapping current: it is how the po
 | `su5-7-llm-agents/local-llm/` | Ollama + `codex --oss` on the RTX 5070: setup, tests, benchmark |
 | `su5-7-llm-agents/mission-control/` | Terminal dashboard (Python + Textual) for containers, projects and agents |
 | `models/` | One note per model downloaded or tried; Modelfiles and fine-tuning scripts. **No weights in git.** |
-| `tools/summaries/` | Generator for the study-summary pages (`<unit>/summary.html` + root `summary-all.html`). Edit `content.py`, run `build.py`; never hand-edit the HTML. Source: Trask's *Grokking Deep Learning* (PDF in `~/Downloads`, **never commit it**). |
+| `tools/summaries/` | Generator for the study-summary pages (`<unit>/SU<n>-summary.html`, e.g. `su3-learning-models/SU3-summary.html`, + root `summary-all.html`). Edit `content.py`, run `build.py`; never hand-edit the HTML. Source: Trask's *Grokking Deep Learning* (PDF in `~/Downloads`, **never commit it**). |
 | `particle-sim/` | GPU particle simulator. **Still its own repo** (gitignored here) until its Codex worktree work is done; then it moves into `su5-7-llm-agents/` with its history. |
 
 Each subproject keeps its own `CLAUDE.md` / `AGENTS.md`, which apply on top of this file.

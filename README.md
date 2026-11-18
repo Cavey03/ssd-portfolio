@@ -30,18 +30,18 @@ HTML files as code, so download a page (or clone the repo) and open it in a brow
 | Unit | Page |
 |---|---|
 | All units | [`summary-all.html`](summary-all.html): every outcome, with search and a unit filter |
-| SU1 | [`su1-machine-learning/summary.html`](su1-machine-learning/summary.html) |
-| SU2 | [`su2-neural-networks/summary.html`](su2-neural-networks/summary.html) |
-| SU3 | [`su3-learning-models/summary.html`](su3-learning-models/summary.html) |
-| SU4 | [`su4-cnn/summary.html`](su4-cnn/summary.html) |
-| SU5–7 | [`su5-7-llm-agents/summary.html`](su5-7-llm-agents/summary.html) |
+| SU1 | [`su1-machine-learning/SU1-summary.html`](su1-machine-learning/SU1-summary.html) |
+| SU2 | [`su2-neural-networks/SU2-summary.html`](su2-neural-networks/SU2-summary.html) |
+| SU3 | [`su3-learning-models/SU3-summary.html`](su3-learning-models/SU3-summary.html) |
+| SU4 | [`su4-cnn/SU4-summary.html`](su4-cnn/SU4-summary.html) |
+| SU5–7 | [`su5-7-llm-agents/SU5-7-summary.html`](su5-7-llm-agents/SU5-7-summary.html) |
 
 To change a page, edit `tools/summaries/content.py`, then run `python3 tools/summaries/build.py`.
 
 ## Checklist
 
 ### SU1 – Machine learning → [`su1-machine-learning/`](su1-machine-learning/)
-No deliverable. The outcomes are covered in the [SU1 study summary](su1-machine-learning/summary.html).
+No deliverable. The outcomes are covered in the [SU1 study summary](su1-machine-learning/SU1-summary.html).
 
 ### SU2 – Neural networks: introduction → [`su2-neural-networks/`](su2-neural-networks/)
 | Item | Status | Where |
@@ -75,7 +75,7 @@ No deliverable. The outcomes are covered in the [SU1 study summary](su1-machine-
 | System documentation: usage instructions | 🟡 | commands exist, spread through the log |
 
 ## Learning outcomes still to cover (SU5–7)
-All of these are explained in the [SU5–7 study summary](su5-7-llm-agents/summary.html). What's still
+All of these are explained in the [SU5–7 study summary](su5-7-llm-agents/SU5-7-summary.html). What's still
 missing is hands-on evidence:
 - Fine-tuning an LLM to a specific domain (Unsloth). Transfer learning is shown by the SU4 group project's
   ImageNet-pretrained EfficientNetV2-S.

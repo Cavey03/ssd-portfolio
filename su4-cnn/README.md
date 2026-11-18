@@ -8,7 +8,7 @@ that repo. On GitHub, click the folder to open it. To get its files when cloning
 `git clone --recurse-submodules`. To move the pointer to the group's latest work, run
 `git submodule update --remote su4-cnn/group-repo` and commit.
 
-**Study summary of the SU4 outcomes:** [`summary.html`](summary.html) (download it and open it in a browser;
+**Study summary of the SU4 outcomes:** [`SU4-summary.html`](SU4-summary.html) (download it and open it in a browser;
 GitHub shows HTML as code).
 
 What `group-repo/` holds: training and evaluation scripts (`train.py`, `evaluate.py`, `compare.py`),

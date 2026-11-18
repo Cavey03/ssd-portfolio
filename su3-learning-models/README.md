@@ -8,7 +8,7 @@ The originals come unchanged from the book's official repo,
 downloaded on 2026-11-18.
 
 **Study summary of the SU3 outcomes** (including the Scikit-Learn regression and SVC examples):
-[`summary.html`](summary.html). Download it and open it in a browser; GitHub shows HTML as code.
+[`SU3-summary.html`](SU3-summary.html). Download it and open it in a browser; GitHub shows HTML as code.
 
 ## Checklist
 | Item | Status | Where |
