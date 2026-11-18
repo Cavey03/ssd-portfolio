@@ -16,7 +16,7 @@ The main deliverable is **my system that uses a local LLM for agentic workflows*
 ## Checklist
 | Item | Status | Notes |
 |---|---|---|
-| Document outlining my learning process (starting points, each model tried and what I learned) | ✅ | [`learning-process.md`](learning-process.md): starting points, goal, a 17-step learning log, models tried, concepts, what went wrong, sources |
+| Document outlining my learning process (starting points, each model tried and what I learned) | ✅ | [`learning-process.md`](learning-process.md) (also as [PDF](export/learning-process.pdf) and [Word](export/learning-process.docx)): starting points, goal, a 17-step learning log, models tried, concepts, what went wrong, sources |
 | My system which uses a local LLM for agentic workflow(s) (suggested platform: Unsloth) | ✅ | Built: Mission Control + Dispatch with the local model as a worker ([DESIGN](DESIGN.md)); a router fine-tuned with Unsloth on my GPU, suggesting a worker in Dispatch, and reproduced on a free Colab T4 ([write-up](../models/router-finetune/README.md)) |
 | Documentation: design and development | ✅ | [`DESIGN.md`](DESIGN.md): requirements, architecture, Dispatch, decisions, how it was built and tested, limitations |
 | Documentation: intro video | ✅ | [`video/out/mission-control-intro.mp4`](video/out/mission-control-intro.mp4); how it was made: [`video/VIDEO.md`](video/VIDEO.md) |
