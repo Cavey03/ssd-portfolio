@@ -391,7 +391,9 @@ def topbar(current, prefix):
     links = []
     for u in UNITS:
         cur = ' aria-current="page"' if u["id"] == current else ""
-        links.append(f'<a class="ulink g" style="{gvars(u)}" href="{prefix}{u["folder"]}/summary.html"{cur}>{u["code"]}</a>')
+        # On the combined page, jump within the page so it works even when opened as a single file
+        href = f'#{u["id"]}' if current == "all" else f'{prefix}{u["folder"]}/summary.html'
+        links.append(f'<a class="ulink g" style="{gvars(u)}" href="{href}"{cur}>{u["code"]}</a>')
     cur = ' aria-current="page"' if current == "all" else ""
     links.append(f'<a class="ulink all" href="{prefix}summary-all.html"{cur}>All</a>')
     return (f'<nav class="topbar" aria-label="Study units"><div class="wrap">'
