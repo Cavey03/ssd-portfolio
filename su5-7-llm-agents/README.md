@@ -17,7 +17,7 @@ The main deliverable is **my system that uses a local LLM for agentic workflows*
 | Item | Status | Notes |
 |---|---|---|
 | Document outlining my learning process (from the "Starting points" in *Update for Study Units 5,6,7.pdf*; each model tried and what I learned) | 🟡 | Template: [`learning-process.md`](learning-process.md). The facts are in `local-llm` and `models/` |
-| My system which uses a local LLM for agentic workflow(s) (suggested platform: Unsloth) | 🟡 | Built: Mission Control + Dispatch with the local model as a worker ([DESIGN](DESIGN.md)); a router fine-tuned with Unsloth on my GPU, suggesting a worker in Dispatch, and reproduced on a free Colab T4 ([write-up](../models/router-finetune/README.md)) |
+| My system which uses a local LLM for agentic workflow(s) (suggested platform: Unsloth) | ✅ | Built: Mission Control + Dispatch with the local model as a worker ([DESIGN](DESIGN.md)); a router fine-tuned with Unsloth on my GPU, suggesting a worker in Dispatch, and reproduced on a free Colab T4 ([write-up](../models/router-finetune/README.md)) |
 | Documentation: design and development | ✅ | [`DESIGN.md`](DESIGN.md): requirements, architecture, Dispatch, decisions, how it was built and tested, limitations |
 | Documentation: intro video | ✅ | [`video/out/mission-control-intro.mp4`](video/out/mission-control-intro.mp4); how it was made: [`video/VIDEO.md`](video/VIDEO.md) |
 | Documentation: usage instructions | ✅ | [`USAGE.md`](USAGE.md): setup, keys, local model, Dispatch, command line, troubleshooting |
