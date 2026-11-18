@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Help works anywhere, even before the virtual environment is set up.
+if [[ "${1-}" == --help ]]; then
+    printf 'Usage: mc [APP_ARGS...]\nRun Mission Control (on the host if its .venv works there, otherwise inside dev).\n'
+    exit 0
+fi
+
+# Resolve the installed symlink so we always find the original checkout.
+script_path=$(readlink -f "$0")
+repo_dir=$(dirname "$(dirname "$script_path")")
+
+# Distrobox names the container in the environment or in this metadata file.
+# The file override also lets tests simulate the host from inside dev.
+container=${CONTAINER_ID-}
+containerenv=${MISSION_CONTROL_CONTAINERENV:-/run/.containerenv}
+if [[ -z "$container" && -f "$containerenv" ]]; then
+    container=$(sed -n 's/^name="\([^"]*\)"$/\1/p' "$containerenv")
+    container=${container:-unknown}
+fi
+
+venv_python="$repo_dir/.venv/bin/python"
+
+case "$container" in
+    '')
+        # On the host: prefer running the app right here, using the same .venv.
+        # Why: a program started through `distrobox enter` keeps running invisibly
+        # if you close its window (podman's conmon keeps the container side of the
+        # terminal open). On the host, closing the window stops the app normally.
+        # The .venv only works on the host while host and container have the same
+        # Python version, so check that it can import the app's library first.
+        if [[ -x "$venv_python" ]] && "$venv_python" -c 'import textual' >/dev/null 2>&1; then
+            cd "$repo_dir"
+            exec "$venv_python" -m mission_control "$@"
+        fi
+        printf 'Note: the .venv does not work on the host, so Mission Control runs inside dev.\n' >&2
+        printf 'Quit it with q: closing the window would leave it running in the background.\n' >&2
+        exec distrobox enter dev -- "$script_path" "$@" ;;
+    dev) ;; # Already in the right container; continue below.
+    *) printf 'Error: run mc on the host or inside dev (current container: %s).\n' "$container" >&2
+       exit 1 ;;
+esac
+
+# Show the README setup steps if this checkout has no working Python venv.
+if [[ ! -x "$venv_python" ]]; then
+    {
+        printf 'Missing .venv/bin/python. Run the README setup commands:\n'
+        printf 'distrobox enter dev\ncd %q\n' "$repo_dir"
+        printf 'python3 -m venv .venv\nsource .venv/bin/activate\npip install -r requirements.txt\n'
+    } >&2
+    exit 1
+fi
+
+# Replace this shell with the app, preserving every argument.
+cd "$repo_dir"
+exec "$venv_python" -m mission_control "$@"

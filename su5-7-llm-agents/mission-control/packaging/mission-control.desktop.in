@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Mission Control
+GenericName=Dev dashboard
+Comment=Monitor development containers, projects, and coding agents
+Categories=Development;
+Icon=utilities-system-monitor
+Exec=konsole --hide-menubar -e @MC_PATH@
+Terminal=false
+Type=Application
+Keywords=agents;containers;git;dashboard;

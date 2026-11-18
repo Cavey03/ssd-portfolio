@@ -1,0 +1,151 @@
+/* All colours come from the active theme (see themes.py):
+   $primary = main accent, $secondary = second accent (footer keys),
+   $foreground / $text-muted = text, $background / $surface / $panel = layers. */
+
+Screen {
+    background: $background;
+    color: $foreground;
+}
+
+Header {
+    background: $surface;
+    color: $primary;
+    text-style: bold;
+}
+
+#dashboard {
+    height: 1fr;
+    padding: 1 2;
+}
+
+#main-panels {
+    width: 1fr;
+    margin-right: 2;
+}
+
+#usage {
+    height: auto;
+    margin-top: 1;
+}
+
+.usage-body {
+    padding: 1 0 0 0;
+}
+
+#side-panels {
+    width: 1fr;
+    min-width: 0;
+}
+
+.panel {
+    height: 1fr;
+    min-width: 0;
+    background: $background;
+    border: round $primary 30%;
+    border-title-color: $text-muted;
+    border-title-style: bold;
+    padding: 0 1;
+}
+
+.panel:focus-within {
+    border: round $primary;
+    border-title-color: $primary;
+}
+
+#containers {
+    margin-bottom: 1;
+}
+
+.panel-label {
+    height: 1;
+    margin: 0 0 1 0;
+    color: $text-muted;
+    text-style: italic;
+}
+
+DataTable {
+    height: 1fr;
+    background: $background;
+    color: $foreground;
+    scrollbar-color: $panel;
+    scrollbar-color-hover: $primary;
+    scrollbar-color-active: $primary;
+}
+
+DataTable > .datatable--header {
+    background: $background;
+    color: $text-muted;
+    text-style: bold;
+}
+
+DataTable > .datatable--even-row {
+    background: $background;
+}
+
+DataTable > .datatable--odd-row {
+    background: $surface;
+}
+
+DataTable > .datatable--cursor {
+    background: $panel;
+    color: $foreground;
+}
+
+DataTable:focus > .datatable--cursor {
+    background: $primary 20%;
+    color: $primary;
+    text-style: bold;
+}
+
+Footer {
+    background: $surface;
+    color: $text-muted;
+}
+
+FooterKey {
+    background: $surface;
+}
+
+FooterKey > .footer-key--key {
+    background: $surface;
+    color: $secondary;
+    text-style: bold;
+}
+
+FooterKey > .footer-key--description {
+    color: $foreground;
+}
+
+/* Confirmation dialog */
+ConfirmScreen {
+    align: center middle;
+    background: $background 60%;
+}
+
+#confirm-box {
+    width: 64;
+    height: auto;
+    padding: 1 2;
+    background: $surface;
+    border: round $primary;
+}
+
+#confirm-question {
+    text-style: bold;
+    color: $foreground;
+}
+
+#confirm-detail {
+    margin-top: 1;
+    color: $text-muted;
+}
+
+#confirm-buttons {
+    height: auto;
+    margin-top: 1;
+    align-horizontal: right;
+}
+
+#confirm-buttons Button {
+    margin-left: 2;
+}
