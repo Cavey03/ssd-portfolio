@@ -13,7 +13,7 @@ free T4** and on **my RTX 5070**, then both are measured against the untrained b
 | Model | Prompt | Accuracy | **Balanced accuracy** | Recall local | Recall codex | Recall claude | Time per task |
 |---|---|---|---|---|---|---|---|
 | **router-rtx5070**: Gemma 4 E2B fine-tuned on my RTX 5070 | one line | **82%** | **63%** | 90% | 50% | 50% | 0.05 s |
-| COLAB_ROW
+| *router-colab: same code and data on a free Colab T4* | *notebook ready; not run yet (no free T4 was available when tried)* | | | | | | |
 | `gemma4:e2b`: the same model, **not** fine-tuned | full routing guidelines | 75% | 52% | 80% | 75% | 0% | 0.08 s |
 | `ornith-1.5:9b`, thinking on | full routing guidelines | 51% | 62% | 52% | 33% | 100% | ~5 s |
 | `ornith-1.5:9b`, thinking off | full routing guidelines | 78% | 41% | 97% | 0% | 25% | ~0.2 s |
@@ -33,12 +33,14 @@ Balanced accuracy = the mean of the three recalls; it is the fair measure here b
   label either way ("Refactor to follow style guides", "Update for latest version of Rust"): a one-line commit
   message often doesn't say how big the job is. The labels are one reviewer's judgement.
 
-**Training** (`runs/*/metrics.json`)
+**Training** (`runs/*/metrics.json`). The Colab notebook ([`colab/router_finetune_colab.ipynb`](colab/router_finetune_colab.ipynb))
+runs the identical script with the data built in, so anyone without a GPU can repeat this on a free Colab T4
+with *Runtime → Run all*. When I tried it, Colab had no free T4 available.
 | | RTX 5070 (12 GB), `gpu` container | Colab free T4 (16 GB) |
 |---|---|---|
-| Training time (409 examples × 3 epochs) | 247 s | COLAB_TIME |
-| Peak GPU memory | 7.98 GB | COLAB_VRAM |
-| Loss at the end | 0.012 | COLAB_LOSS |
+| Training time (409 examples × 3 epochs) | 247 s | not run yet |
+| Peak GPU memory | 7.98 GB | |
+| Loss at the end | 0.012 | |
 | LoRA adapter | 97 MB | |
 | Exported model (GGUF Q4_K_M) | 3.4 GB | |
 
