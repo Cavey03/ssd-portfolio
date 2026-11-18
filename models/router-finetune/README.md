@@ -13,7 +13,7 @@ free T4** and on **my RTX 5070**, then both are measured against the untrained b
 | Model | Prompt | Accuracy | **Balanced accuracy** | Recall local | Recall codex | Recall claude | Time per task |
 |---|---|---|---|---|---|---|---|
 | **router-rtx5070**: Gemma 4 E2B fine-tuned on my RTX 5070 | one line | **82%** | **63%** | 90% | 50% | 50% | 0.05 s |
-| *router-colab: same code and data on a free Colab T4* | *notebook ready; not run yet (no free T4 was available when tried)* | | | | | | |
+| **router-colab**: the same, trained on a free Colab T4 | one line | 80% | **58%** | 92% | 33% | 50% | 0.04 s |
 | `gemma4:e2b`: the same model, **not** fine-tuned | full routing guidelines | 75% | 52% | 80% | 75% | 0% | 0.08 s |
 | `ornith-1.5:9b`, thinking on | full routing guidelines | 51% | 62% | 52% | 33% | 100% | ~5 s |
 | `ornith-1.5:9b`, thinking off | full routing guidelines | 78% | 41% | 97% | 0% | 25% | ~0.2 s |
@@ -28,6 +28,7 @@ Balanced accuracy = the mean of the three recalls; it is the fair measure here b
   one-line instruction instead of a page of rules: the rules are now in its weights. That is transfer learning:
   general language understanding from pre-training, adapted with ~300 examples to one narrow job.
 - **A 2B fine-tune matches a 9B model that reasons first** (62%), about 100× faster and with no thinking step.
+- **It reproduces:** trained again on a free Colab T4, the same code and data gave 58%, agreeing on 72 of 76 tasks.
 - **Caveats:** the test set is small, especially the rare classes (12 codex, 4 claude: "50% claude" is 2 of 4),
   so the per-class numbers would move a lot with another split. Many mistakes are on tasks a person could
   label either way ("Refactor to follow style guides", "Update for latest version of Rust"): a one-line commit
@@ -35,12 +36,16 @@ Balanced accuracy = the mean of the three recalls; it is the fair measure here b
 
 **Training** (`runs/*/metrics.json`). The Colab notebook ([`colab/router_finetune_colab.ipynb`](colab/router_finetune_colab.ipynb))
 runs the identical script with the data built in, so anyone without a GPU can repeat this on a free Colab T4
-with *Runtime → Run all*. When I tried it, Colab had no free T4 available.
+with *Runtime → Run all* (the first time I tried, no T4 was free; later it worked).
+
+**Colab vs my GPU:** the RTX 5070 trained ~17% faster (247 vs 299 s). The two routers agree on 72 of the 76 test
+tasks; the gap in codex recall (50% vs 33%) is two tasks out of 12. They differ slightly because the T4 trains in
+float16 instead of bfloat16. Both clearly beat the untrained model, so **a free Colab GPU is enough** to do this.
 | | RTX 5070 (12 GB), `gpu` container | Colab free T4 (16 GB) |
 |---|---|---|
-| Training time (409 examples × 3 epochs) | 247 s | not run yet |
-| Peak GPU memory | 7.98 GB | |
-| Loss at the end | 0.012 | |
+| Training time (409 examples × 3 epochs) | 247 s | 299 s |
+| Peak GPU memory | 7.98 GB | 8.0 GB |
+| Number format | bfloat16 | float16 (the T4 has no bfloat16) |
 | LoRA adapter | 97 MB | |
 | Exported model (GGUF Q4_K_M) | 3.4 GB | |
 

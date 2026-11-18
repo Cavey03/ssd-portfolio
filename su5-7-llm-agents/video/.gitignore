@@ -1,3 +1,4 @@
 # Raw screen recordings and in-between files stay out of git; the finished video is kept.
 clips/
 out/parts/
+samples/
