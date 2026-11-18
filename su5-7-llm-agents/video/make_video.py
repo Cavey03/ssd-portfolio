@@ -21,6 +21,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from voices import SPEAKER, VOICES  # who speaks each part, and their caption colour
+
 HERE = Path(__file__).parent
 CLIPS = HERE / "clips"
 NARRATION = HERE / "narration"
@@ -33,7 +35,7 @@ VOICE_TAIL = 0.7   # seconds of quiet after it, before the next part
 
 TITLE = ("Agentic coding system", "Mission Control · local LLM · Dispatch · fine-tuned router", "626 portfolio · SU5–7")
 END = ("Thanks for watching",
-       "Narration: Kokoro text-to-speech, run locally on the GPU, structured by Claude",
+       "Voices: Kokoro text-to-speech, run locally on the GPU · script structured by Claude",
        "Design: su5-7-llm-agents/DESIGN.md   ·   Usage: su5-7-llm-agents/USAGE.md")
 
 SHOTS = [
@@ -80,12 +82,17 @@ def audio_input(voice: Path | None) -> tuple[list[str], str]:
     return ["-i", str(voice)], f"[1:a]adelay={delay}:all=1,aresample=48000,aformat=channel_layouts=stereo,apad[a]"
 
 
+def speaker_colour(key: str) -> str:
+    speaker = SPEAKER.get(key)
+    return VOICES[speaker][3] if speaker in VOICES else "white"
+
+
 def needed_length(voice: Path | None) -> float:
     return VOICE_START + duration(voice) + VOICE_TAIL if voice else 0.0
 
 
-def caption_filter(text_file: Path, position: str) -> str:
-    """A semi-transparent bar with white text, every line centred on its own.
+def caption_filter(text_file: Path, position: str, colour: str = "white") -> str:
+    """A semi-transparent bar with text in the speaker's colour, every line centred on its own.
 
     Each line is drawn separately (one text file per line): drawtext would otherwise align the lines
     to the left of the widest one, and draw the line break itself as a box.
@@ -93,11 +100,12 @@ def caption_filter(text_file: Path, position: str) -> str:
     lines = text_file.read_text().splitlines()
     bar_h = 40 + 62 * len(lines)
     y = 24 if position == "top" else H - bar_h - 70  # 70 px keeps Mission Control's key hints visible
-    filters = [f"drawbox=x=0:y={y}:w=iw:h={bar_h}:color=black@0.75:t=fill"]
+    filters = [f"drawbox=x=0:y={y}:w=iw:h={bar_h}:color=black@0.75:t=fill",
+               f"drawbox=x=0:y={y}:w=iw:h=5:color={colour}:t=fill"]  # a line in the speaker's colour
     for i, line in enumerate(lines):
         line_file = text_file.with_name(f"{text_file.stem}-line{i}.txt")
         line_file.write_text(line)
-        filters.append(f"drawtext=expansion=none:fontfile='{FONT}':textfile='{esc(line_file)}':fontcolor=white:"
+        filters.append(f"drawtext=expansion=none:fontfile='{FONT}':textfile='{esc(line_file)}':fontcolor={colour}:"
                        f"fontsize=46:x=(w-text_w)/2:y={y + 24 + 62 * i}")
     return ",".join(filters)
 
@@ -138,7 +146,7 @@ def shot(clip: Path, spec: dict, index: int) -> Path:
         f"scale={W}:{H}:force_original_aspect_ratio=decrease", f"pad={W}:{H}:(ow-iw)/2:(oh-ih)/2:color=black",
         f"setpts=(PTS-STARTPTS)/{speed}", f"fps={FPS}",
         *([f"tpad=stop_mode=clone:stop_duration={hold + 0.1:.3f}"] if hold > 0 else []),
-        caption_filter(text_file, spec.get("position", "bottom")),
+        caption_filter(text_file, spec.get("position", "bottom"), speaker_colour(str(index))),
     ]
     audio_args, audio_filter = audio_input(voice)
     run(["-ss", str(start), "-to", str(end), "-i", str(clip), *audio_args,

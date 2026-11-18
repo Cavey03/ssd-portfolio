@@ -1,7 +1,7 @@
 """Speak text with Kokoro-82M, a small open text-to-speech model (Apache 2.0), run locally.
 
-The whole narration uses one voice (Kokoro's `am_puck`); only the closing line gets a robot effect, as a
-"yes, this was AI" ending. Other voices are kept in CAST for trying alternatives.
+The narration uses four voices (VOICES), one per part of the video (SPEAKER); the closing line gets a robot
+effect, as a "yes, this was AI" ending. CAST holds the voices tried earlier, for samples.
 
   distrobox enter gpu -- ~/.venvs/tts/bin/python voices.py               -> narration/<shot>.wav (the video's voice)
   distrobox enter gpu -- ~/.venvs/tts/bin/python voices.py --samples     -> samples/ (voice try-outs)
@@ -44,23 +44,37 @@ SAMPLES = {
 # What is said over each part of the video: the title card, shots 1-9 (see VIDEO.md), the end card.
 # Written as it should be SPOKEN (numbers in words), because the model reads exactly what it gets.
 NARRATION = {
-    "title": "This is an agentic coding system, built for the six-two-six portfolio.",
-    "1": "This is Mission Control: one hub for all the coding agents, including a model that runs on the local GPU.",
-    "2": "Every panel is live: the projects and their git status, dispatched tasks, plan usage, containers, "
-         "the local model, and every running agent.",
-    "3": "Pressing O starts Ollama, the local model server. The model loads straight onto the GPU.",
-    "4": "Pressing four opens Codex on the local model. The same agent, on local hardware: free, offline and private.",
-    "5": "Next, Dispatch. A task is described, the fine-tuned router answers instantly, "
-         "and then Opus plans the job and writes the brief.",
-    "6": "The worker gets its own copy of the project, a git worktree, so the real code stays untouched. "
+    "title": "This is an agentic coding system that was built for the six-two-six portfolio.",
+    "1": "This is Mission Control: one hub for all the coding agents and for a model that runs on the local GPU.",
+    "2": "Every panel is live. You can see the projects with their git status and the dispatched tasks and the plan "
+         "usage. Next to them are the containers and the local model and every agent that is running.",
+    "3": "Pressing O starts Ollama, which is the local model server. The model then loads straight onto the GPU.",
+    "4": "Pressing four opens Codex on the local model. It is the same agent but on local hardware, "
+         "so it is free and offline and private.",
+    "5": "Next comes Dispatch. A task is described and the fine-tuned router answers instantly. "
+         "Then Opus plans the job and writes the brief.",
+    "6": "The worker gets its own copy of the project in a git worktree so the real code stays untouched. "
          "It also runs with a time limit.",
-    "7": "When the worker is done, Opus reviews the change. The review and the diff are checked before anything is merged.",
-    "8": "The router is Gemma 4, fine-tuned with Unsloth. Balanced accuracy rose from fifty-two to sixty-three percent: "
-         "as good as a nine billion parameter model that thinks first, and about a hundred times faster.",
-    "9": "The design, the usage guide and every experiment are documented in the portfolio repo.",
-    "end": "The narration in this video was made with Kokoro, an open-source text-to-speech model, "
-           "running locally on the same GPU. It was structured by Claude.",
+    "7": "Once the worker is done Opus reviews the change. The review and the diff are then checked "
+         "before anything is merged.",
+    "8": "The router is Gemma 4 and it was fine-tuned with Unsloth. Its balanced accuracy rose from fifty-two to "
+         "sixty-three percent. That is as good as a nine billion parameter model that thinks first "
+         "while being about a hundred times faster.",
+    "9": "The design and the usage guide and every experiment are documented in the portfolio repo.",
+    "end": "The voices in this video were made with Kokoro. It is an open-source text-to-speech model that runs "
+           "locally on the same GPU. The script was structured by Claude.",
 }
+
+# The narration voices: one per part of the video, each with its own caption colour (make_video.py uses it).
+# name: (Kokoro voice, language a = American / b = British, speed, caption colour)
+VOICES = {
+    "puck": ("am_puck", "a", 1.0, "0xfff3b0"),   # pale yellow: title, the hub, the repo, closing
+    "nova": ("af_nova", "a", 1.0, "0x8fd8ff"),   # light blue: the local model
+    "onyx": ("am_onyx", "a", 1.0, "0xffb072"),   # orange: Dispatch
+    "lily": ("bf_lily", "b", 1.0, "0x9ff0a8"),   # light green: the fine-tune results
+}
+SPEAKER = {"title": "puck", "1": "puck", "2": "puck", "3": "nova", "4": "nova", "5": "onyx", "6": "onyx",
+           "7": "onyx", "8": "lily", "9": "puck", "end": "puck"}
 
 # Silence added after each sentence and after a colon (Kokoro's own pauses are short).
 PAUSE_SENTENCE = 0.2
@@ -90,7 +104,7 @@ def speak(role: str, text: str, out: Path, device: str | None = None) -> Path:
     import soundfile as sf
     from kokoro import KPipeline
 
-    voice, lang, speed = CAST[role]
+    voice, lang, speed = VOICES[role][:3] if role in VOICES else CAST[role]
     key = (lang, device or default_device())
     if key not in _PIPELINES:  # loading the model takes a few seconds: do it once per language
         _PIPELINES[key] = KPipeline(lang_code=lang, device=key[1])
@@ -158,10 +172,10 @@ def narrate() -> None:
     for key, text in NARRATION.items():
         out = folder / f"{key}.wav"
         if key == "end" and ROBOT_LAST_LINE:
-            robotize(speak("narrator", text, folder / "end-natural.wav"), out)
+            robotize(speak(SPEAKER[key], text, folder / "end-natural.wav"), out)
         else:
-            speak("narrator", text, out)
-        print(f"{out.name:<10} {text[:70]}")
+            speak(SPEAKER[key], text, out)
+        print(f"{out.name:<10} {SPEAKER[key]:<5} {text[:65]}")
 
 
 if __name__ == "__main__":
