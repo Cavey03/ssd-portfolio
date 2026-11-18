@@ -23,8 +23,8 @@ Legend: ✅ done · 🟡 partly done · ❌ not yet · ➖ optional
 ### SU2 – Neural networks: introduction → [`su2-neural-networks/`](su2-neural-networks/)
 | Item | Status | Where |
 |---|---|---|
-| Assignment submitted on eFundi: simple FF networks explained with creative scenarios | 🟡 linked | [TreasureSweeper-simple-neural-network](https://github.com/Cavey03/TreasureSweeper-simple-neural-network) |
-| ➖ Other Jupyter notebooks tried or learned from | ❌ | |
+| Assignment submitted on eFundi: simple FF networks explained with creative scenarios | ✅ | [SISO, MISO, SIMO, MIMO notebooks](su2-neural-networks/README.md) |
+| ➖ Other Jupyter notebooks tried or learned from | 🟡 | [TreasureSweeper-simple-neural-network](https://github.com/Cavey03/TreasureSweeper-simple-neural-network) |
 
 ### SU3 – Learning models: basic applications → [`su3-learning-models/`](su3-learning-models/)
 | Item | Status | Where |
