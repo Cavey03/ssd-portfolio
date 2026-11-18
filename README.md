@@ -52,8 +52,8 @@ No deliverable. The outcomes are covered in the [SU1 study summary](su1-machine-
 ### SU3 – Learning models: basic applications → [`su3-learning-models/`](su3-learning-models/)
 | Item | Status | Where |
 |---|---|---|
-| Chapter 3 – Forward Propagation (original + with my comments) | 🟡 original added, comments to do | [`su3-learning-models/`](su3-learning-models/README.md) |
-| Chapter 4 – Gradient Descent (original + with my comments) | 🟡 original added, comments to do | [`su3-learning-models/`](su3-learning-models/README.md) |
+| Chapter 3 – Forward Propagation (original + with my comments) | ✅ | [`su3-learning-models/`](su3-learning-models/README.md) |
+| Chapter 4 – Gradient Descent (original + with my comments) | ✅ | [`su3-learning-models/`](su3-learning-models/README.md) |
 | ➖ Chapters 5, 6, 8, 9 and other notebooks | ❌ | |
 
 ### SU4 – Convolutional neural networks → [`su4-cnn/`](su4-cnn/)
