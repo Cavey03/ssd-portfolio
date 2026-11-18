@@ -1,0 +1,132 @@
+Read AGENTS.md first. Your task: create TWO new files, and nothing else.
+  1. mission_control/localllm.py   (no UI code; Python standard library only)
+  2. tests/test_localllm.py        (unittest; no network, no real commands)
+Read mission_control/gitinfo.py and mission_control/containers.py first and copy their style:
+module docstring, `from __future__ import annotations`, frozen dataclasses, type hints, a short
+docstring on every function, comments that explain WHY.
+
+## Rules
+- Do NOT edit any other file. Do NOT commit. Do NOT install packages.
+- NEVER run `systemctl`, `ollama` or `nvidia-smi` yourself, and never call the real Ollama server from
+  tests: you are running ON that Ollama server, so stopping it would stop you. Tests mock everything.
+- Run the tests with:  python3 -m unittest tests.test_localllm -v
+  Finish only when they all pass. Then print a short summary of what you made.
+
+## What the module is for
+Mission Control (a Textual dashboard) will show a "Local LLM" panel: is the Ollama model server running,
+which models are installed, which model is loaded in GPU memory, and how full the GPU is. It can also
+start/stop the Ollama user service. Your module provides the data; the UI is written by someone else
+against EXACTLY the names below, so keep every name and signature.
+
+## Exact API
+
+OLLAMA_URL = "http://127.0.0.1:11434"
+    Default server address. The environment variable MISSION_CONTROL_OLLAMA_URL overrides it.
+
+@dataclass(frozen=True)
+class InstalledModel:
+    name: str
+    size_bytes: int
+    parameter_size: str | None      # from details.parameter_size, e.g. "9.0B"
+    quantization: str | None        # from details.quantization_level, e.g. "Q4_K_M"
+
+@dataclass(frozen=True)
+class LoadedModel:
+    name: str
+    size_bytes: int                 # "size"
+    vram_bytes: int                 # "size_vram"
+    context_length: int | None      # "context_length"
+    expires_at: datetime | None     # "expires_at", timezone-aware
+    @property
+    def gpu_percent(self) -> int: ...   # round(100 * vram_bytes / size_bytes); 0 if size_bytes is 0
+
+@dataclass(frozen=True)
+class GpuInfo:
+    name: str
+    memory_used_mb: int
+    memory_total_mb: int
+    utilization_percent: int | None    # None when nvidia-smi prints "[N/A]"
+
+@dataclass(frozen=True)
+class OllamaStatus:
+    running: bool
+    version: str | None = None
+    installed: tuple[InstalledModel, ...] = ()
+    loaded: tuple[LoadedModel, ...] = ()
+    error: str | None = None
+
+def parse_timestamp(value: object) -> datetime | None
+    Ollama writes NANOseconds ("2026-11-18T13:11:50.080476753+02:00"). Cut the fraction to 6 digits before
+    datetime.fromisoformat. Also accept a trailing "Z". Return None for anything that isn't a valid string.
+
+def parse_tags(text: str) -> tuple[InstalledModel, ...]
+    Parse the JSON reply of GET /api/tags. Raise ValueError for invalid JSON or when "models" isn't a list.
+    Skip entries that aren't objects or have no string "name". Missing size -> 0; missing details -> None
+    fields. Sort by name.
+
+def parse_ps(text: str) -> tuple[LoadedModel, ...]
+    Parse the JSON reply of GET /api/ps, same error rules as parse_tags. Missing numbers -> 0 / None.
+
+def parse_nvidia_smi(text: str) -> GpuInfo | None
+    Parse the FIRST line of `nvidia-smi --query-gpu=name,memory.used,memory.total,utilization.gpu
+    --format=csv,noheader,nounits`, e.g. "NVIDIA GeForce RTX 5070, 9351, 12227, 18".
+    Return None for empty or malformed output (never raise).
+
+def host_command(argv: list[str]) -> list[str]
+    Mission Control can run inside the distrobox container "dev", where systemctl --user and nvidia-smi
+    belong to the HOST. If mission_control.containers.current_container_name() is not None, return
+    ["distrobox-host-exec", *argv]; otherwise return argv unchanged.
+
+def read_ollama(base_url: str | None = None, timeout: float = 1.5) -> OllamaStatus
+    GET {url}/api/version with urllib.request. If it can't connect (URLError, OSError, timeout):
+    return OllamaStatus(running=False) with NO error (a stopped server is normal, not an error).
+    Otherwise GET /api/tags and /api/ps. If one of those fails or doesn't parse, still return
+    running=True and the version, with error set to a short readable message.
+
+def read_gpu(timeout: float = 3.0) -> GpuInfo | None
+    Run host_command(["nvidia-smi", "--query-gpu=name,memory.used,memory.total,utilization.gpu",
+    "--format=csv,noheader,nounits"]) with subprocess.run(capture_output=True, text=True, timeout=timeout,
+    check=False). Return None on OSError, TimeoutExpired or a non-zero exit code.
+
+def set_service(start: bool, timeout: float = 20.0) -> tuple[bool, str]
+    Run host_command(["systemctl", "--user", "start" if start else "stop", "ollama"]).
+    Success: (True, "Ollama started") or (True, "Ollama stopped").
+    Failure: (False, "Could not start Ollama: <last line of stderr>") (or "stop"); also for OSError and
+    TimeoutExpired, using the exception text.
+
+## Real samples (use them in the tests)
+GET /api/version:
+{"version":"0.40.14"}
+
+GET /api/tags (shortened):
+{"models":[
+ {"name":"ornith-1.5:9b","model":"ornith-1.5:9b","modified_at":"2026-11-05T12:04:02.612059505+02:00",
+  "size":6550813657,"details":{"format":"gguf","family":"qwen35","parameter_size":"9.0B",
+  "quantization_level":"Q4_K_M"}},
+ {"name":"gemma4:12b","model":"gemma4:12b","modified_at":"2026-11-05T11:53:44.328136641+02:00",
+  "size":8021618941,"details":{"format":"gguf","family":"gemma4","parameter_size":"11.9B",
+  "quantization_level":"Q4_K_M"}}]}
+
+GET /api/ps:
+{"models":[{"name":"ornith-1.5:9b","model":"ornith-1.5:9b","size":7682517892,
+  "details":{"parameter_size":"9.0B","quantization_level":"Q4_K_M"},
+  "expires_at":"2026-11-18T13:11:50.080476753+02:00","size_vram":7682517892,"context_length":65536}]}
+
+GET /api/ps with nothing loaded:
+{"models":[]}
+
+nvidia-smi:
+NVIDIA GeForce RTX 5070, 9351, 12227, 18
+
+## Tests to write (at least these)
+- parse_tags on the sample: 2 models, sorted (gemma4:12b first), sizes and details correct.
+- parse_ps on both samples; gpu_percent is 100 for the sample; expires_at has the right hour and tz.
+- parse_timestamp: nanoseconds, "Z", None, a number, garbage.
+- parse_tags / parse_ps raise ValueError for "not json" and for {"models": 3}; skip a nameless entry.
+- parse_nvidia_smi: the sample, "[N/A]" utilization -> None, "" -> None, "garbage" -> None.
+- host_command with current_container_name patched to "dev" and to None.
+- read_ollama: patch urllib.request.urlopen. Connection refused -> running False, error None.
+  All three replies OK -> running True, version, 2 installed, 1 loaded. /api/ps returning bad JSON ->
+  running True with an error message.
+- read_gpu and set_service: patch subprocess.run (success, non-zero exit, OSError, TimeoutExpired) and
+  check the exact argv passed (including the distrobox-host-exec prefix when in a container).

@@ -1,0 +1,80 @@
+Your task: create TWO new files, and nothing else.
+  1. mission_control/localllm.py   (Python standard library only)
+  2. tests/test_localllm.py        (unittest)
+
+HOW TO WORK: do not plan at length. Write mission_control/localllm.py FIRST, straight away, then write the
+test file, then run the tests and fix what fails. A first version that you then fix is better than a
+perfect plan. Keep the code simple.
+
+Rules: do NOT edit any other file, do NOT commit, do NOT run systemctl, ollama or nvidia-smi.
+Run the tests with:  python3 -m unittest tests.test_localllm -v
+Finish when they pass, and print a short summary.
+
+## mission_control/localllm.py
+Start with a module docstring: "Parse what the local model server (Ollama) and nvidia-smi report."
+Then `from __future__ import annotations`, and exactly these:
+
+@dataclass(frozen=True)
+class InstalledModel:
+    name: str
+    size_bytes: int
+    parameter_size: str | None      # details.parameter_size, e.g. "9.0B"
+    quantization: str | None        # details.quantization_level, e.g. "Q4_K_M"
+
+@dataclass(frozen=True)
+class LoadedModel:
+    name: str
+    size_bytes: int                 # "size"
+    vram_bytes: int                 # "size_vram"
+    context_length: int | None      # "context_length"
+    expires_at: datetime | None     # "expires_at"
+
+    @property
+    def gpu_percent(self) -> int:   # round(100 * vram_bytes / size_bytes), or 0 if size_bytes is 0
+
+@dataclass(frozen=True)
+class GpuInfo:
+    name: str
+    memory_used_mb: int
+    memory_total_mb: int
+    utilization_percent: int | None   # None when nvidia-smi prints "[N/A]"
+
+def parse_timestamp(value: object) -> datetime | None:
+    Ollama writes nanoseconds: "2026-11-18T13:11:50.080476753+02:00". Keep only the first 6 digits after
+    the dot, replace a final "Z" with "+00:00", then datetime.fromisoformat. Return None if value is not a
+    string or doesn't parse.
+
+def parse_tags(text: str) -> tuple[InstalledModel, ...]:
+    JSON from Ollama's /api/tags. Raise ValueError if the text isn't JSON or "models" isn't a list.
+    Skip entries that aren't dicts or have no string "name". Missing size -> 0, missing details -> None.
+    Return the models sorted by name.
+
+def parse_ps(text: str) -> tuple[LoadedModel, ...]:
+    JSON from Ollama's /api/ps. Same error rules. Missing size/size_vram -> 0, context_length -> None.
+
+def parse_nvidia_smi(text: str) -> GpuInfo | None:
+    First line looks like "NVIDIA GeForce RTX 5070, 9351, 12227, 18" (name, used MB, total MB, busy %).
+    Return None for empty or malformed text. Never raise.
+
+## Samples for the tests
+/api/tags:
+{"models":[
+ {"name":"ornith-1.5:9b","size":6550813657,"details":{"parameter_size":"9.0B","quantization_level":"Q4_K_M"}},
+ {"name":"gemma4:12b","size":8021618941,"details":{"parameter_size":"11.9B","quantization_level":"Q4_K_M"}}]}
+
+/api/ps:
+{"models":[{"name":"ornith-1.5:9b","size":7682517892,"size_vram":7682517892,"context_length":65536,
+ "expires_at":"2026-11-18T13:11:50.080476753+02:00"}]}
+
+/api/ps with nothing loaded:  {"models":[]}
+
+nvidia-smi:  NVIDIA GeForce RTX 5070, 9351, 12227, 18
+
+## Tests (tests/test_localllm.py)
+- parse_tags(sample): 2 models, gemma4:12b first; sizes, parameter_size and quantization right.
+- parse_ps(sample): 1 model, gpu_percent == 100, context_length == 65536, expires_at.hour == 13,
+  expires_at.microsecond == 80476. parse_ps of the empty sample == ().
+- parse_timestamp: the nanosecond sample, "2026-11-18T11:00:00Z", None, 42, "garbage".
+- parse_tags("not json") and parse_tags('{"models": 3}') raise ValueError; an entry without "name" is skipped.
+- parse_nvidia_smi: the sample; "NVIDIA GeForce RTX 5070, 9351, 12227, [N/A]" gives utilization None;
+  "" and "garbage" give None.

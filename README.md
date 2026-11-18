@@ -69,7 +69,7 @@ No deliverable. The outcomes are covered in the [SU1 study summary](su1-machine-
 | Item | Status | Where |
 |---|---|---|
 | Document outlining my learning process (from the "Starting points", each model tried and what I learned) | 🟡 | template: [`learning-process.md`](su5-7-llm-agents/learning-process.md); facts recorded in [`local-llm`](su5-7-llm-agents/local-llm/README.md) and [`models/`](models/) |
-| My system that uses a local LLM for agentic workflow(s) (suggested: Unsloth) | 🟡 | Ollama + Codex works ([`local-llm`](su5-7-llm-agents/local-llm/README.md)); no fine-tuned model or own workflow yet |
+| My system that uses a local LLM for agentic workflow(s) (suggested: Unsloth) | 🟡 | Ollama + Codex works ([`local-llm`](su5-7-llm-agents/local-llm/README.md)); Mission Control shows and launches the local model; the local model built part of it ([agentic run](su5-7-llm-agents/local-llm/agentic-runs/2026-11-18-localllm/README.md)); Dispatch and fine-tune to do |
 | System documentation: design and development | 🟡 | decisions and install log exist; no design section yet |
 | System documentation: intro video | ❌ | |
 | System documentation: usage instructions | 🟡 | commands exist, spread through the log |

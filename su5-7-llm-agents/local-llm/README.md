@@ -250,6 +250,20 @@ summarised. **Correct, 21 s, 100% GPU at 65536 context (`ollama ps`).**
 It used **27,308 tokens** for this tiny task: Codex sends a long system prompt and tool list on every step.
 This is why the 4K default would never work and why 64K is the minimum.
 
+## Agentic run: the local model builds part of Mission Control (2026-11-18)
+First real agentic task for `ornith-1.5:9b` (via `codex exec -p local`, in a sandboxed git worktree): write the
+parsing module for Mission Control's Local LLM panel. Full write-up, briefs, logs and its raw output:
+[`agentic-runs/2026-11-18-localllm/`](agentic-runs/2026-11-18-localllm/README.md).
+
+| Run | Task | Result |
+|---|---|---|
+| 1 | Full module: 4 data classes, 9 functions, tests | Looped in its reasoning for 6 min ("let me write…" ×42, "reconsider" ×40); **no files written**; stopped |
+| 2 | A third: 3 data classes, 4 parse functions, tests; "write first, then fix"; 10-min limit | Wrote the module in 2½ min; 13/15 tests; stuck 7 min on a stray bracket in its own test data. One real bug (`self.` missing). Fixed in review, merged |
+
+**Lessons:** give small models small, single-step tasks; overthinking (Codex ran it at `reasoning effort: high`)
+is the main failure, not wrong code; they struggle to *find* their own small errors; always set a time limit
+and review the output.
+
 ## Plan
 - [x] Choose the install option and install Ollama (option 1, v0.40.14)
 - [x] Verify Ollama uses the GPU (`ollama ps`, `nvidia-smi`): both models 100% GPU
@@ -260,7 +274,8 @@ This is why the 4K default would never work and why 64K is the minimum.
 - [ ] Benchmark: the same small coding tasks on each local model vs Sol/Claude (speed, success, quality)
 - [ ] Pick a default local model (provisional: `ornith-1.5:9b`, confirm after benchmark)
 - [ ] Add rules for delegating to the local model in `~/Projects/CLAUDE.md`
-- [ ] Mission Control: show Ollama status, loaded model and GPU memory
+- [x] Mission Control: show Ollama status, loaded model and GPU memory (Local LLM panel, 2026-11-18)
+- [ ] Retry the agentic task with `-c model_reasoning_effort=low` and with `gemma4:12b`
 
 ## Sources
 - [Ollama Linux docs](https://docs.ollama.com/linux.md)
@@ -279,3 +294,4 @@ This is why the 4K default would never work and why 64K is the minimum.
 | Model tag check, pulls, first GPU/speed check | Claude Code (owner approved pulling two models) |
 | Context/GPU-fit test, `bench/coding_test.py` and first coding test | Claude Code (owner asked to test the models) |
 | Model recommendation, Codex profile and 64K server setting | Claude Code (owner chose Ornith as provisional default) |
+| Agentic runs 1–2 (briefs, running, review, write-up) | Claude Code; the code in run 2 by `ornith-1.5:9b` (owner approved both runs and asked for the evidence) |
