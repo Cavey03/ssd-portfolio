@@ -28,7 +28,11 @@ Finished video: `out/mission-control-intro.mp4`.
    card, and joins everything into `out/mission-control-intro.mp4`. It also writes `out/contact-sheet.png`
    (one frame per shot) to check every caption at a glance.
 
-Captions, speed-ups and trims are in the `SHOTS` list at the top of [`make_video.py`](make_video.py). Only
+**Outro music:** `python3 music.py` (in the `gpu` container, which has numpy) synthesises an original soft
+piece (pad, bells, bass from sine waves), so there is nothing to license. It plays quietly (about 12 dB under
+the voice) over the last shot and fades out as the closing voice starts.
+
+Captions, speed-ups, trims and zooms are in the `SHOTS` list at the top of [`make_video.py`](make_video.py). Only
 ffmpeg is used (already on the host); raw clips are not committed.
 
 ## Before recording
@@ -59,4 +63,5 @@ Closing line (am_puck, robot effect): "The voices in this video were made with K
 |---|---|
 | Shot list, captions, narration text (wording approved by me), `make_video.py` (ffmpeg editing), `voices.py` | Claude Code |
 | Voice | Kokoro-82M, run locally on the GPU |
-| Recording, choice of voice and speed | Me |
+| Music | `music.py` (synthesised by code written by Claude Code) |
+| Recording shots 1–4, starting/stopping shots 5–9 (driven by a script through tmux), choice of voices | Me |

@@ -26,6 +26,8 @@ from voices import SPEAKER, VOICES  # who speaks each part, and their caption co
 HERE = Path(__file__).parent
 CLIPS = HERE / "clips"
 NARRATION = HERE / "narration"
+MUSIC = HERE / "music" / "outro.wav"  # made by music.py; plays under the last shot, stops as the closing voice starts
+MUSIC_VOLUME = 0.16
 OUT = HERE / "out"
 WORK = OUT / "parts"
 FONT = "/usr/share/fonts/google-noto-vf/NotoSans[wght].ttf"
@@ -49,7 +51,7 @@ SHOTS = [
     {"caption": "Opus reviews the change, then a human decides: m merges, x discards", "speed": 1.5},
     {"caption": "Router fine-tuned with Unsloth: from 52% to 63% balanced accuracy,\nas good as a 9B model that thinks first, ~100× faster",
      "crop": (0, 40, 1152, 648), "trim_end": 3},
-    {"caption": "Everything is documented in the portfolio repo", "crop": (0, 0, 1600, 900)},
+    {"caption": "Everything is documented in the portfolio repo", "crop": (0, 0, 1600, 900), "trim_end": 2.3},
 ]
 
 ENCODE = ["-c:v", "libx264", "-preset", "medium", "-crf", "20", "-pix_fmt", "yuv420p",
@@ -162,6 +164,18 @@ def shot(clip: Path, spec: dict, index: int) -> Path:
     return out
 
 
+def add_music(video: Path, out: Path, start: float, stop: float) -> None:
+    """Mix the outro music under the video from `start` to `stop` (seconds), fading in and out."""
+    length = stop - start
+    music = (f"[1:a]atrim=0:{length:.3f},asetpts=PTS-STARTPTS,afade=t=in:d=1.5,"
+             f"afade=t=out:st={max(0.0, length - 2.0):.3f}:d=2.0,volume={MUSIC_VOLUME},"
+             f"aresample=48000,adelay={int(start * 1000)}:all=1[m]")
+    run(["-i", str(video), "-i", str(MUSIC), "-filter_complex",
+         f"{music};[0:a][m]amix=inputs=2:duration=first:normalize=0[a]",
+         "-map", "0:v", "-map", "[a]", "-c:v", "copy", "-c:a", "aac", "-b:a", "160k",
+         "-movflags", "+faststart", str(out)])
+
+
 def contact_sheet(parts: list[Path]) -> None:
     """One frame from the middle of every part, in a grid: to check captions without watching it all."""
     frames = []
@@ -195,7 +209,15 @@ def main() -> None:
     listing = WORK / "parts.txt"
     listing.write_text("".join(f"file '{p.name}'\n" for p in parts))
     final = OUT / "mission-control-intro.mp4"
-    run(["-f", "concat", "-safe", "0", "-i", str(listing), "-c", "copy", "-movflags", "+faststart", str(final)])
+    joined = WORK / "joined.mp4"
+    run(["-f", "concat", "-safe", "0", "-i", str(listing), "-c", "copy", str(joined)])
+    if MUSIC.is_file():
+        starts = [0.0]
+        for part in parts:
+            starts.append(starts[-1] + duration(part))
+        add_music(joined, final, start=starts[-3], stop=starts[-2] + VOICE_START)  # last shot .. closing voice
+    else:
+        shutil.copy(joined, final)
     contact_sheet(parts)
     print(f"\n{final}  ({duration(final):.0f} s, {final.stat().st_size / 1e6:.1f} MB)")
     print(f"{OUT / 'contact-sheet.png'}")
