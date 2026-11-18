@@ -23,7 +23,7 @@ RATE = 24_000  # Kokoro's sample rate
 FFMPEG = ["ffmpeg"] if shutil.which("ffmpeg") else ["distrobox-host-exec", "ffmpeg"]
 
 # role: (Kokoro voice, language code a = American / b = British, speed)
-NARRATOR = ("am_puck", "a", 1.1)  # the chosen narration voice (voice, language, speed)
+NARRATOR = ("am_puck", "a", 1.0)  # the chosen narration voice (voice, language, speed)
 
 CAST = {
     "narrator": NARRATOR,
@@ -63,8 +63,8 @@ NARRATION = {
 }
 
 # Silence added after each sentence and after a colon (Kokoro's own pauses are short).
-PAUSE_SENTENCE = 0.5
-PAUSE_COLON = 0.3
+PAUSE_SENTENCE = 0.2
+PAUSE_COLON = 0.0
 
 # Only the closing line of the video gets the robot effect.
 ROBOT_LAST_LINE = True

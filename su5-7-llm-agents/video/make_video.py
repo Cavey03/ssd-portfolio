@@ -29,7 +29,7 @@ WORK = OUT / "parts"
 FONT = "/usr/share/fonts/google-noto-vf/NotoSans[wght].ttf"
 W, H, FPS = 1920, 1080, 30
 VOICE_START = 0.4  # seconds of quiet before the narration of each part starts
-VOICE_TAIL = 1.0   # seconds of quiet after it, before the next part
+VOICE_TAIL = 0.7   # seconds of quiet after it, before the next part
 
 TITLE = ("Agentic coding system", "Mission Control · local LLM · Dispatch · fine-tuned router", "626 portfolio · SU5–7")
 END = ("Thanks for watching",
