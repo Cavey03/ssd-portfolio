@@ -1,6 +1,6 @@
 """Speak text with Kokoro-82M, a small open text-to-speech model (Apache 2.0), run locally.
 
-The narration uses four voices (VOICES), one per part of the video (SPEAKER); the closing line gets a robot
+The narration uses three voices (VOICES), one per part of the video (SPEAKER); the closing line gets a robot
 effect, as a "yes, this was AI" ending. CAST holds the voices tried earlier, for samples.
 
   distrobox enter gpu -- ~/.venvs/tts/bin/python voices.py               -> narration/<shot>.wav (the video's voice)
@@ -68,13 +68,12 @@ NARRATION = {
 # The narration voices: one per part of the video, each with its own caption colour (make_video.py uses it).
 # name: (Kokoro voice, language a = American / b = British, speed, caption colour)
 VOICES = {
-    "puck": ("am_puck", "a", 1.0, "0xfff3b0"),   # pale yellow: title, the hub, the repo, closing
-    "nova": ("af_nova", "a", 1.0, "0x8fd8ff"),   # light blue: the local model
-    "onyx": ("am_onyx", "a", 1.0, "0xffb072"),   # orange: Dispatch
-    "lily": ("bf_lily", "b", 1.0, "0x9ff0a8"),   # light green: the fine-tune results
+    "puck": ("am_puck", "a", 1.0, "0xfff3b0"),        # pale yellow: title, the hub, the repo, closing
+    "heart": ("af_heart", "a", 1.0, "0x8fd8ff"),      # light blue: the local model and the fine-tune results
+    "michael": ("am_michael", "a", 1.0, "0xffb072"),  # orange: Dispatch
 }
-SPEAKER = {"title": "puck", "1": "puck", "2": "puck", "3": "nova", "4": "nova", "5": "onyx", "6": "onyx",
-           "7": "onyx", "8": "lily", "9": "puck", "end": "puck"}
+SPEAKER = {"title": "puck", "1": "puck", "2": "puck", "3": "heart", "4": "heart", "5": "michael", "6": "michael",
+           "7": "michael", "8": "heart", "9": "puck", "end": "puck"}
 
 # Silence added after each sentence and after a colon (Kokoro's own pauses are short).
 PAUSE_SENTENCE = 0.2
