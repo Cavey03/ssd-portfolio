@@ -2,14 +2,15 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-
 import json
+from dataclasses import dataclass
 from datetime import datetime
 
 
 @dataclass(frozen=True)
 class InstalledModel:
+    """One model on disk (from Ollama's /api/tags)."""
+
     name: str
     size_bytes: int
     parameter_size: str | None      # details.parameter_size, e.g. "9.0B"
@@ -18,6 +19,8 @@ class InstalledModel:
 
 @dataclass(frozen=True)
 class LoadedModel:
+    """One model loaded in memory (from Ollama's /api/ps)."""
+
     name: str
     size_bytes: int                 # "size"
     vram_bytes: int                 # "size_vram"
@@ -25,14 +28,17 @@ class LoadedModel:
     expires_at: datetime | None     # "expires_at"
 
     @property
-    def gpu_percent(self) -> int:   # round(100 * vram_bytes / size_bytes), or 0 if size_bytes is 0
-        if size_bytes == 0:
+    def gpu_percent(self) -> int:
+        """How much of the model sits in GPU memory; below 100 means part spilled into RAM."""
+        if self.size_bytes == 0:
             return 0
-        return round(100 * vram_bytes / size_bytes)
+        return round(100 * self.vram_bytes / self.size_bytes)
 
 
 @dataclass(frozen=True)
 class GpuInfo:
+    """The GPU's memory use and load (from nvidia-smi)."""
+
     name: str
     memory_used_mb: int
     memory_total_mb: int
@@ -40,6 +46,7 @@ class GpuInfo:
 
 
 def parse_timestamp(value: object) -> datetime | None:
+    """Parse Ollama's timestamps, which have nanoseconds that datetime can't hold."""
     if not isinstance(value, str):
         return None
     if "." in value:
@@ -55,14 +62,21 @@ def parse_timestamp(value: object) -> datetime | None:
         return None
 
 
-def parse_tags(text: str) -> tuple[InstalledModel, ...]:
+def _models_list(text: str) -> list[object]:
+    """Return the "models" list of an Ollama reply; ValueError if the reply isn't shaped like one."""
     try:
         data = json.loads(text)
-    except ValueError:
-        raise ValueError(f"Could not parse tags JSON: {text!r}")
-    models = data.get("models")
+    except ValueError as exc:
+        raise ValueError(f"not JSON: {exc}") from exc
+    models = data.get("models") if isinstance(data, dict) else None
     if not isinstance(models, list):
         raise ValueError("'models' is not a list")
+    return models
+
+
+def parse_tags(text: str) -> tuple[InstalledModel, ...]:
+    """Parse /api/tags: the installed models, sorted by name."""
+    models = _models_list(text)
 
     result: list[InstalledModel] = []
     for entry in models:
@@ -86,13 +100,8 @@ def parse_tags(text: str) -> tuple[InstalledModel, ...]:
 
 
 def parse_ps(text: str) -> tuple[LoadedModel, ...]:
-    try:
-        data = json.loads(text)
-    except ValueError:
-        raise ValueError(f"Could not parse ps JSON: {text!r}")
-    models = data.get("models")
-    if not isinstance(models, list):
-        raise ValueError("'models' is not a list")
+    """Parse /api/ps: the models loaded in memory right now."""
+    models = _models_list(text)
 
     result: list[LoadedModel] = []
     for entry in models:
@@ -119,6 +128,7 @@ def parse_ps(text: str) -> tuple[LoadedModel, ...]:
 
 
 def parse_nvidia_smi(text: str) -> GpuInfo | None:
+    """Parse nvidia-smi's CSV line "name, used MB, total MB, busy %"; None if it doesn't fit."""
     if not text.strip():
         return None
     first_line = text.splitlines()[0].strip()

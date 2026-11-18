@@ -28,8 +28,7 @@ PS_SAMPLE = (
     '"name":"ornith-1.5:9b","size":7682517892,'
     '"size_vram":7682517892,"context_length":65536,'
     '"expires_at":"2026-11-18T13:11:50.080476753+02:00"'
-    '],'
-    ']}'
+    '}]}'
 )
 
 PS_EMPTY = '{"models":[]}'
@@ -55,8 +54,9 @@ class ParseTagsTests(unittest.TestCase):
             parse_tags("not json")
 
     def test_models_not_list_raises(self):
-        with self.assertRaises(ValueError):
-            parse_tags('{"models": 3}')
+        for text in ('{"models": 3}', '[]', '"just a string"'):
+            with self.subTest(text=text), self.assertRaises(ValueError):
+                parse_tags(text)
 
     def test_skips_entry_without_name(self):
         text = (
@@ -64,7 +64,7 @@ class ParseTagsTests(unittest.TestCase):
             '{"name":"ornith-1.5:9b","size":100,'
             '"details":{"parameter_size":"9.0B","quantization_level":"Q4_K_M"}},'
             '{"size":200},'
-            '"notadict"}'
+            '"notadict"'
             ']}'
         )
         models = parse_tags(text)
@@ -82,6 +82,9 @@ class ParsePsTests(unittest.TestCase):
         self.assertEqual(model.vram_bytes, 7682517892)
         self.assertEqual(model.context_length, 65536)
         self.assertEqual(model.gpu_percent, 100)
+        spilled = LoadedModel("x", size_bytes=200, vram_bytes=150, context_length=None, expires_at=None)
+        self.assertEqual(spilled.gpu_percent, 75)
+        self.assertEqual(LoadedModel("x", 0, 0, None, None).gpu_percent, 0)
         self.assertIsNotNone(model.expires_at)
         self.assertEqual(model.expires_at.hour, 13)
         self.assertEqual(model.expires_at.microsecond, 80476)
