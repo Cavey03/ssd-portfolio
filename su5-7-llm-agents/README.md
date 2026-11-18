@@ -13,7 +13,7 @@ The main deliverable is **my system that uses a local LLM for agentic workflows*
 ## Checklist
 | Item | Status | Notes |
 |---|---|---|
-| Document outlining my learning process (from the "Starting points" in *Update for Study Units 5,6,7.pdf*; each model tried and what I learned) | 🟡 | The facts are in `local-llm` and `models/`; needs writing as a learning story |
+| Document outlining my learning process (from the "Starting points" in *Update for Study Units 5,6,7.pdf*; each model tried and what I learned) | 🟡 | Template: [`learning-process.md`](learning-process.md). The facts are in `local-llm` and `models/` |
 | My system which uses a local LLM for agentic workflow(s) (suggested platform: Unsloth) | 🟡 | Ollama + Codex works; still to add a fine-tuned model (Unsloth) and a clear workflow of my own |
 | Documentation: design and development | 🟡 | Decisions and install log exist; needs an architecture/design section |
 | Documentation: intro video | ❌ | |

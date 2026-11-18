@@ -68,7 +68,7 @@ No deliverable. The outcomes are covered in the [SU1 study summary](su1-machine-
 ### SU5–7 – Transfer learning, LLMs, agents → [`su5-7-llm-agents/`](su5-7-llm-agents/)
 | Item | Status | Where |
 |---|---|---|
-| Document outlining my learning process (from the "Starting points", each model tried and what I learned) | 🟡 | facts recorded in [`local-llm`](su5-7-llm-agents/local-llm/README.md) and [`models/`](models/); still to be written up as a learning story |
+| Document outlining my learning process (from the "Starting points", each model tried and what I learned) | 🟡 | template: [`learning-process.md`](su5-7-llm-agents/learning-process.md); facts recorded in [`local-llm`](su5-7-llm-agents/local-llm/README.md) and [`models/`](models/) |
 | My system that uses a local LLM for agentic workflow(s) (suggested: Unsloth) | 🟡 | Ollama + Codex works ([`local-llm`](su5-7-llm-agents/local-llm/README.md)); no fine-tuned model or own workflow yet |
 | System documentation: design and development | 🟡 | decisions and install log exist; no design section yet |
 | System documentation: intro video | ❌ | |
